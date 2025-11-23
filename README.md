@@ -1,10 +1,10 @@
-# SmartCity-Platform (Bài dự thi PMNM 2025)
+# SmartCity-Platform (Bài dự thi Phần Mềm Nguồn Mở 2025)
 
-**Đội:** Haui-HIT-NhoNguoiYeuCu 
+**Đội:** Haui-HIT-H2K
 
 **Trường:** Trường Công Nghệ Thông Tin và Truyền Thông (SICT) - Đại Học Công Nghiệp Hà Nội
 
-[![Documentation](https://img.shields.io/badge/Documentation-View_Site-blue?style=for-the-badge)](https://Haui-HIT-NhoNguoiYeuCu.github.io/SmartCity-Platform/)
+[![Documentation](https://img.shields.io/badge/Documentation-View_Site-blue?style=for-the-badge)](https://Haui-HIT-H2K.github.io/SmartCity-Platform/)
 [![License](https://img.shields.io/badge/License-Apache_2.0-yellow.svg?style=for-the-badge)](./LICENSE)
 
 Bài dự thi Xây dựng ứng dụng thành phố thông minh dựa trên nền tảng dữ liệu mở.
@@ -94,7 +94,7 @@ Hệ thống yêu cầu đã cài đặt Docker và Docker Compose.
 
 **Clone kho mã nguồn:**
 ```bash
-git clone https://github.com/Haui-HIT-NhoNguoiYeuCu/SmartCity-Platform.git
+git clone https://github.com/Haui-HIT-H2K/SmartCity-Platform.git
 ```
 
 **Di chuyển vào thư mục dự án:**
@@ -131,8 +131,8 @@ Tài liệu này chỉ là tổng quan. Toàn bộ mô tả chi tiết về Back
 
 ## 🤝 Đóng góp cho Dự án
 
-* **Báo lỗi ⚠️:** [Tạo một Bug Report](https://github.com/Haui-HIT-NhoNguoiYeuCu/open-linked-hub/issues/new?assignees=&labels=bug&template=bug_report.md&title=%5BBUG%5D)
-* **Yêu cầu tính năng 👩‍💻:** [Đề xuất một tính năng mới](https://github.com/Haui-HIT-NhoNguoiYeuCu/open-linked-hub/issues/new?assignees=&labels=enhancement&template=feature_request.md&title=%5BFEAT%5D)
+* **Báo lỗi ⚠️:** [Tạo một Bug Report](https://github.com/Haui-HIT-H2K/open-linked-hub/issues/new?assignees=&labels=bug&template=bug_report.md&title=%5BBUG%5D)
+* **Yêu cầu tính năng 👩‍💻:** [Đề xuất một tính năng mới](https://github.com/Haui-HIT-H2K/open-linked-hub/issues/new?assignees=&labels=enhancement&template=feature_request.md&title=%5BFEAT%5D)
 
 Nếu bạn muốn đóng góp cho dự án, hãy đọc `CONTRIBUTING.md` để biết thêm chi tiết.
 Mọi đóng góp của các bạn đều được trân trọng, đừng ngần ngại gửi pull request cho dự án.
