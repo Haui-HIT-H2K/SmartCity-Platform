@@ -12,6 +12,13 @@
       />
     </ClientOnly>
 
+    <!-- Top-Right Controls -->
+    <div v-if="!isLoading" class="top-controls">
+      <UIIconButton title="Toggle Theme" @click="toggleTheme">
+        {{ theme === "dark" ? "☀️" : "🌙" }}
+      </UIIconButton>
+    </div>
+
     <!-- Connection Status -->
     <div
       v-if="!isLoading"
@@ -39,6 +46,7 @@ import type { Alert } from "~/types/alerts";
 // State management
 const { activeAlerts } = useAlerts();
 const { connected: wsConnected, connect } = useWebSocket();
+const { theme, toggleTheme } = useTheme();
 
 // UI state
 const isLoading = ref(true);
