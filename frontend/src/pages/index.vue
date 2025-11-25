@@ -1,5 +1,8 @@
 <template>
   <div class="dashboard">
+    <!-- Loading Screen -->
+    <UILoadingScreen v-if="isLoading" />
+
     <!-- Main Map -->
     <ClientOnly>
       <MapAlertMap
