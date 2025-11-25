@@ -1,0 +1,303 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
+
+/* ===== CSS Variables ===== */
+/* Dark Theme (Default) */
+:root,
+[data-theme="dark"] {
+  /* Colors */
+  --color-bg: #0a0e1a;
+  --color-bg-secondary: #151923;
+  --color-surface: rgba(30, 41, 59, 0.8);
+  --color-surface-hover: rgba(51, 65, 85, 0.9);
+  --color-border: rgba(148, 163, 184, 0.2);
+
+  --color-primary: #3b82f6;
+  --color-primary-light: #60a5fa;
+  --color-primary-dark: #2563eb;
+
+  --color-fire: #ef4444;
+  --color-traffic: #f59e0b;
+  --color-aqi: #8b5cf6;
+  --color-success: #10b981;
+
+  --color-text: #f1f5f9;
+  --color-text-secondary: #cbd5e1;
+  --color-text-muted: #94a3b8;
+
+  /* Spacing */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.6),
+    0 4px 6px -2px rgba(0, 0, 0, 0.4);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.7),
+    0 10px 10px -5px rgba(0, 0, 0, 0.4);
+
+  /* Border Radius */
+  --radius-sm: 0.375rem;
+  --radius: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+
+  /* Transitions */
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 400ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Light Theme */
+[data-theme="light"] {
+  /* Colors */
+  --color-bg: #ffffff;
+  --color-bg-secondary: #f8fafc;
+  --color-surface: rgba(255, 255, 255, 0.9);
+  --color-surface-hover: rgba(241, 245, 249, 0.95);
+  --color-border: rgba(148, 163, 184, 0.3);
+
+  --color-primary: #3b82f6;
+  --color-primary-light: #2563eb;
+  --color-primary-dark: #1d4ed8;
+
+  --color-fire: #dc2626;
+  --color-traffic: #ea580c;
+  --color-aqi: #7c3aed;
+  --color-success: #059669;
+
+  --color-text: #0f172a;
+  --color-text-secondary: #475569;
+  --color-text-muted: #64748b;
+
+  /* Shadows (lighter for light theme) */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* ===== Base Styles ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  background: var(--color-bg);
+  color: var(--color-text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#__nuxt {
+  width: 100%;
+  height: 100%;
+}
+
+/* ===== Typography ===== */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+h1 {
+  font-size: 2rem;
+}
+
+h2 {
+  font-size: 1.5rem;
+}
+
+h3 {
+  font-size: 1.25rem;
+}
+
+h4 {
+  font-size: 1.125rem;
+}
+
+h5 {
+  font-size: 1rem;
+}
+
+h6 {
+  font-size: 0.875rem;
+}
+
+p {
+  line-height: 1.6;
+}
+
+/* ===== Utility Classes ===== */
+.glassmorphism {
+  background: var(--color-surface);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--color-border);
+}
+
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* ===== Animations ===== */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes ping {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  75%,
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn var(--transition) ease-out;
+}
+
+.animate-slideInRight {
+  animation: slideInRight var(--transition-slow) cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.animate-slideInUp {
+  animation: slideInUp var(--transition) ease-out;
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* ===== Scrollbar Styles ===== */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-surface);
+  border-radius: var(--radius);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-surface-hover);
+}
+
+/* ===== Leaflet Override Styles ===== */
+.leaflet-container {
+  font-family: "Inter", sans-serif;
+  background: var(--color-bg);
+}
+
+.leaflet-popup-content-wrapper {
+  background: var(--color-surface);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  color: var(--color-text);
+  box-shadow: var(--shadow-xl);
+}
+
+.leaflet-popup-tip {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+}
+
+.leaflet-control-zoom a {
+  background: var(--color-surface) !important;
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--color-border) !important;
+  color: var(--color-text) !important;
+}
+
+.leaflet-control-zoom a:hover {
+  background: var(--color-surface-hover) !important;
+}
+
+.leaflet-control-attribution {
+  background: var(--color-surface) !important;
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--color-border) !important;
+  color: var(--color-text-muted) !important;
+}
+
+.leaflet-control-attribution a {
+  color: var(--color-primary-light) !important;
+}
