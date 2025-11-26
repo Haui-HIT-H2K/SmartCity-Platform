@@ -53,6 +53,16 @@
       @close="showRecentPanel = false"
       @alert-click="handleRecentAlertClick"
     />
+
+    <!-- Toast Notifications -->
+    <div class="toast-container">
+      <UIToastNotification
+        v-for="toast in toastNotifications"
+        :key="toast.id"
+        :alert="toast"
+        @close="removeToast(toast.id)"
+      />
+    </div>
   </div>
 </template>
 
@@ -88,6 +98,26 @@ const filteredAlerts = computed(() => {
     return alertTime >= cutoffTime;
   });
 });
+
+// Toast notifications
+const toastNotifications = ref<Alert[]>([]);
+const MAX_TOASTS = 3;
+
+const addToast = (alert: Alert) => {
+  // Add to beginning of array
+  toastNotifications.value.unshift(alert);
+
+  // Keep only max 3 toasts
+  if (toastNotifications.value.length > MAX_TOASTS) {
+    toastNotifications.value = toastNotifications.value.slice(0, MAX_TOASTS);
+  }
+};
+
+const removeToast = (id: string) => {
+  toastNotifications.value = toastNotifications.value.filter(
+    (t) => t.id !== id
+  );
+};
 
 // Handle map marker clicks
 const handleAlertClick = (alert: Alert) => {
