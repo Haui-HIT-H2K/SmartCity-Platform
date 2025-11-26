@@ -17,6 +17,14 @@
       <UIIconButton title="Toggle Theme" @click="toggleTheme">
         {{ theme === "dark" ? "☀️" : "🌙" }}
       </UIIconButton>
+
+      <UIIconButton
+        title="Recent Alerts"
+        :has-notification="recentAlerts.length > 0"
+        @click="showRecentPanel = true"
+      >
+        🔔
+      </UIIconButton>
     </div>
 
     <!-- Connection Status -->
@@ -37,6 +45,14 @@
       :alert="selectedAlert"
       @close="showAlertModal = false"
     />
+
+    <!-- Recent panel -->
+    <AlertsRecentPanel
+      :is-open="showRecentPanel"
+      :alerts="recentAlerts"
+      @close="showRecentPanel = false"
+      @alert-click="handleRecentAlertClick"
+    />
   </div>
 </template>
 
@@ -44,13 +60,14 @@
 import type { Alert } from "~/types/alerts";
 
 // State management
-const { activeAlerts } = useAlerts();
-const { connected: wsConnected, connect } = useWebSocket();
+const { activeAlerts, recentAlerts, addAlert, removeAlert } = useAlerts();
+const { connected: wsConnected, connect, onMessage } = useWebSocket();
 const { theme, toggleTheme } = useTheme();
 
 // UI state
 const isLoading = ref(true);
 const showAlertModal = ref(false);
+const showRecentPanel = ref(false);
 const selectedAlert = ref<Alert | null>(null);
 const mapRef = ref<any>(null);
 
@@ -76,6 +93,38 @@ const filteredAlerts = computed(() => {
 const handleAlertClick = (alert: Alert) => {
   selectedAlert.value = alert;
   showAlertModal.value = true;
+};
+
+// Handle recent alert list clicks
+const handleRecentAlertClick = (alert: Alert) => {
+  // Pan map to alert location
+  if (mapRef.value) {
+    mapRef.value.panToAlert(alert);
+  }
+  // Show alert details
+  selectedAlert.value = alert;
+  showAlertModal.value = true;
+};
+
+// WebSocket message handler
+onMessage.value = (message: WebSocketMessage) => {
+  switch (message.type) {
+    case "alert":
+      const alert = message.data as Alert;
+      addAlert(alert);
+      // Show toast notification for new alert
+      if (!isLoading.value) {
+        addToast(alert);
+      }
+      break;
+    case "alert_resolved":
+      const resolvedData = message.data as { id: string };
+      removeAlert(resolvedData.id);
+      break;
+    case "metrics":
+      updateMetrics(message.data as any);
+      break;
+  }
 };
 
 // Connect to WebSocket on mount
