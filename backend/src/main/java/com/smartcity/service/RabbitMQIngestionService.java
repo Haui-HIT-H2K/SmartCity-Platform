@@ -1,12 +1,14 @@
 package com.smartcity.service;
 
+import com.smartcity.config.EdgeNodeConfig;
 import com.smartcity.model.CityData;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import pika.PlainCredentials;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,17 +17,13 @@ import java.util.List;
  * RabbitMQ Ingestion Service
  * Service chủ động PULL dữ liệu từ RabbitMQ theo batch
  * 
- * Cơ chế:
- * - Mỗi 10 giây, kéo dữ liệu từ cả 2 edge nodes
- * - Lấy 1 batch lớn (1000-5000 messages)
- * - Không dùng Listener thụ động
+ * Sử dụng EdgeNodeRegistry để quản lý danh sách Edge Storage động
  */
 @Slf4j
 @Service
 public class RabbitMQIngestionService {
 
-    private final RabbitTemplate edge1RabbitTemplate;
-    private final RabbitTemplate edge2RabbitTemplate;
+    private final EdgeNodeRegistry edgeNodeRegistry;
     private final DataRoutingService dataRoutingService;
     
     @Value("${ingestion.batch.size}")
@@ -35,17 +33,15 @@ public class RabbitMQIngestionService {
     private int maxBatchSize;
 
     public RabbitMQIngestionService(
-            @Qualifier("edge1RabbitTemplate") RabbitTemplate edge1RabbitTemplate,
-            @Qualifier("edge2RabbitTemplate") RabbitTemplate edge2RabbitTemplate,
+            EdgeNodeRegistry edgeNodeRegistry,
             DataRoutingService dataRoutingService) {
-        this.edge1RabbitTemplate = edge1RabbitTemplate;
-        this.edge2RabbitTemplate = edge2RabbitTemplate;
+        this.edgeNodeRegistry = edgeNodeRegistry;
         this.dataRoutingService = dataRoutingService;
     }
 
     /**
      * Scheduled Task - Chạy mỗi 10 giây
-     * Kéo dữ liệu từ cả 2 edge nodes
+     * Kéo dữ liệu từ tất cả Edge Nodes có trong Registry
      */
     @Scheduled(fixedRateString = "${ingestion.schedule.fixed-rate}", 
                initialDelayString = "${ingestion.schedule.initial-delay}")
@@ -55,20 +51,40 @@ public class RabbitMQIngestionService {
         log.info("========================================");
         
         try {
-            // Pull từ Edge Node 1
-            List<CityData> edge1Data = pullBatchFromEdge(edge1RabbitTemplate, "Edge-1");
+            // Lấy danh sách Edge Nodes từ Registry (DNS Resolution)
+            List<EdgeNodeConfig.EdgeNode> availableNodes = edgeNodeRegistry.getAvailableNodes();
             
-            // Pull từ Edge Node 2
-            List<CityData> edge2Data = pullBatchFromEdge(edge2RabbitTemplate, "Edge-2");
+            if (availableNodes.isEmpty()) {
+                log.warn("No available edge nodes found in registry");
+                return;
+            }
             
-            // Tổng hợp dữ liệu
+            log.info("DNS Resolved: Found {} Edge Storage(s)", availableNodes.size());
+            
+            // Collect tất cả dữ liệu từ các nodes
             List<CityData> allData = new ArrayList<>();
-            allData.addAll(edge1Data);
-            allData.addAll(edge2Data);
             
-            int totalReceived = allData.size();
-            log.info("Total messages received: {} (Edge-1: {}, Edge-2: {})", 
-                    totalReceived, edge1Data.size(), edge2Data.size());
+            // Loop qua từng Edge Node
+            for (EdgeNodeConfig.EdgeNode node : availableNodes) {
+                try {
+                    log.info("Pulling batch from [{}] ({}:{})", 
+                            node.getName(), node.getHost(), node.getPort());
+                    
+                    List<CityData> nodeData = pullBatchFromEdge(node);
+                    allData.addAll(nodeData);
+                    
+                    log.info("  → Received {} messages from [{}]", 
+                            nodeData.size(), node.getName());
+                    
+                } catch (Exception e) {
+                    // Resilience: Nếu một node fail, tiếp tục với node khác
+                    log.error("Failed to pull from [{}]: {}", node.getName(), e.getMessage());
+                    log.debug("Continuing with other nodes...");
+                }
+            }
+            
+            // Tổng hợp
+            log.info("Total messages received from all nodes: {}", allData.size());
             
             // Route và lưu trữ dữ liệu
             if (!allData.isEmpty()) {
@@ -90,17 +106,25 @@ public class RabbitMQIngestionService {
     /**
      * Pull một batch dữ liệu từ một edge node
      * 
-     * @param rabbitTemplate RabbitTemplate của edge node
-     * @param edgeName Tên edge node (để log)
+     * @param node Edge Node configuration
      * @return List các CityData đã nhận được
      */
-    private List<CityData> pullBatchFromEdge(RabbitTemplate rabbitTemplate, String edgeName) {
+    private List<CityData> pullBatchFromEdge(EdgeNodeConfig.EdgeNode node) {
         List<CityData> batchData = new ArrayList<>();
         
-        log.info("Pulling batch from {}, target size: {}, max: {}", 
-                edgeName, batchSize, maxBatchSize);
+        RabbitTemplate rabbitTemplate = null;
+        CachingConnectionFactory connectionFactory = null;
         
         try {
+            // Tạo connection động dựa vào node config
+            connectionFactory = createConnectionFactory(node);
+            rabbitTemplate = new RabbitTemplate(connectionFactory);
+            
+            // Set default queue
+            String queueName = node.getQueueName() != null ? 
+                    node.getQueueName() : "city-data-queue";
+            rabbitTemplate.setDefaultReceiveQueue(queueName);
+            
             int receivedCount = 0;
             
             // Loop để lấy messages cho đến khi:
@@ -111,7 +135,8 @@ public class RabbitMQIngestionService {
                 
                 if (message == null) {
                     // Queue đã rỗng
-                    log.debug("{} - Queue empty after {} messages", edgeName, receivedCount);
+                    log.debug("[{}] - Queue empty after {} messages", 
+                            node.getName(), receivedCount);
                     break;
                 }
                 
@@ -122,28 +147,51 @@ public class RabbitMQIngestionService {
                     
                     // Log mỗi 100 messages
                     if (receivedCount % 100 == 0) {
-                        log.debug("{} - Received {} messages...", edgeName, receivedCount);
+                        log.debug("[{}] - Received {} messages...", 
+                                node.getName(), receivedCount);
                     }
                 } else {
-                    log.warn("{} - Received unknown message type: {}", 
-                            edgeName, message.getClass().getName());
+                    log.warn("[{}] - Received unknown message type: {}", 
+                            node.getName(), message.getClass().getName());
                 }
                 
-                // Đạt batch size mong muốn? Có thể dừng (hoặc tiếp tục đến max)
+                // Đạt batch size mong muốn
                 if (receivedCount >= batchSize) {
-                    log.debug("{} - Reached target batch size: {}", edgeName, batchSize);
-                    // Có thể break ở đây, hoặc tiếp tục đến maxBatchSize
+                    log.debug("[{}] - Reached target batch size: {}", 
+                            node.getName(), batchSize);
+                    // Có thể break hoặc tiếp tục đến maxBatchSize
                 }
             }
             
-            log.info("{} - Successfully pulled {} messages", edgeName, receivedCount);
-            
         } catch (Exception e) {
-            log.error("{} - Error pulling batch: {}", edgeName, e.getMessage(), e);
-            // Không throw exception - cho phép edge khác tiếp tục
+            log.error("[{}] - Error pulling batch: {}", node.getName(), e.getMessage());
+            throw new RuntimeException("Failed to pull from " + node.getName(), e);
+            
+        } finally {
+            // Đóng connection
+            if (connectionFactory != null) {
+                connectionFactory.destroy();
+            }
         }
         
         return batchData;
+    }
+
+    /**
+     * Tạo RabbitMQ ConnectionFactory động từ node config
+     */
+    private CachingConnectionFactory createConnectionFactory(EdgeNodeConfig.EdgeNode node) {
+        CachingConnectionFactory factory = new CachingConnectionFactory();
+        factory.setHost(node.getHost());
+        factory.setPort(node.getPort());
+        
+        // Use credentials từ node, hoặc default
+        if (node.getUsername() != null && node.getPassword() != null) {
+            factory.setUsername(node.getUsername());
+            factory.setPassword(node.getPassword());
+        }
+        
+        return factory;
     }
 
     /**
