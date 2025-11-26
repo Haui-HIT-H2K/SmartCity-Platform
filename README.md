@@ -110,7 +110,7 @@ docker-compose up -d --build
 
 ## 🌐 Xem Giao diện Web (Ví dụ)
 
-- **Giao diện GreenX (Demo):** http://localhost:3000 (Hoặc cổng bạn cấu hình)  
+- **Giao diện GreenX (Demo):** http://localhost:3000
 - **Orion-LD (Lớp Nóng API):** http://localhost:1026/ngsi-ld/v1/entities  
 - **MinIO (Lớp Lạnh):** http://localhost:9001  
 - **NATS Monitor (Lớp Đệm):** http://localhost:8222  
@@ -124,7 +124,7 @@ docker-compose down
 
 Tài liệu này chỉ là tổng quan. Toàn bộ mô tả chi tiết về Backend, Infrastructure, API, và hướng dẫn sử dụng đều có tại trang Docusaurus của dự án.
 
-➡️ **Xem tài liệu đầy đủ tại đây:** https://Haui-HIT-NhoNguoiYeuCu.github.io/SmartCity-Platform/
+➡️ **Xem tài liệu đầy đủ tại đây:** https://Haui-HIT-H2K.github.io/SmartCity-Platform/
 
 
 

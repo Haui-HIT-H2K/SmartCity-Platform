@@ -1,0 +1,192 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: smart-city-core-backend
+
+  # Active profile: 'docker' hoặc 'local'
+  # - docker: Backend chạy trong Docker container (cùng network với services)
+  # - local: Backend chạy ngoài Docker (development mode)
+  profiles:
+    active: local
+
+  # Data Configuration (Redis + MongoDB)
+  data:
+    # Redis Configuration (Hot Storage)
+    redis:
+      host: core-redis-hot
+      port: 6379
+      timeout: 3000ms
+      lettuce:
+        pool:
+          max-active: 20
+          max-idle: 10
+          min-idle: 5
+          max-wait: 2000ms
+    
+    # MongoDB Primary Configuration (Warm Storage)
+    mongodb:
+      host: core-mongo-warm
+      port: 27017
+      database: warm_db
+      username: admin
+      password: password123
+      authentication-database: admin
+      auto-index-creation: true
+
+  # RabbitMQ Configuration (Default Edge 1)
+  rabbitmq:
+    host: rabbit-edge-1
+    port: 5672
+    username: edge_user
+    password: edge_pass
+    virtual-host: /
+    listener:
+      simple:
+        acknowledge-mode: manual
+        prefetch: 1000
+        concurrency: 5
+        max-concurrency: 10
+
+# Custom MongoDB Configuration for Multi-Datasource
+mongodb:
+  warm:
+    host: core-mongo-warm
+    port: 27017
+    database: warm_db
+    username: admin
+    password: password123
+    authentication-database: admin
+    
+  cold:
+    host: core-mongo-cold
+    port: 27017
+    database: cold_db
+    username: admin
+    password: password123
+    authentication-database: admin
+
+# Custom RabbitMQ Edge Nodes Configuration
+rabbitmq:
+  edge1:
+    host: rabbit-edge-1
+    port: 5672
+    username: edge_user
+    password: edge_pass
+    virtual-host: /
+    queue-name: city-data-queue-1
+    
+  edge2:
+    host: rabbit-edge-2
+    port: 5672
+    username: edge_user
+    password: edge_pass
+    virtual-host: /
+    queue-name: city-data-queue-2
+
+# Data Ingestion Configuration
+ingestion:
+  # Batch pull configuration
+  batch:
+    size: 1000                 # Số lượng message mỗi batch
+    max-size: 5000            # Số lượng message tối đa mỗi batch
+    
+  # Scheduling configuration
+  schedule:
+    fixed-rate: 10000         # 10 giây (milliseconds)
+    initial-delay: 5000       # Delay 5 giây khi khởi động
+
+# Redis TTL Configuration
+redis:
+  hot-data:
+    ttl: 3600                 # TTL = 1 giờ (seconds)
+
+---
+# ============================================================
+# PROFILE: DOCKER
+# Khi backend chạy TRONG Docker container (cùng network)
+# ============================================================
+spring:
+  config:
+    activate:
+      on-profile: docker
+  
+  data:
+    redis:
+      host: core-redis-hot
+      port: 6379
+    mongodb:
+      host: core-mongo-warm
+      port: 27017
+
+# Override connections để sử dụng container hostnames
+mongodb:
+  warm:
+    host: core-mongo-warm
+    port: 27017
+    
+  cold:
+    host: core-mongo-cold
+    port: 27017
+
+rabbitmq:
+  edge1:
+    host: rabbit-edge-1
+    port: 5672
+    
+  edge2:
+    host: rabbit-edge-2
+    port: 5672
+
+---
+# ============================================================
+# PROFILE: LOCAL
+# Khi backend chạy NGOÀI Docker (local development)
+# ============================================================
+spring:
+  config:
+    activate:
+      on-profile: local
+  
+  data:
+    redis:
+      host: localhost
+      port: 6379
+    mongodb:
+      host: localhost
+      port: 27018
+
+# Override connections để sử dụng localhost với port mapping
+mongodb:
+  warm:
+    host: localhost
+    port: 27018              # Mapped port cho warm storage
+    
+  cold:
+    host: localhost
+    port: 27019              # Mapped port cho cold storage
+
+rabbitmq:
+  edge1:
+    host: localhost
+    port: 5672               # Mapped port cho edge-1
+    
+  edge2:
+    host: localhost
+    port: 5673               # Mapped port cho edge-2
+
+# Logging Configuration
+logging:
+  level:
+    root: INFO
+    com.smartcity: DEBUG
+    org.springframework.data.mongodb: DEBUG
+    org.springframework.amqp: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: logs/smart-city-backend.log
+    max-size: 10MB
+    max-history: 30
