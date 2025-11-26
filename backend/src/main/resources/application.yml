@@ -102,6 +102,29 @@ redis:
   hot-data:
     ttl: 3600                 # TTL = 1 giờ (seconds)
 
+# ============================================================
+# EDGE NODE REGISTRY (DNS-like Configuration)
+# Quản lý danh sách Edge Storage động
+# ============================================================
+app:
+  edge:
+    nodes:
+      - name: "Subnet-CauGiay"
+        host: "rabbit-edge-1"
+        port: 5672
+        queue-name: "city-data-queue-1"
+        username: "edge_user"
+        password: "edge_pass"
+        enabled: true
+        
+      - name: "Subnet-ThanhXuan"
+        host: "rabbit-edge-2"
+        port: 5672
+        queue-name: "city-data-queue-2"
+        username: "edge_user"
+        password: "edge_pass"
+        enabled: true
+
 ---
 # ============================================================
 # PROFILE: DOCKER
