@@ -1,6 +1,6 @@
-# SmartCity-Platform (Bài dự thi PMNM 2025)
+# SmartCity-Platform (Bài dự thi Phần Mềm Nguồn Mở 2025)
 
-**Đội:** Haui-HIT-H2K  
+**Đội:** Haui-HIT-H2K
 
 **Trường:** Trường Công Nghệ Thông Tin và Truyền Thông (SICT) - Đại Học Công Nghiệp Hà Nội
 
