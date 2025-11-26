@@ -3,6 +3,11 @@
     <!-- Loading Screen -->
     <UILoadingScreen v-if="isLoading" />
 
+    <!-- Time Filter -->
+    <div v-if="!isLoading" class="time-filter-container">
+      <UITimeFilter v-model="selectedTimeFilter" />
+    </div>
+
     <!-- Main Map -->
     <ClientOnly>
       <MapAlertMap
