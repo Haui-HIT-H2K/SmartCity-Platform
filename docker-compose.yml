@@ -1,0 +1,107 @@
+version: '3.8'
+
+services:
+  # =======================================================
+  # VÙNG BIÊN (EDGE STORAGE LAYER) - RABBITMQ
+  # Nơi hứng 40 triệu request đầu tiên
+  # =======================================================
+  
+  # Subnet 1: Giả lập Edge Node khu vực A
+  edge-subnet-1:
+    image: rabbitmq:3-management-alpine
+    container_name: rabbit-edge-1
+    hostname: rabbit-edge-1
+    restart: always
+    ports:
+      - "5672:5672"   # Port nhận data từ sensor (Python sim)
+      - "15672:15672" # GUI quản lý
+    environment:
+      RABBITMQ_DEFAULT_USER: edge_user
+      RABBITMQ_DEFAULT_PASS: edge_pass
+    networks:
+      - h2k-network
+
+  # Subnet 2: Giả lập Edge Node khu vực B
+  edge-subnet-2:
+    image: rabbitmq:3-management-alpine
+    container_name: rabbit-edge-2
+    hostname: rabbit-edge-2
+    restart: always
+    ports:
+      - "5673:5672"   # Map ra port khác để máy host phân biệt
+      - "15673:15672" # GUI quản lý
+    environment:
+      RABBITMQ_DEFAULT_USER: edge_user
+      RABBITMQ_DEFAULT_PASS: edge_pass
+    networks:
+      - h2k-network
+
+  # =======================================================
+  # VÙNG LÕI (CORE PLATFORM) - LƯU TRỮ TRUNG TÂM
+  # Nơi lưu data sau khi đã xử lý/phân loại
+  # =======================================================
+
+  # 1. HOT STORAGE (Redis In-Memory)
+  core-redis-hot:
+    image: redis:alpine
+    container_name: core-redis-hot
+    restart: always
+    command: redis-server --save "" --appendonly no --maxmemory 512mb --maxmemory-policy allkeys-lru
+    ports:
+      - "6379:6379"
+    networks:
+      - h2k-network
+
+  # 2. WARM STORAGE (MongoDB)
+  core-mongo-warm:
+    image: mongo:7.0
+    container_name: core-mongo-warm
+    restart: always
+    # XÓA DÒNG command: ["mongod", "--nojournal"] ĐI
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password123
+      MONGO_INITDB_DATABASE: warm_db
+    ports:
+      - "27018:27017"
+    volumes:
+      - ./data/warm:/data/db
+    networks:
+      - h2k-network
+
+  # 3. COLD STORAGE (MongoDB)
+  core-mongo-cold:
+    image: mongo:7.0
+    container_name: core-mongo-cold
+    restart: always
+    # XÓA DÒNG command: ["mongod", "--nojournal"] ĐI
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password123
+      MONGO_INITDB_DATABASE: cold_db
+    ports:
+      - "27019:27017"
+    volumes:
+      - ./data/cold:/data/db
+    networks:
+      - h2k-network
+
+  # =======================================================
+  # CÔNG CỤ QUẢN TRỊ (VISUALIZATION)
+  # =======================================================
+  mongo-express:
+    image: mongo-express
+    container_name: core-ui
+    restart: always
+    ports:
+      - "8081:8081"
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: admin
+      ME_CONFIG_MONGODB_ADMINPASSWORD: password123
+      ME_CONFIG_MONGODB_SERVER: core-mongo-warm,core-mongo-cold
+    networks:
+      - h2k-network
+
+networks:
+  h2k-network:
+    driver: bridge
