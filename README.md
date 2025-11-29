@@ -141,7 +141,7 @@ Mọi đóng góp của các bạn đều được trân trọng, đừng ngần
 
 ## Contributors
 <a href="https://github.com/Tên-User-Của-Anh/Tên-Repo-Của-Anh/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=Tên-User-Của-Anh/Tên-Repo-Của-Anh" />
+  <img src="https://contrib.rocks/image?repo=/Haui-HIT-H2K/SmartCity-Platform" />
 </a>
 
 ## 📞 Liên hệ
