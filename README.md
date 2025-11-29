@@ -139,6 +139,11 @@ Mọi đóng góp của các bạn đều được trân trọng, đừng ngần
 
 ---
 
+## Contributors
+<a href="https://github.com/Tên-User-Của-Anh/Tên-Repo-Của-Anh/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=Tên-User-Của-Anh/Tên-Repo-Của-Anh" />
+</a>
+
 ## 📞 Liên hệ
 
 * **Nguyễn Huy Hoàng:** nguyenhuyhoangpt0402@gmail.com
