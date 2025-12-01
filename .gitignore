@@ -115,9 +115,9 @@ venv.bak/
 *.safetensors
 
 # Model directories
-ml-service/models/
+# ml-service/models/ - COMMENTED: Allow ml-service/app/models/*.pkl to be committed
 consumer-worker/models/
-models/
+# models/ - COMMENTED: Too broad, blocks ml-service/app/models/*.pkl exception
 checkpoints/
 weights/
 

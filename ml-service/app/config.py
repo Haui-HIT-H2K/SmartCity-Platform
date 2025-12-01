@@ -3,7 +3,7 @@ import os
 from pathlib import Path
 
 # Base paths
-BASE_DIR = Path(__file__).parent.parent
+BASE_DIR = Path(__file__).parent  # Changed from parent.parent to work in Docker
 MODELS_DIR = BASE_DIR / "models"
 
 # Model files
