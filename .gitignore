@@ -1,4 +1,4 @@
-# ============================================================
+﻿# ============================================================
 # JAVA (existing backend)
 # ============================================================
 
@@ -100,6 +100,8 @@ venv.bak/
 
 # Model files - ALL will be stored in MLflow
 *.pkl
+# EXCEPTION: Allow trained ML service models to be committed for easy deployment
+!ml-service/app/models/*.pkl
 *.pickle
 *.h5
 *.hdf5
