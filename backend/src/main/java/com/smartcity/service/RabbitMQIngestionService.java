@@ -1,16 +1,19 @@
 package com.smartcity.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.smartcity.config.EdgeNodeConfig;
 import com.smartcity.model.CityData;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * RabbitMQ Ingestion Service
@@ -24,6 +27,8 @@ public class RabbitMQIngestionService {
 
     private final EdgeNodeRegistry edgeNodeRegistry;
     private final DataRoutingService dataRoutingService;
+    private final MessageConverter messageConverter;
+    private final ObjectMapper objectMapper;
     
     @Value("${ingestion.batch.size}")
     private int batchSize;
@@ -33,9 +38,13 @@ public class RabbitMQIngestionService {
 
     public RabbitMQIngestionService(
             EdgeNodeRegistry edgeNodeRegistry,
-            DataRoutingService dataRoutingService) {
+            DataRoutingService dataRoutingService,
+            MessageConverter messageConverter,
+            ObjectMapper objectMapper) {
         this.edgeNodeRegistry = edgeNodeRegistry;
         this.dataRoutingService = dataRoutingService;
+        this.messageConverter = messageConverter;
+        this.objectMapper = objectMapper;
     }
 
     /**
@@ -119,6 +128,9 @@ public class RabbitMQIngestionService {
             connectionFactory = createConnectionFactory(node);
             rabbitTemplate = new RabbitTemplate(connectionFactory);
             
+            // Set MessageConverter để deserialize JSON
+            rabbitTemplate.setMessageConverter(messageConverter);
+            
             // Set default queue
             String queueName = node.getQueueName() != null ? 
                     node.getQueueName() : "city-data-queue";
@@ -140,8 +152,24 @@ public class RabbitMQIngestionService {
                 }
                 
                 // Convert message to CityData
+                CityData cityData = null;
                 if (message instanceof CityData) {
-                    batchData.add((CityData) message);
+                    cityData = (CityData) message;
+                } else if (message instanceof Map) {
+                    // LinkedHashMap from JSON deserialization
+                    try {
+                        cityData = objectMapper.convertValue(message, CityData.class);
+                    } catch (Exception e) {
+                        log.error("[{}] - Error converting Map to CityData: {}", 
+                                node.getName(), e.getMessage());
+                    }
+                } else {
+                    log.warn("[{}] - Received unknown message type: {}", 
+                            node.getName(), message.getClass().getName());
+                }
+                
+                if (cityData != null) {
+                    batchData.add(cityData);
                     receivedCount++;
                     
                     // Log mỗi 100 messages
@@ -149,9 +177,6 @@ public class RabbitMQIngestionService {
                         log.debug("[{}] - Received {} messages...", 
                                 node.getName(), receivedCount);
                     }
-                } else {
-                    log.warn("[{}] - Received unknown message type: {}", 
-                            node.getName(), message.getClass().getName());
                 }
                 
                 // Đạt batch size mong muốn

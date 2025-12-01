@@ -1,0 +1,10 @@
+# Simplified Dockerfile for quick testing
+FROM maven:3.9-eclipse-temurin-17
+
+WORKDIR /app
+
+# Copy everything
+COPY . .
+
+# Build and run in one stage
+CMD ["sh", "-c", "mvn clean package -DskipTests && java -jar target/*.jar"]
