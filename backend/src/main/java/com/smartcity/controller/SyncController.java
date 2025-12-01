@@ -3,9 +3,10 @@ package com.smartcity.controller;
 import com.smartcity.service.RabbitMQIngestionService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -18,6 +19,7 @@ import java.util.Map;
 @Slf4j
 @RestController
 @RequestMapping("/api/sync")
+@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:3001"}, allowCredentials = "true")
 public class SyncController {
 
     private final RabbitMQIngestionService ingestionService;
@@ -27,14 +29,14 @@ public class SyncController {
     }
 
     /**
-     * API: GET /api/sync/trigger
+     * API: POST /api/sync/trigger
      * Kích hoạt thủ công việc kéo dữ liệu từ RabbitMQ
      * 
      * Mục đích: Demo, testing, hoặc manual sync khi cần
      * 
      * @return Response với status và timestamp
      */
-    @GetMapping("/trigger")
+    @PostMapping("/trigger")
     public ResponseEntity<Map<String, Object>> triggerManualSync() {
         log.info("========================================");
         log.info("Received manual trigger request");

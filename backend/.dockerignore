@@ -1,0 +1,13 @@
+# Backend Docker ignore file
+target/
+.idea/
+.settings/
+.vscode/
+*.iml
+*.log
+logs/
+.DS_Store
+.git/
+.gitignore
+*.md
+README.md

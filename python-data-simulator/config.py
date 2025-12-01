@@ -10,12 +10,12 @@ Giả lập 40 triệu requests tới RabbitMQ
 # Edge Node 1 (localhost:5672)
 EDGE1_HOST = "localhost"
 EDGE1_PORT = 5672
-EDGE1_QUEUE = "sensor_queue_1"
+EDGE1_QUEUE = "city-data-queue-1"
 
 # Edge Node 2 (localhost:5673)
 EDGE2_HOST = "localhost"
 EDGE2_PORT = 5673
-EDGE2_QUEUE = "sensor_queue_2"
+EDGE2_QUEUE = "city-data-queue-2"
 
 # Credentials
 RABBITMQ_USER = "edge_user"

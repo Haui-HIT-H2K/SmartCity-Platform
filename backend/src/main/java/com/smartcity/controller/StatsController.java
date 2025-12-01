@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -22,6 +23,7 @@ import java.util.Set;
 @Slf4j
 @RestController
 @RequestMapping("/api/stats")
+@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:3001"}, allowCredentials = "true")
 public class StatsController {
 
     private final MongoTemplate warmMongoTemplate;
@@ -40,14 +42,13 @@ public class StatsController {
     /**
      * API: GET /api/stats
      * Trả về thống kê số lượng bản ghi trong các storage tiers
+     * Response format khớp với frontend SystemStats interface
      * 
      * @return Response với số liệu thống kê
      */
     @GetMapping
     public ResponseEntity<Map<String, Object>> getSystemStats() {
         log.info("Fetching system statistics");
-        
-        Map<String, Object> stats = new HashMap<>();
         
         try {
             // 1. Thống kê Redis (HOT data)
@@ -66,28 +67,14 @@ public class StatsController {
             // Tổng hợp
             long totalCount = redisCount + warmCount + coldCount;
             
-            // Build response
-            Map<String, Object> storageStats = new HashMap<>();
-            storageStats.put("redis_hot", redisCount);
-            storageStats.put("mongodb_warm", warmCount);
-            storageStats.put("mongodb_cold", coldCount);
-            storageStats.put("total", totalCount);
-            
-            stats.put("status", "success");
-            stats.put("timestamp", LocalDateTime.now().toString());
-            stats.put("storage", storageStats);
-            
-            // Thêm thông tin phần trăm
-            Map<String, String> distribution = new HashMap<>();
-            if (totalCount > 0) {
-                distribution.put("hot_percentage", 
-                        String.format("%.2f%%", (redisCount * 100.0 / totalCount)));
-                distribution.put("warm_percentage", 
-                        String.format("%.2f%%", (warmCount * 100.0 / totalCount)));
-                distribution.put("cold_percentage", 
-                        String.format("%.2f%%", (coldCount * 100.0 / totalCount)));
-            }
-            stats.put("distribution", distribution);
+            // Build response - FLATTENED format để khớp với frontend
+            Map<String, Object> stats = new HashMap<>();
+            stats.put("hotCount", redisCount);
+            stats.put("warmCount", warmCount);
+            stats.put("coldCount", coldCount);
+            stats.put("totalCount", totalCount);
+            stats.put("incomingRate", 0);  // TODO: Calculate actual incoming rate
+            stats.put("processedRate", 0); // TODO: Calculate actual processed rate
             
             log.info("System stats: Total={}, HOT={}, WARM={}, COLD={}", 
                     totalCount, redisCount, warmCount, coldCount);
@@ -97,11 +84,16 @@ public class StatsController {
         } catch (Exception e) {
             log.error("Error fetching system stats: {}", e.getMessage(), e);
             
-            stats.put("status", "error");
-            stats.put("message", "Failed to fetch statistics: " + e.getMessage());
-            stats.put("timestamp", LocalDateTime.now().toString());
+            // Return default values on error
+            Map<String, Object> stats = new HashMap<>();
+            stats.put("hotCount", 0);
+            stats.put("warmCount", 0);
+            stats.put("coldCount", 0);
+            stats.put("totalCount", 0);
+            stats.put("incomingRate", 0);
+            stats.put("processedRate", 0);
             
-            return ResponseEntity.internalServerError().body(stats);
+            return ResponseEntity.ok(stats);
         }
     }
 

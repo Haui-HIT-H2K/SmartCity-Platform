@@ -8,7 +8,6 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import pika.PlainCredentials;
 
 import java.util.ArrayList;
 import java.util.List;
