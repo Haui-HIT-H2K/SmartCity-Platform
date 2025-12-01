@@ -1,6 +1,7 @@
 package com.smartcity.controller;
 
 import com.smartcity.model.CityData;
+import com.smartcity.service.MetricsService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -29,14 +30,17 @@ public class StatsController {
     private final MongoTemplate warmMongoTemplate;
     private final MongoTemplate coldMongoTemplate;
     private final RedisTemplate<String, Object> redisTemplate;
+    private final MetricsService metricsService;
 
     public StatsController(
             @Qualifier("warmMongoTemplate") MongoTemplate warmMongoTemplate,
             @Qualifier("coldMongoTemplate") MongoTemplate coldMongoTemplate,
-            RedisTemplate<String, Object> redisTemplate) {
+            RedisTemplate<String, Object> redisTemplate,
+            MetricsService metricsService) {
         this.warmMongoTemplate = warmMongoTemplate;
         this.coldMongoTemplate = coldMongoTemplate;
         this.redisTemplate = redisTemplate;
+        this.metricsService = metricsService;
     }
 
     /**
@@ -73,8 +77,8 @@ public class StatsController {
             stats.put("warmCount", warmCount);
             stats.put("coldCount", coldCount);
             stats.put("totalCount", totalCount);
-            stats.put("incomingRate", 0);  // TODO: Calculate actual incoming rate
-            stats.put("processedRate", 0); // TODO: Calculate actual processed rate
+            stats.put("incomingRate", metricsService.getIncomingRate());
+            stats.put("processedRate", metricsService.getProcessedRate());
             
             log.info("System stats: Total={}, HOT={}, WARM={}, COLD={}", 
                     totalCount, redisCount, warmCount, coldCount);

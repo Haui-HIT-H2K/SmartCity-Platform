@@ -30,6 +30,7 @@ public class RabbitMQIngestionService {
     private final MLServiceClient mlServiceClient;
     private final MessageConverter messageConverter;
     private final ObjectMapper objectMapper;
+    private final MetricsService metricsService;
     
     @Value("${ingestion.batch.size}")
     private int batchSize;
@@ -42,12 +43,14 @@ public class RabbitMQIngestionService {
             DataRoutingService dataRoutingService,
             MLServiceClient mlServiceClient,
             MessageConverter messageConverter,
-            ObjectMapper objectMapper) {
+            ObjectMapper objectMapper,
+            MetricsService metricsService) {
         this.edgeNodeRegistry = edgeNodeRegistry;
         this.dataRoutingService = dataRoutingService;
         this.mlServiceClient = mlServiceClient;
         this.messageConverter = messageConverter;
         this.objectMapper = objectMapper;
+        this.metricsService = metricsService;
     }
 
     /**
@@ -97,9 +100,16 @@ public class RabbitMQIngestionService {
             // Tổng hợp
             log.info("Total messages received from all nodes: {}", allData.size());
             
+            // Record metrics for incoming messages
+            if (!allData.isEmpty()) {
+                metricsService.recordIncoming(allData.size());
+            }
+            
             // Route và lưu trữ dữ liệu
             if (!allData.isEmpty()) {
                 dataRoutingService.routeAndStore(allData);
+                // Record as processed after storage
+                metricsService.recordProcessed(allData.size());
             } else {
                 log.info("No data to process in this cycle");
             }
