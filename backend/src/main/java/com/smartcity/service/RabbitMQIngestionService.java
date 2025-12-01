@@ -27,6 +27,7 @@ public class RabbitMQIngestionService {
 
     private final EdgeNodeRegistry edgeNodeRegistry;
     private final DataRoutingService dataRoutingService;
+    private final MLServiceClient mlServiceClient;
     private final MessageConverter messageConverter;
     private final ObjectMapper objectMapper;
     
@@ -39,10 +40,12 @@ public class RabbitMQIngestionService {
     public RabbitMQIngestionService(
             EdgeNodeRegistry edgeNodeRegistry,
             DataRoutingService dataRoutingService,
+            MLServiceClient mlServiceClient,
             MessageConverter messageConverter,
             ObjectMapper objectMapper) {
         this.edgeNodeRegistry = edgeNodeRegistry;
         this.dataRoutingService = dataRoutingService;
+        this.mlServiceClient = mlServiceClient;
         this.messageConverter = messageConverter;
         this.objectMapper = objectMapper;
     }
@@ -169,6 +172,21 @@ public class RabbitMQIngestionService {
                 }
                 
                 if (cityData != null) {
+                    // CRITICAL: Classify data using ML Service before storing
+                    try {
+                        com.smartcity.model.DataType dataType = mlServiceClient.classifyData(cityData);
+                        cityData.setDataType(dataType);
+                        
+                        if (receivedCount % 100 == 0 && receivedCount > 0) {
+                            log.debug("[{}] - Classified {} messages (last: {})", 
+                                    node.getName(), receivedCount, dataType);
+                        }
+                    } catch (Exception e) {
+                        log.error("[{}] - Error classifying data, defaulting to COLD: {}", 
+                                node.getName(), e.getMessage());
+                        cityData.setDataType(com.smartcity.model.DataType.COLD);
+                    }
+                    
                     batchData.add(cityData);
                     receivedCount++;
                     
