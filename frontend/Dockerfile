@@ -21,7 +21,7 @@ FROM node:20-alpine
 WORKDIR /app
 
 # Copy built files from builder
-COPY --from=builder /app/.output ./output
+COPY --from=builder /app/.output ./.output
 COPY --from=builder /app/package*.json ./
 
 # Set environment to production
