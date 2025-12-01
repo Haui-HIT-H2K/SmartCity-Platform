@@ -102,6 +102,65 @@ services:
     networks:
       - h2k-network
 
+  # =======================================================
+  # APPLICATION SERVICES (CORE BACKEND & ML)
+  # =======================================================
+  
+  # Backend Service (Spring Boot)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: smart-city-backend
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    depends_on:
+      - core-redis-hot
+      - core-mongo-warm
+      - core-mongo-cold
+      - edge-subnet-1
+      - edge-subnet-2
+    networks:
+      - h2k-network
+    volumes:
+      - ./backend/logs:/app/logs
+
+  # ML Service (FastAPI)
+  ml-service:
+    build:
+      context: ./ml-service
+      dockerfile: Dockerfile
+    container_name: smart-city-ml
+    restart: always
+    ports:
+      - "8000:8000"
+    networks:
+      - h2k-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Frontend Service (Nuxt.js) - Optional
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: smart-city-frontend
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      NUXT_PUBLIC_API_BASE: http://backend:8080
+    depends_on:
+      - backend
+    networks:
+      - h2k-network
+
 networks:
   h2k-network:
     driver: bridge

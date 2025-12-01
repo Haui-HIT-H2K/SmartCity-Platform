@@ -9,7 +9,7 @@ spring:
   # - docker: Backend chạy trong Docker container (cùng network với services)
   # - local: Backend chạy ngoài Docker (development mode)
   profiles:
-    active: local
+    active: docker
 
   # Data Configuration (Redis + MongoDB)
   data:
@@ -101,6 +101,11 @@ ingestion:
 redis:
   hot-data:
     ttl: 3600                 # TTL = 1 giờ (seconds)
+
+# ML Service Configuration
+ml:
+  service:
+    url: http://smart-city-ml:8000  # ML Service URL (Docker network)
 
 # ============================================================
 # EDGE NODE REGISTRY (DNS-like Configuration)

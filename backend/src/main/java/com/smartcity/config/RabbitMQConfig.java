@@ -6,6 +6,8 @@ import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -74,15 +76,26 @@ public class RabbitMQConfig {
     }
 
     /**
+     * Message Converter - JSON to Object
+     * Converts JSON messages from Python simulator to Java objects
+     */
+    @Bean
+    public MessageConverter jsonMessageConverter() {
+        return new Jackson2JsonMessageConverter();
+    }
+
+    /**
      * RabbitTemplate cho Edge Node 1
      */
     @Bean(name = "edge1RabbitTemplate")
     @Primary
     public RabbitTemplate edge1RabbitTemplate(
-            @Qualifier("edge1ConnectionFactory") ConnectionFactory connectionFactory) {
+            @Qualifier("edge1ConnectionFactory") ConnectionFactory connectionFactory,
+            MessageConverter messageConverter) {
         
         RabbitTemplate template = new RabbitTemplate(connectionFactory);
         template.setDefaultReceiveQueue(edge1QueueName);
+        template.setMessageConverter(messageConverter); // Enable JSON deserialization
         
         log.info("Created Edge1 RabbitTemplate for queue: {}", edge1QueueName);
         
@@ -127,10 +140,12 @@ public class RabbitMQConfig {
      */
     @Bean(name = "edge2RabbitTemplate")
     public RabbitTemplate edge2RabbitTemplate(
-            @Qualifier("edge2ConnectionFactory") ConnectionFactory connectionFactory) {
+            @Qualifier("edge2ConnectionFactory") ConnectionFactory connectionFactory,
+            MessageConverter messageConverter) {
         
         RabbitTemplate template = new RabbitTemplate(connectionFactory);
         template.setDefaultReceiveQueue(edge2QueueName);
+        template.setMessageConverter(messageConverter); // Enable JSON deserialization
         
         log.info("Created Edge2 RabbitTemplate for queue: {}", edge2QueueName);
         
