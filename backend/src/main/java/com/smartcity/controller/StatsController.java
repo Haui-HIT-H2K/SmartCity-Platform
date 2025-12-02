@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -103,14 +104,29 @@ public class StatsController {
         try {
             stats.put("incomingRate", metricsService.getIncomingRate());
             stats.put("processedRate", metricsService.getProcessedRate());
+            
+            // Add rate history for chart visualization
+            List<Map<String, Object>> rateHistory = metricsService.getRateHistory().stream()
+                    .map(snapshot -> {
+                        Map<String, Object> point = new HashMap<>();
+                        point.put("timestamp", snapshot.getTimestamp());
+                        point.put("incomingRate", snapshot.getIncomingRate());
+                        point.put("processedRate", snapshot.getProcessedRate());
+                        return point;
+                    })
+                    .collect(java.util.stream.Collectors.toList());
+            stats.put("rateHistory", rateHistory);
+            
         } catch (Exception e) {
             log.warn("Error getting metrics: {}", e.getMessage());
             stats.put("incomingRate", 0);
             stats.put("processedRate", 0);
+            stats.put("rateHistory", java.util.Collections.emptyList());
         }
         
-        log.info("System stats: Total={}, HOT={}, WARM={}, COLD={}", 
-                totalCount, redisCount, warmCount, coldCount);
+        log.info("System stats: Total={}, HOT={}, WARM={}, COLD={}, History size={}", 
+                totalCount, redisCount, warmCount, coldCount, 
+                stats.containsKey("rateHistory") ? ((List<?>)stats.get("rateHistory")).size() : 0);
         
         return ResponseEntity.ok(stats);
     }
