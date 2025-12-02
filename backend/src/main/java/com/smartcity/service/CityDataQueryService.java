@@ -111,31 +111,35 @@ public class CityDataQueryService {
     private DataSlice fetchAllTypes(String sensorId, int page, int size) {
         log.debug("Fetching from all storage tiers");
         
+        // Calculate how many records to fetch from each tier to ensure we have enough for pagination
+        // Fetch 3x the requested page size from each tier to handle sorting across tiers
+        int fetchLimit = Math.max(size * 3, 300); // Minimum 300, or 3x page size
+        
         List<CityData> allData = new java.util.ArrayList<>();
         
-        // Fetch from HOT (Redis)
+        // Fetch limited records from HOT (Redis)
         try {
-            DataSlice hotSlice = fetchHotSlice(sensorId, 0, Integer.MAX_VALUE);
+            DataSlice hotSlice = fetchHotSlice(sensorId, 0, fetchLimit);
             allData.addAll(hotSlice.records());
-            log.debug("Fetched {} HOT records", hotSlice.records().size());
+            log.debug("Fetched {} HOT records (limit={})", hotSlice.records().size(), fetchLimit);
         } catch (Exception e) {
             log.warn("Error fetching HOT data: {}", e.getMessage());
         }
         
-        // Fetch from WARM (MongoDB)
+        // Fetch limited records from WARM (MongoDB) - most recent only
         try {
-            DataSlice warmSlice = fetchMongoSlice(warmMongoTemplate, DataType.WARM, sensorId, 0, Integer.MAX_VALUE);
+            DataSlice warmSlice = fetchMongoSlice(warmMongoTemplate, DataType.WARM, sensorId, 0, fetchLimit);
             allData.addAll(warmSlice.records());
-            log.debug("Fetched {} WARM records", warmSlice.records().size());
+            log.debug("Fetched {} WARM records (limit={})", warmSlice.records().size(), fetchLimit);
         } catch (Exception e) {
             log.warn("Error fetching WARM data: {}", e.getMessage());
         }
         
-        // Fetch from COLD (MongoDB)
+        // Fetch limited records from COLD (MongoDB) - most recent only
         try {
-            DataSlice coldSlice = fetchMongoSlice(coldMongoTemplate, DataType.COLD, sensorId, 0, Integer.MAX_VALUE);
+            DataSlice coldSlice = fetchMongoSlice(coldMongoTemplate, DataType.COLD, sensorId, 0, fetchLimit);
             allData.addAll(coldSlice.records());
-            log.debug("Fetched {} COLD records", coldSlice.records().size());
+            log.debug("Fetched {} COLD records (limit={})", coldSlice.records().size(), fetchLimit);
         } catch (Exception e) {
             log.warn("Error fetching COLD data: {}", e.getMessage());
         }
@@ -156,7 +160,7 @@ public class CityDataQueryService {
                 ? sortedData.subList(fromIndex, toIndex)
                 : Collections.emptyList();
         
-        log.debug("All types slice | total={} returning={}", total, pageRecords.size());
+        log.debug("All types slice | fetched={} returning={} (memory-efficient mode)", total, pageRecords.size());
         return new DataSlice(pageRecords, total);
     }
 
@@ -318,46 +322,39 @@ public class CityDataQueryService {
     public Object getById(String id) {
         log.info("Searching for record with ID: {}", id);
         
-        // Try Redis
+        // Try Redis (HOT tier)
         try {
-            log.debug("Checking Redis for ID: {}", id);
             Object redisData = redisTemplate.opsForValue().get("hot:citydata:" + id);
             if (redisData != null) {
-                log.info("Found in Redis, converting to response");
                 CityData cityData = objectMapper.convertValue(redisData, CityData.class);
                 return toResponse(cityData);
             }
         } catch (Exception e) {
-            log.error("Error searching Redis for ID {}: {}", id, e.getMessage(), e);
+            log.error("Error searching Redis: {}", e.getMessage());
         }
         
-        // Try Warm
+        // Try MongoDB Warm
         try {
-            log.debug("Checking MongoDB Warm for ID: {}", id);
             CityData warm = warmMongoTemplate.findOne(
                 new Query(Criteria.where("_id").is(id)), CityData.class);
             if (warm != null) {
-                log.info("Found in MongoDB Warm");
                 return toResponse(warm);
             }
         } catch (Exception e) {
-            log.error("Error searching Warm for ID {}: {}", id, e.getMessage(), e);
+            log.error("Error searching Warm: {}", e.getMessage());
         }
         
-        // Try Cold
+        // Try MongoDB Cold
         try {
-            log.debug("Checking MongoDB Cold for ID: {}", id);
             CityData cold = coldMongoTemplate.findOne(
                 new Query(Criteria.where("_id").is(id)), CityData.class);
             if (cold != null) {
-                log.info("Found in MongoDB Cold");
                 return toResponse(cold);
             }
         } catch (Exception e) {
-            log.error("Error searching Cold for ID {}: {}", id, e.getMessage(), e);
+            log.error("Error searching Cold: {}", e.getMessage());
         }
         
-        log.warn("Record not found in any tier for ID: {}", id);
         return null;
     }
 
