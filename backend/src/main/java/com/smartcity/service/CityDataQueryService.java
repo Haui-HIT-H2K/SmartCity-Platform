@@ -312,6 +312,55 @@ public class CityDataQueryService {
         return ISO_FORMATTER.format(Instant.ofEpochMilli(safeTs).atOffset(ZoneOffset.UTC));
     }
 
+    /**
+     * Get single record by ID from any tier
+     */
+    public Object getById(String id) {
+        log.info("Searching for record with ID: {}", id);
+        
+        // Try Redis
+        try {
+            log.debug("Checking Redis for ID: {}", id);
+            Object redisData = redisTemplate.opsForValue().get("hot:citydata:" + id);
+            if (redisData != null) {
+                log.info("Found in Redis, converting to response");
+                CityData cityData = objectMapper.convertValue(redisData, CityData.class);
+                return toResponse(cityData);
+            }
+        } catch (Exception e) {
+            log.error("Error searching Redis for ID {}: {}", id, e.getMessage(), e);
+        }
+        
+        // Try Warm
+        try {
+            log.debug("Checking MongoDB Warm for ID: {}", id);
+            CityData warm = warmMongoTemplate.findOne(
+                new Query(Criteria.where("_id").is(id)), CityData.class);
+            if (warm != null) {
+                log.info("Found in MongoDB Warm");
+                return toResponse(warm);
+            }
+        } catch (Exception e) {
+            log.error("Error searching Warm for ID {}: {}", id, e.getMessage(), e);
+        }
+        
+        // Try Cold
+        try {
+            log.debug("Checking MongoDB Cold for ID: {}", id);
+            CityData cold = coldMongoTemplate.findOne(
+                new Query(Criteria.where("_id").is(id)), CityData.class);
+            if (cold != null) {
+                log.info("Found in MongoDB Cold");
+                return toResponse(cold);
+            }
+        } catch (Exception e) {
+            log.error("Error searching Cold for ID {}: {}", id, e.getMessage(), e);
+        }
+        
+        log.warn("Record not found in any tier for ID: {}", id);
+        return null;
+    }
+
     private record DataSlice(List<CityData> records, long total) {
         static DataSlice empty() {
             return new DataSlice(Collections.emptyList(), 0);

@@ -94,6 +94,9 @@
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">
                 Location
               </th>
+              <th class="px-6 py-3 text-center text-xs font-medium text-gray-400 uppercase tracking-wider">
+                Actions
+              </th>
             </tr>
           </thead>
           <tbody class="divide-y divide-dark-border/30">
@@ -128,6 +131,15 @@
                   {{ item.location.lat.toFixed(4) }}, {{ item.location.lng.toFixed(4) }}
                 </span>
                 <span v-else class="text-gray-600">N/A</span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-center">
+                <button
+                  @click.stop="viewRecordDetail(item.id)"
+                  class="inline-flex items-center justify-center p-2 rounded-lg bg-dark-card border border-dark-border hover:bg-primary/10 hover:border-primary transition-all group"
+                  title="View details"
+                >
+                  <Eye class="w-4 h-4 text-gray-400 group-hover:text-primary transition-colors" />
+                </button>
               </td>
             </tr>
           </tbody>
@@ -193,7 +205,8 @@ import {
   Search, 
   Database, 
   ChevronLeft, 
-  ChevronRight 
+  ChevronRight,
+  Eye
 } from 'lucide-vue-next'
 import { useDataStore } from '~/stores/data'
 import type { CityData, DataType } from '~/stores/data'
@@ -203,6 +216,7 @@ definePageMeta({
 })
 
 const dataStore = useDataStore()
+const router = useRouter()
 
 // Local filter state
 const selectedType = ref<DataType | ''>('')
@@ -277,9 +291,13 @@ const formatTimestamp = (timestamp: string) => {
   return new Date(timestamp).toLocaleString()
 }
 
+const viewRecordDetail = (id: string) => {
+  router.push(`/record/${id}`)
+}
+
 const selectRecord = (record: CityData) => {
+  // Row click - could be used for selection if needed
   console.log('Selected record:', record)
-  // Could open a modal or navigate to detail page
 }
 
 // Fetch data on mount
