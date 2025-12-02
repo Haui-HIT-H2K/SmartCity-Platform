@@ -57,7 +57,7 @@ services:
     image: mongo:7.0
     container_name: core-mongo-warm
     restart: always
-    # XÓA DÒNG command: ["mongod", "--nojournal"] ĐI
+    command: ["mongod", "--wiredTigerCacheSizeGB", "0.5"]
     environment:
       MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INITDB_ROOT_PASSWORD: password123
@@ -68,13 +68,19 @@ services:
       - ./data/warm:/data/db
     networks:
       - h2k-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
 
   # 3. COLD STORAGE (MongoDB)
   core-mongo-cold:
     image: mongo:7.0
     container_name: core-mongo-cold
     restart: always
-    # XÓA DÒNG command: ["mongod", "--nojournal"] ĐI
+    command: ["mongod", "--wiredTigerCacheSizeGB", "0.5"]
     environment:
       MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INITDB_ROOT_PASSWORD: password123
@@ -85,6 +91,12 @@ services:
       - ./data/cold:/data/db
     networks:
       - h2k-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
 
   # =======================================================
   # CÔNG CỤ QUẢN TRỊ (VISUALIZATION)

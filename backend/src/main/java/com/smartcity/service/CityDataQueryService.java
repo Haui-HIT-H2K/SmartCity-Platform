@@ -55,27 +55,36 @@ public class CityDataQueryService {
 
     /**
      * Fetches data based on the requested filters.
+     * If requestedType is null, fetches from ALL storage tiers.
      */
     public DataPageResponse fetchData(DataType requestedType, String sensorId, int page, int size) {
-        DataType effectiveType = requestedType != null ? requestedType : DataType.WARM;
         int safePage = Math.max(page, 0);
         int safeSize = Math.min(Math.max(size, 1), 100);
 
         log.debug("Fetching data | type={}, sensorId={}, page={}, size={}",
-                effectiveType, sensorId, safePage, safeSize);
+                requestedType, sensorId, safePage, safeSize);
 
         DataSlice slice;
-        switch (effectiveType) {
-            case HOT:
-                slice = fetchHotSlice(sensorId, safePage, safeSize);
-                break;
-            case COLD:
-                slice = fetchMongoSlice(coldMongoTemplate, DataType.COLD, sensorId, safePage, safeSize);
-                break;
-            case WARM:
-            default:
-                slice = fetchMongoSlice(warmMongoTemplate, DataType.WARM, sensorId, safePage, safeSize);
-                break;
+        
+        // If no type specified, fetch from all storage tiers
+        if (requestedType == null) {
+            slice = fetchAllTypes(sensorId, safePage, safeSize);
+        } else {
+            // Fetch from specific storage tier
+            switch (requestedType) {
+                case HOT:
+                    slice = fetchHotSlice(sensorId, safePage, safeSize);
+                    break;
+                case COLD:
+                    slice = fetchMongoSlice(coldMongoTemplate, DataType.COLD, sensorId, safePage, safeSize);
+                    break;
+                case WARM:
+                    slice = fetchMongoSlice(warmMongoTemplate, DataType.WARM, sensorId, safePage, safeSize);
+                    break;
+                default:
+                    slice = DataSlice.empty();
+                    break;
+            }
         }
 
         List<CityDataResponse> payload = slice.records().stream()
@@ -92,8 +101,63 @@ public class CityDataQueryService {
                 safePage + 1,
                 safeSize,
                 totalPages,
-                effectiveType
+                requestedType
         );
+    }
+    
+    /**
+     * Fetch data from all storage tiers (HOT + WARM + COLD) when no specific type is requested
+     */
+    private DataSlice fetchAllTypes(String sensorId, int page, int size) {
+        log.debug("Fetching from all storage tiers");
+        
+        List<CityData> allData = new java.util.ArrayList<>();
+        
+        // Fetch from HOT (Redis)
+        try {
+            DataSlice hotSlice = fetchHotSlice(sensorId, 0, Integer.MAX_VALUE);
+            allData.addAll(hotSlice.records());
+            log.debug("Fetched {} HOT records", hotSlice.records().size());
+        } catch (Exception e) {
+            log.warn("Error fetching HOT data: {}", e.getMessage());
+        }
+        
+        // Fetch from WARM (MongoDB)
+        try {
+            DataSlice warmSlice = fetchMongoSlice(warmMongoTemplate, DataType.WARM, sensorId, 0, Integer.MAX_VALUE);
+            allData.addAll(warmSlice.records());
+            log.debug("Fetched {} WARM records", warmSlice.records().size());
+        } catch (Exception e) {
+            log.warn("Error fetching WARM data: {}", e.getMessage());
+        }
+        
+        // Fetch from COLD (MongoDB)
+        try {
+            DataSlice coldSlice = fetchMongoSlice(coldMongoTemplate, DataType.COLD, sensorId, 0, Integer.MAX_VALUE);
+            allData.addAll(coldSlice.records());
+            log.debug("Fetched {} COLD records", coldSlice.records().size());
+        } catch (Exception e) {
+            log.warn("Error fetching COLD data: {}", e.getMessage());
+        }
+        
+        // Sort all data by timestamp (most recent first)
+        List<CityData> sortedData = allData.stream()
+                .sorted(Comparator.comparingLong(
+                        (CityData data) -> data.getTimestamp() != null ? data.getTimestamp() : 0L)
+                        .reversed())
+                .collect(Collectors.toList());
+        
+        long total = sortedData.size();
+        
+        // Apply pagination
+        int fromIndex = Math.min((int) ((long) page * size), sortedData.size());
+        int toIndex = Math.min(fromIndex + size, sortedData.size());
+        List<CityData> pageRecords = fromIndex < toIndex
+                ? sortedData.subList(fromIndex, toIndex)
+                : Collections.emptyList();
+        
+        log.debug("All types slice | total={} returning={}", total, pageRecords.size());
+        return new DataSlice(pageRecords, total);
     }
 
     private DataSlice fetchMongoSlice(
