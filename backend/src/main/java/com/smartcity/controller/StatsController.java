@@ -54,65 +54,117 @@ public class StatsController {
     public ResponseEntity<Map<String, Object>> getSystemStats() {
         log.info("Fetching system statistics");
         
+        long redisCount = 0;
+        long warmCount = 0;
+        long coldCount = 0;
+        
+        // 1. Thống kê Redis (HOT data) - try separately
         try {
-            // 1. Thống kê Redis (HOT data)
-            long redisCount = getRedisRecordCount();
-            
-            // 2. Thống kê MongoDB Warm
-            long warmCount = warmMongoTemplate.count(
+            redisCount = getRedisRecordCount();
+            log.info("Redis count retrieved: {}", redisCount);
+        } catch (Exception e) {
+            log.error("Error counting Redis keys: {}", e.getMessage(), e);
+            // Continue with redisCount = 0
+        }
+        
+        // 2. Thống kê MongoDB Warm - try separately
+        try {
+            warmCount = warmMongoTemplate.count(
                     new org.springframework.data.mongodb.core.query.Query(), 
                     CityData.class);
-            
-            // 3. Thống kê MongoDB Cold
-            long coldCount = coldMongoTemplate.count(
+            log.info("Warm MongoDB count retrieved: {}", warmCount);
+        } catch (Exception e) {
+            log.warn("MongoDB Warm not available: {}", e.getMessage());
+            // Continue with warmCount = 0
+        }
+        
+        // 3. Thống kê MongoDB Cold - try separately
+        try {
+            coldCount = coldMongoTemplate.count(
                     new org.springframework.data.mongodb.core.query.Query(), 
                     CityData.class);
-            
-            // Tổng hợp
-            long totalCount = redisCount + warmCount + coldCount;
-            
-            // Build response - FLATTENED format để khớp với frontend
-            Map<String, Object> stats = new HashMap<>();
-            stats.put("hotCount", redisCount);
-            stats.put("warmCount", warmCount);
-            stats.put("coldCount", coldCount);
-            stats.put("totalCount", totalCount);
+            log.info("Cold MongoDB count retrieved: {}", coldCount);
+        } catch (Exception e) {
+            log.warn("MongoDB Cold not available: {}", e.getMessage());
+            // Continue with coldCount = 0
+        }
+        
+        // Tổng hợp
+        long totalCount = redisCount + warmCount + coldCount;
+        
+        // Build response - FLATTENED format để khớp với frontend
+        Map<String, Object> stats = new HashMap<>();
+        stats.put("hotCount", redisCount);
+        stats.put("warmCount", warmCount);
+        stats.put("coldCount", coldCount);
+        stats.put("totalCount", totalCount);
+        
+        // Get metrics rates safely
+        try {
             stats.put("incomingRate", metricsService.getIncomingRate());
             stats.put("processedRate", metricsService.getProcessedRate());
-            
-            log.info("System stats: Total={}, HOT={}, WARM={}, COLD={}", 
-                    totalCount, redisCount, warmCount, coldCount);
-            
-            return ResponseEntity.ok(stats);
-            
         } catch (Exception e) {
-            log.error("Error fetching system stats: {}", e.getMessage(), e);
-            
-            // Return default values on error
-            Map<String, Object> stats = new HashMap<>();
-            stats.put("hotCount", 0);
-            stats.put("warmCount", 0);
-            stats.put("coldCount", 0);
-            stats.put("totalCount", 0);
+            log.warn("Error getting metrics: {}", e.getMessage());
             stats.put("incomingRate", 0);
             stats.put("processedRate", 0);
-            
-            return ResponseEntity.ok(stats);
         }
+        
+        log.info("System stats: Total={}, HOT={}, WARM={}, COLD={}", 
+                totalCount, redisCount, warmCount, coldCount);
+        
+        return ResponseEntity.ok(stats);
     }
 
     /**
      * Đếm số lượng keys trong Redis với pattern "hot:citydata:*"
+     * Sử dụng SCAN thay vì KEYS để tránh block Redis
      * 
      * @return Số lượng records trong Redis
      */
     private long getRedisRecordCount() {
         try {
-            Set<String> keys = redisTemplate.keys("hot:citydata:*");
-            return keys != null ? keys.size() : 0;
+            log.debug("Attempting to count Redis keys with pattern: hot:citydata:*");
+            
+            // Use execute with RedisCallback for better control
+            Long count = redisTemplate.execute((org.springframework.data.redis.core.RedisCallback<Long>) connection -> {
+                long keyCount = 0;
+                
+                // Use SCAN instead of KEYS for better performance
+                org.springframework.data.redis.core.ScanOptions options = 
+                    org.springframework.data.redis.core.ScanOptions.scanOptions()
+                        .match("hot:citydata:*")
+                        .count(1000)
+                        .build();
+                
+                org.springframework.data.redis.core.Cursor<byte[]> cursor = 
+                    connection.scan(options);
+                
+                while (cursor.hasNext()) {
+                    cursor.next();
+                    keyCount++;
+                }
+                
+                cursor.close();
+                return keyCount;
+            });
+            
+            log.info("Redis key count for pattern 'hot:citydata:*': {}", count);
+            return count != null ? count : 0;
+            
         } catch (Exception e) {
             log.error("Error counting Redis keys: {}", e.getMessage(), e);
-            return 0;
+            
+            // Fallback: Try simple keys() method
+            try {
+                log.warn("Attempting fallback method using keys()");
+                Set<String> keys = redisTemplate.keys("hot:citydata:*");
+                long count = keys != null ? keys.size() : 0;
+                log.info("Fallback key count: {}", count);
+                return count;
+            } catch (Exception e2) {
+                log.error("Fallback method also failed: {}", e2.getMessage(), e2);
+                return 0;
+            }
         }
     }
 
