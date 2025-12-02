@@ -21,23 +21,69 @@
 
   body {
     @apply font-sans antialiased min-h-screen;
-    @apply bg-light text-gray-900 dark:bg-dark dark:text-gray-100;
-    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    @apply bg-gray-50 text-gray-900 dark:bg-dark dark:text-gray-100;
+    background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
     transition: background-color 0.3s ease, color 0.3s ease;
   }
 
   body.dark {
     background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
   }
+
+  /* Global text contrast improvements for light mode */
+  body:not(.dark) {
+
+    /* Make all gray text colors darker in light mode */
+    .text-gray-100 {
+      @apply !text-black;
+    }
+
+    .text-gray-200 {
+      @apply !text-black;
+    }
+
+    .text-gray-300 {
+      @apply !text-black;
+    }
+
+    .text-gray-400 {
+      @apply !text-black;
+    }
+
+    .text-gray-500 {
+      @apply !text-black;
+    }
+
+    /* Make table headers and labels more visible */
+    th,
+    thead {
+      @apply !text-black !font-bold;
+    }
+
+    label {
+      @apply !text-black;
+    }
+
+    /* Increase overall font weight for better readability */
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      @apply !font-bold;
+    }
+  }
 }
 
 @layer components {
+
   /* Glassmorphism Card */
   .glass-card {
     @apply backdrop-blur-xl rounded-lg transition-all duration-300;
-    @apply bg-light-card/80 border border-light-border/50;
+    @apply bg-white/90 border border-gray-200;
     @apply dark:bg-dark-card/40 dark:border-dark-border/50;
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 24px 0 rgba(0, 0, 0, 0.08);
   }
 
   .dark .glass-card {
@@ -58,11 +104,11 @@
 
   /* Status Indicators */
   .status-online {
-    @apply bg-green-100 dark:bg-neon-green/20 text-green-700 dark:text-neon-green border border-green-300 dark:border-neon-green/50;
+    @apply bg-green-50 dark:bg-neon-green/20 text-green-800 dark:text-neon-green border border-green-200 dark:border-neon-green/50;
   }
 
   .status-offline {
-    @apply bg-red-100 dark:bg-red-500/20 text-red-700 dark:text-red-500 border border-red-300 dark:border-red-500/50;
+    @apply bg-red-50 dark:bg-red-500/20 text-red-800 dark:text-red-500 border border-red-200 dark:border-red-500/50;
   }
 
   /* Pulse Animation */
@@ -126,7 +172,7 @@
   }
 
   .bg-gradient-cyber {
-    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #f8fafc 100%);
+    background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 50%, #f9fafb 100%);
     transition: background 0.3s ease;
   }
 
@@ -143,6 +189,7 @@
       opacity: 0;
       transform: translateY(10px);
     }
+
     to {
       opacity: 1;
       transform: translateY(0);
