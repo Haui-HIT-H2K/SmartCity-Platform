@@ -67,6 +67,13 @@ public class DataRoutingService {
                 // Tạo ID nếu chưa có
                 data.generateId();
                 
+                // Auto-classify nếu dataType null
+                if (data.getDataType() == null) {
+                    DataType classifiedType = classifyData(data);
+                    data.setDataType(classifiedType);
+                    log.debug("Auto-classified data {} as {}", data.getId(), classifiedType);
+                }
+                
                 // Phân loại theo dataType
                 switch (data.getDataType()) {
                     case HOT:
@@ -103,7 +110,77 @@ public class DataRoutingService {
     }
 
     /**
+     * Rule-based classification cho data không có dataType
+     * Logic: Dựa vào sensor type và giá trị để phân loại
+     */
+    private DataType classifyData(CityData data) {
+        // Default là WARM
+        DataType result = DataType.WARM;
+        
+        try {
+            // Lấy sensor type từ sourceId hoặc payload
+            String sourceId = data.getSourceId();
+            if (sourceId == null) {
+                return DataType.WARM;
+            }
+            
+            // Rule 1: Emergency sensors → HOT
+            if (sourceId.toLowerCase().contains("emergency") || 
+                sourceId.toLowerCase().contains("alert") ||
+                sourceId.toLowerCase().contains("fire") ||
+                sourceId.toLowerCase().contains("police")) {
+                return DataType.HOT;
+            }
+            
+            // Rule 2: Temperature sensors với ngưỡng cao → HOT
+            if (data.getPayload() != null && data.getPayload().containsKey("temperature")) {
+                Object tempObj = data.getPayload().get("temperature");
+                if (tempObj instanceof Number) {
+                    double temp = ((Number) tempObj).doubleValue();
+                    if (temp > 35 || temp < 0) {  // Nhiệt độ cực đoan
+                        return DataType.HOT;
+                    }
+                }
+            }
+            
+            // Rule 3: Air quality sensors với chất lượng kém → HOT  
+            if (data.getPayload() != null && data.getPayload().containsKey("co2_level")) {
+                Object co2Obj = data.getPayload().get("co2_level");
+                if (co2Obj instanceof Number) {
+                    int co2 = ((Number) co2Obj).intValue();
+                    if (co2 > 1000) {  // CO2 cao
+                        return DataType.HOT;
+                    }
+                }
+            }
+            
+            // Rule 4: Traffic sensors → WARM (thường xuyên truy cập)
+            if (sourceId.toLowerCase().contains("traffic") ||
+                sourceId.toLowerCase().contains("camera") ||
+                sourceId.toLowerCase().contains("parking")) {
+                return DataType.WARM;
+            }
+            
+            // Rule 5: Historical/Archive sensors → COLD
+            if (sourceId.toLowerCase().contains("archive") ||
+                sourceId.toLowerCase().contains("history") ||
+                sourceId.toLowerCase().contains("logger")) {
+                return DataType.COLD;
+            }
+            
+            // Default: WARM
+            return DataType.WARM;
+            
+        } catch (Exception e) {
+            log.warn("Error classifying data {}: {}. Using default WARM", 
+                    data.getId(), e.getMessage());
+            return DataType.WARM;
+        }
+    }
+
+    /**
      * Lưu HOT data vào Redis với TTL
+     * ĐỒNG THỜI backup vào MongoDB Warm để persist sau khi TTL expire
      * 
      * @param hotList List các CityData HOT
      */
@@ -134,9 +211,53 @@ public class DataRoutingService {
             storedCount = hotList.size();
             log.info("Successfully stored {} HOT records to Redis", storedCount);
             
+            // BACKUP: Lưu HOT data vào MongoDB Warm để persist sau khi Redis expire
+            storeHotAsWarmBackup(hotList);
+            
         } catch (Exception e) {
             log.error("Error storing HOT data to Redis: {}", e.getMessage(), e);
             // Không throw exception - cho phép WARM/COLD tiếp tục
+        }
+    }
+
+    /**
+     * Backup HOT data vào MongoDB Warm
+     * Đảm bảo data không mất khi Redis TTL expire
+     */
+    private void storeHotAsWarmBackup(List<CityData> hotList) {
+        if (hotList.isEmpty()) {
+            return;
+        }
+        
+        log.info("Backing up {} HOT records to MongoDB Warm for persistence", hotList.size());
+        
+        try {
+            // Clone và đổi dataType sang WARM
+            List<CityData> warmBackup = new ArrayList<>();
+            for (CityData data : hotList) {
+                CityData warm = new CityData();
+                warm.setId(data.getId()); // Giữ nguyên ID
+                warm.setSourceId(data.getSourceId());
+                warm.setTimestamp(data.getTimestamp());
+                warm.setPayload(data.getPayload());
+                warm.setDataType(DataType.WARM); // ← Change to WARM
+                warmBackup.add(warm);
+            }
+            
+            // Bulk insert vào MongoDB Warm
+            BulkOperations bulkOps = warmMongoTemplate.bulkOps(
+                    BulkOperations.BulkMode.UNORDERED,
+                    CityData.class);
+            bulkOps.insert(warmBackup);
+            
+            com.mongodb.bulk.BulkWriteResult result = bulkOps.execute();
+            
+            log.info("Successfully backed up {} HOT→WARM records to MongoDB Warm (inserted={})", 
+                    warmBackup.size(), result.getInsertedCount());
+            
+        } catch (Exception e) {
+            log.error("Error backing up HOT data to MongoDB Warm: {}", e.getMessage(), e);
+            // Log error nhưng không throw - Redis insert đã thành công
         }
     }
 

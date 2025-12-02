@@ -9,6 +9,12 @@ export interface EdgeNode {
     lastPing?: string
 }
 
+export interface RateSnapshot {
+    timestamp: number
+    incomingRate: number
+    processedRate: number
+}
+
 export interface SystemStats {
     hotCount: number
     warmCount: number
@@ -16,6 +22,7 @@ export interface SystemStats {
     totalCount: number
     incomingRate: number
     processedRate: number
+    rateHistory: RateSnapshot[]
 }
 
 export const useSystemStore = defineStore('system', {
@@ -27,6 +34,7 @@ export const useSystemStore = defineStore('system', {
             totalCount: 0,
             incomingRate: 0,
             processedRate: 0,
+            rateHistory: [],
         } as SystemStats,
         edgeNodes: [] as EdgeNode[],
         isLoading: false,

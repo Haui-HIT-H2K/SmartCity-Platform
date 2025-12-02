@@ -1,213 +1,97 @@
 <template>
-  <div ref="chartRef" class="w-full" :style="{ height: height }" />
+  <div class="space-y-4">
+    <!-- Chart Title -->
+    <div class="flex items-center justify-between">
+      <p class="text-sm text-gray-400">{{ rateHistory.length }} data points (last 10 minutes)</p>
+      <div class="flex gap-4 text-xs">
+        <div class="flex items-center gap-2">
+          <div class="w-3 h-3 rounded-full bg-cyan-400"></div>
+          <span class="text-gray-400">Incoming</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <div class="w-3 h-3 rounded-full bg-green-400"></div>
+          <span class="text-gray-400">Processed</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bar Chart -->
+    <div v-if="rateHistory.length > 0" class="relative h-64 bg-gray-900/50 rounded-lg p-4 overflow-x-auto">
+      <div class="flex items-end justify-between h-full gap-1">
+        <div 
+          v-for="(snapshot, index) in displayData" 
+          :key="index"
+          class="flex flex-col items-center justify-end flex-1 min-w-[8px] group"
+        >
+          <!-- Incoming Rate Bar (Cyan) -->
+          <div 
+            class="w-full bg-gradient-to-t from-cyan-500 to-cyan-300 rounded-t transition-all duration-300 hover:from-cyan-400 hover:to-cyan-200"
+            :style="{ height: snapshot.incomingHeight + '%' }"
+            :title="`Incoming: ${snapshot.incomingRate}/s at ${snapshot.time}`"
+          ></div>
+          
+          <!-- Processed Rate Bar (Green) - stacked on top -->
+          <div 
+            class="w-full bg-gradient-to-t from-green-500 to-green-300 mt-0.5 rounded-t transition-all duration-300 hover:from-green-400 hover:to-green-200"
+            :style="{ height: snapshot.processedHeight + '%' }"
+            :title="`Processed: ${snapshot.processedRate}/s at ${snapshot.time}`"
+          ></div>
+        </div>
+      </div>
+      
+      <!-- Y-axis labels -->
+      <div class="absolute left-0 top-0 h-full flex flex-col justify-between text-xs text-gray-500 pr-2">
+        <span>{{ maxRate }}</span>
+        <span>{{ Math.floor(maxRate * 0.5) }}</span>
+        <span>0</span>
+      </div>
+    </div>
+
+    <!-- No Data Message -->
+    <div v-else class="h-64 bg-gray-900/50 rounded-lg flex items-center justify-center">
+      <div class="text-center text-gray-500">
+        <Activity class="w-12 h-12 mx-auto mb-2 opacity-50" />
+        <p>Waiting for rate data...</p>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
-import * as echarts from 'echarts/core'
-import { LineChart } from 'echarts/charts'
-import {
-  GridComponent,
-  TooltipComponent,
-  LegendComponent,
-  DataZoomComponent,
-} from 'echarts/components'
-import { CanvasRenderer } from 'echarts/renderers'
-import type { EChartsOption } from 'echarts'
+import { Activity } from 'lucide-vue-next'
 
-// Register ECharts components
-echarts.use([
-  LineChart,
-  GridComponent,
-  TooltipComponent,
-  LegendComponent,
-  DataZoomComponent,
-  CanvasRenderer,
-])
-
-interface Props {
+interface RateSnapshot {
+  timestamp: number
   incomingRate: number
   processedRate: number
-  height?: string
+}
+
+interface Props {
+  rateHistory: RateSnapshot[]
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  height: '300px',
+  rateHistory: () => []
 })
 
-const chartRef = ref<HTMLElement>()
-let chart: echarts.ECharts | null = null
-const timeData = ref<string[]>([])
-const incomingData = ref<number[]>([])
-const processedData = ref<number[]>([])
-const maxDataPoints = 30
-
-const initChart = () => {
-  if (!chartRef.value) return
-
-  chart = echarts.init(chartRef.value, 'dark')
-  updateChart()
-}
-
-const updateChart = () => {
-  if (!chart) return
-
-  const now = new Date()
-  const timeStr = now.toLocaleTimeString()
-
-  // Add new data point
-  timeData.value.push(timeStr)
-  incomingData.value.push(props.incomingRate)
-  processedData.value.push(props.processedRate)
-
-  // Keep only last N data points
-  if (timeData.value.length > maxDataPoints) {
-    timeData.value.shift()
-    incomingData.value.shift()
-    processedData.value.shift()
-  }
-
-  const option: EChartsOption = {
-    backgroundColor: 'transparent',
-    tooltip: {
-      trigger: 'axis',
-      backgroundColor: 'rgba(26, 31, 58, 0.95)',
-      borderColor: '#00f0ff',
-      borderWidth: 1,
-      textStyle: {
-        color: '#e5e7eb',
-      },
-    },
-    legend: {
-      data: ['Incoming Rate', 'Processed Rate'],
-      textStyle: {
-        color: '#9ca3af',
-      },
-      top: 10,
-    },
-    grid: {
-      left: '3%',
-      right: '4%',
-      bottom: '10%',
-      top: '15%',
-      containLabel: true,
-    },
-    xAxis: {
-      type: 'category',
-      boundaryGap: false,
-      data: timeData.value,
-      axisLine: {
-        lineStyle: {
-          color: '#2a2f4a',
-        },
-      },
-      axisLabel: {
-        color: '#6b7280',
-        rotate: 45,
-      },
-    },
-    yAxis: {
-      type: 'value',
-      name: 'Requests/s',
-      nameTextStyle: {
-        color: '#9ca3af',
-      },
-      axisLine: {
-        lineStyle: {
-          color: '#2a2f4a',
-        },
-      },
-      axisLabel: {
-        color: '#6b7280',
-      },
-      splitLine: {
-        lineStyle: {
-          color: '#1a1f3a',
-        },
-      },
-    },
-    series: [
-      {
-        name: 'Incoming Rate',
-        type: 'line',
-        smooth: true,
-        data: incomingData.value,
-        lineStyle: {
-          color: '#00f0ff',
-          width: 2,
-          shadowColor: 'rgba(0, 240, 255, 0.5)',
-          shadowBlur: 10,
-        },
-        itemStyle: {
-          color: '#00f0ff',
-        },
-        areaStyle: {
-          color: {
-            type: 'linear',
-            x: 0,
-            y: 0,
-            x2: 0,
-            y2: 1,
-            colorStops: [
-              { offset: 0, color: 'rgba(0, 240, 255, 0.4)' },
-              { offset: 1, color: 'rgba(0, 240, 255, 0.0)' },
-            ],
-          },
-        },
-      },
-      {
-        name: 'Processed Rate',
-        type: 'line',
-        smooth: true,
-        data: processedData.value,
-        lineStyle: {
-          color: '#00ff41',
-          width: 2,
-          shadowColor: 'rgba(0, 255, 65, 0.5)',
-          shadowBlur: 10,
-        },
-        itemStyle: {
-          color: '#00ff41',
-        },
-        areaStyle: {
-          color: {
-            type: 'linear',
-            x: 0,
-            y: 0,
-            x2: 0,
-            y2: 1,
-            colorStops: [
-              { offset: 0, color: 'rgba(0, 255, 65, 0.3)' },
-              { offset: 1, color: 'rgba(0, 255, 65, 0.0)' },
-            ],
-          },
-        },
-      },
-    ],
-  }
-
-  chart.setOption(option)
-}
-
-// Watch for prop changes and update chart
-watch(
-  () => [props.incomingRate, props.processedRate],
-  () => {
-    updateChart()
-  }
-)
-
-// Handle window resize
-const handleResize = () => {
-  chart?.resize()
-}
-
-onMounted(() => {
-  initChart()
-  window.addEventListener('resize', handleResize)
+const maxRate = computed(() => {
+  if (props.rateHistory.length === 0) return 100
+  return Math.max(
+    ...props.rateHistory.flatMap(s => [s.incomingRate, s.processedRate]),
+    10
+  )
 })
 
-onUnmounted(() => {
-  window.removeEventListener('resize', handleResize)
-  chart?.dispose()
+const displayData = computed(() => {
+  return props.rateHistory.map(snapshot => {
+    const date = new Date(snapshot.timestamp)
+    return {
+      time: date.toLocaleTimeString(),
+      incomingRate: snapshot.incomingRate,
+      processedRate: snapshot.processedRate,
+      incomingHeight: (snapshot.incomingRate / maxRate.value) * 100,
+      processedHeight: (snapshot.processedRate / maxRate.value) * 100
+    }
+  })
 })
 </script>
