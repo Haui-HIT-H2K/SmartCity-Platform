@@ -1,10 +1,12 @@
+import { defineEventHandler, getHeaders, getQuery, readBody, createError } from 'h3'
+
 // Proxy all /api/* requests to backend
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig()
   const path = event.path.replace('/api', '')
 
-  // Get backend URL from runtime config or fallback
-  const backendUrl = config.public.apiBase || process.env.NUXT_PUBLIC_API_BASE || 'http://backend:8080'
+  // Get backend URL from runtime config (already has proper fallback)
+  const backendUrl = config.public.apiBase
   const targetUrl = `${backendUrl}/api${path}`
 
   // Forward the request to backend
@@ -36,3 +38,4 @@ export default defineEventHandler(async (event) => {
     })
   }
 })
+

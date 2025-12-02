@@ -1,3 +1,5 @@
+import { defineNuxtConfig } from "nuxt/config";
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
@@ -31,13 +33,31 @@ export default defineNuxtConfig({
         target: 'http://localhost:8080',
         changeOrigin: true,
       }
+    },
+    // Enable compression
+    compressPublicAssets: true,
+    minify: true
+  },
+
+  // Route-level caching rules
+  routeRules: {
+    '/api/data': {
+      cache: {
+        maxAge: 30, // 30 seconds cache
+        swr: true   // Stale-while-revalidate
+      }
+    },
+    '/api/data/**': {
+      cache: {
+        maxAge: 300 // 5 minutes for individual records
+      }
     }
   },
 
   runtimeConfig: {
     public: {
-      // Backend URL will be injected from env variable in Docker
-      apiBase: process.env.NUXT_PUBLIC_API_BASE || 'http://localhost:8080'
+      // Backend URL - use correct Docker container name
+      apiBase: process.env.NUXT_PUBLIC_API_BASE || 'http://smart-city-backend:8080'
     }
   },
 

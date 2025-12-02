@@ -167,7 +167,7 @@ services:
     ports:
       - "3000:3000"
     environment:
-      NUXT_PUBLIC_API_BASE: http://backend:8080
+      NUXT_PUBLIC_API_BASE: http://smart-city-backend:8080
     depends_on:
       - backend
     networks:
