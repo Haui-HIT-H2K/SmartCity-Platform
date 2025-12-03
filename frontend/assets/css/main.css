@@ -43,12 +43,12 @@
     .text-gray-400,
     .text-gray-500,
     .text-gray-600 {
-      @apply !text-gray-900;
+      color: rgb(17 24 39) !important; /* text-gray-900 */
     }
 
     /* Make medium gray text darker but not pure black for subtle hierarchy */
     .text-gray-700 {
-      @apply !text-gray-800;
+      color: rgb(31 41 55) !important; /* text-gray-800 */
     }
 
     /* Ensure headings and important text are pure black */
@@ -60,27 +60,30 @@
     h6,
     .text-gray-800,
     .text-gray-900 {
-      @apply !text-black !font-bold;
+      color: rgb(0 0 0) !important; /* text-black */
+      font-weight: 700 !important; /* font-bold */
     }
 
     /* Make table headers and labels more visible */
     th,
     thead {
-      @apply !text-black !font-bold;
+      color: rgb(0 0 0) !important; /* text-black */
+      font-weight: 700 !important; /* font-bold */
     }
 
     label {
-      @apply !text-black !font-medium;
+      color: rgb(0 0 0) !important; /* text-black */
+      font-weight: 500 !important; /* font-medium */
     }
 
     /* Ensure paragraphs and body text have high contrast */
     p {
-      @apply !text-gray-900;
+      color: rgb(17 24 39) !important; /* text-gray-900 */
     }
 
     /* Make links more visible */
     a {
-      @apply !text-gray-900;
+      color: rgb(17 24 39) !important; /* text-gray-900 */
     }
 
     /* Ensure all text elements have minimum contrast */
@@ -103,7 +106,7 @@
     .text-gray-700,
     .text-gray-800,
     .text-gray-900 {
-      @apply !text-white;
+      color: rgb(255 255 255) !important; /* text-white */
     }
   }
 }
