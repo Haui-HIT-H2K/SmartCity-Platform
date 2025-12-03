@@ -132,7 +132,10 @@ weights/
 *.data
 *.parquet
 *.feather
-data/
+# MongoDB data directories (runtime data, should not be committed)
+# Ignore all contents but keep directory structure with .gitkeep
+data/*
+!data/.gitkeep
 datasets/
 *.db
 *.sqlite

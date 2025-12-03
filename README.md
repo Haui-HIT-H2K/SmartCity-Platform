@@ -340,6 +340,57 @@ Kiểm tra backend API:
 curl http://localhost:8080/api/data
 ```
 
+### MongoDB restart liên tục (Database Corruption)
+
+**Triệu chứng:**
+- Containers `core-mongo-warm` hoặc `core-mongo-cold` restart liên tục
+- Logs hiển thị lỗi: `WT_TRY_SALVAGE: database corruption detected` hoặc `WT_PANIC: WiredTiger library panic`
+- Lỗi: `Detected unclean shutdown - Lock file is not empty`
+
+**Nguyên nhân:**
+- Container bị dừng đột ngột (unclean shutdown)
+- Database files bị corrupt do WiredTiger không đọc được metadata
+- Lock files không được clear đúng cách
+
+**Giải pháp:**
+
+**Cách 1: Sử dụng script tự động (Khuyến nghị)**
+```powershell
+# Chạy script fix corruption
+.\fix-mongodb-corruption.ps1
+```
+
+**Cách 2: Thủ công**
+```powershell
+# 1. Dừng MongoDB containers
+docker-compose stop core-mongo-warm core-mongo-cold
+
+# 2. Xóa data directories bị corrupt
+Remove-Item -Recurse -Force ./data/warm
+Remove-Item -Recurse -Force ./data/cold
+
+# 3. Tạo lại thư mục sạch
+New-Item -ItemType Directory -Force -Path ./data/warm
+New-Item -ItemType Directory -Force -Path ./data/cold
+
+# 4. Khởi động lại containers
+docker-compose up -d core-mongo-warm core-mongo-cold
+
+# 5. Kiểm tra logs
+docker logs core-mongo-warm --follow
+docker logs core-mongo-cold --follow
+```
+
+**Lưu ý:**
+- ⚠️ **Cảnh báo:** Xóa data directories sẽ mất toàn bộ dữ liệu hiện tại
+- Backup dữ liệu trước khi xóa nếu có dữ liệu quan trọng
+- Sau khi xóa, MongoDB sẽ tự động khởi tạo database mới khi container start
+
+**Phòng tránh:**
+- Luôn dừng containers đúng cách: `docker-compose down` (không dùng kill/force stop)
+- Tránh tắt máy đột ngột khi containers đang chạy
+- Thư mục `data/` đã được thêm vào `.gitignore` để tránh commit database files lên Git
+
 ## 📚 Tài liệu Chi tiết
 
 Tài liệu đầy đủ về API, kiến trúc, và hướng dẫn phát triển:
