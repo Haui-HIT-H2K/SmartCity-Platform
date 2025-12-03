@@ -42,3 +42,4 @@ RabbitMQ                 3.x            MPL-2.0            Message broker for di
 Node.js                  20.x           MIT                JavaScript runtime built on Chrome's V8 engine                   https://nodejs.org
 
 .. see copyright information at the header of source code file.
+
