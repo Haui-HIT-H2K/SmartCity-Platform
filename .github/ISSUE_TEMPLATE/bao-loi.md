@@ -2,7 +2,7 @@
 name: Báo lỗi
 about: Tạo báo cáo để giúp cải thiện SmartCity-Platform
 title: '[BUG] '
-labels: bug
+labels: ['bug']
 assignees: ''
 ---
 

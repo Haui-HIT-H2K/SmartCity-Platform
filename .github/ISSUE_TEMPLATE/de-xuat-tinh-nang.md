@@ -2,7 +2,7 @@
 name: Đề xuất ý tưởng
 about: Đề xuất ý tưởng cho dự án SmartCity-Platform
 title: '[FEATURE] '
-labels: enhancement
+labels: ['enhancement']
 assignees: ''
 ---
 
