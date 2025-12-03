@@ -127,9 +127,23 @@
         <div>
           <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">System Health</p>
           <div class="flex items-center justify-center gap-2">
-            <div class="w-3 h-3 rounded-full bg-neon-green animate-pulse" />
-            <p class="text-lg font-semibold text-gray-900 dark:text-gray-100">Healthy</p>
+            <div 
+              class="w-3 h-3 rounded-full" 
+              :class="[
+                healthColor,
+                backendHealth.status === 'healthy' ? 'animate-pulse' : ''
+              ]"
+            />
+            <p 
+              class="text-lg font-semibold text-gray-900 dark:text-gray-100"
+              :title="backendHealth.message + (backendHealth.responseTime ? ` (${backendHealth.responseTime}ms)` : '')"
+            >
+              {{ healthStatus }}
+            </p>
           </div>
+          <p v-if="backendHealth.responseTime" class="text-xs text-gray-500 dark:text-gray-600 mt-1">
+            {{ backendHealth.responseTime }}ms
+          </p>
         </div>
       </div>
     </div>
@@ -169,7 +183,10 @@ const {
   onlineNodes, 
   lastUpdate, 
   error,
-  isPolling 
+  isPolling,
+  backendHealth,
+  healthStatus,
+  healthColor
 } = useSystemStats(2000)
 
 // Calculate bar height for chart

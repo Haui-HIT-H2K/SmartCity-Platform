@@ -14,11 +14,13 @@ export const useSystemStats = (pollingInterval = 2000) => {
         // Fetch immediately
         systemStore.fetchStats()
         systemStore.fetchEdgeNodes()
+        systemStore.fetchHealth()
 
         // Then set up interval
         intervalId = setInterval(() => {
             systemStore.fetchStats()
             systemStore.fetchEdgeNodes()
+            systemStore.fetchHealth()
         }, pollingInterval)
     }
 
@@ -45,6 +47,9 @@ export const useSystemStats = (pollingInterval = 2000) => {
         onlineNodes: computed(() => systemStore.onlineNodes),
         offlineNodes: computed(() => systemStore.offlineNodes),
         hasActiveNodes: computed(() => systemStore.hasActiveNodes),
+        backendHealth: computed(() => systemStore.backendHealth),
+        healthStatus: computed(() => systemStore.healthStatus),
+        healthColor: computed(() => systemStore.healthColor),
         lastUpdate: computed(() => systemStore.lastUpdate),
         error: computed(() => systemStore.error),
         isPolling: readonly(isPolling),
