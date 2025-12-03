@@ -1,31 +1,26 @@
 export default defineEventHandler(async (event) => {
-    const id = getRouterParam(event, 'id')
+  const id = getRouterParam(event, "id");
+  const config = useRuntimeConfig();
+  if (!id) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Record ID is required",
+    });
+  }
 
-    if (!id) {
-        throw createError({
-            statusCode: 400,
-            statusMessage: 'Record ID is required'
-        })
-    }
+  try {
+    // Get headers for forwarding
+    const backendUrl = config.apiSecret || "http://smart-city-backend:8080";
 
-    try {
-        // Get headers for forwarding
-        const headers = getHeaders(event)
+    const record = await $fetch(`${backendUrl}/api/data/${id}`);
 
-        // Fetch from backend API
-        const record = await $fetch(`http://localhost:8080/api/data/${id}`, {
-            headers: {
-                'host': headers.host || 'localhost:8080',
-            }
-        })
+    return record;
+  } catch (error: any) {
+    console.error("Error fetching record:", error);
 
-        return record
-    } catch (error: any) {
-        console.error('Error fetching record:', error)
-
-        throw createError({
-            statusCode: error.statusCode || 500,
-            statusMessage: error.message || 'Failed to fetch record'
-        })
-    }
-})
+    throw createError({
+      statusCode: error.statusCode || 500,
+      statusMessage: error.message || "Failed to fetch record",
+    });
+  }
+});
