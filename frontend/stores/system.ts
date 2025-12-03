@@ -57,12 +57,23 @@ export const useSystemStore = defineStore('system', {
 
         async fetchEdgeNodes() {
             try {
+                console.log('Fetching edge nodes from /api/nodes...')
                 const data = await $fetch<EdgeNode[]>('/api/nodes')
-                this.edgeNodes = data
+                console.log('Received edge nodes data:', data)
+                console.log('Edge nodes count:', data?.length || 0)
+
+                if (data && Array.isArray(data)) {
+                    this.edgeNodes = data
+                    console.log('Successfully set edge nodes:', this.edgeNodes)
+                } else {
+                    console.warn('Invalid edge nodes data received:', data)
+                    this.edgeNodes = []
+                }
                 this.error = null
             } catch (err: any) {
                 this.error = err?.message || 'Failed to fetch edge nodes'
                 console.error('Error fetching edge nodes:', err)
+                console.error('Error details:', err)
             }
         },
 

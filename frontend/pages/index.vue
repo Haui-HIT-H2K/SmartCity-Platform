@@ -8,8 +8,15 @@
         <span class="text-sm text-gray-600 dark:text-gray-500 ml-2">({{ onlineNodes.length }}/{{ edgeNodes.length }} online)</span>
       </h3>
       
+      <!-- Debug Info -->
+      <!-- <div class="mb-4 p-3 bg-yellow-100 dark:bg-yellow-900/20 rounded text-xs">
+        <p><strong>Debug Info:</strong></p>
+        <p>Edge Nodes Length: {{ edgeNodes.length }}</p>
+        <p>Edge Nodes Data: {{ JSON.stringify(edgeNodes) }}</p>
+      </div> -->
+      
       <div v-if="edgeNodes.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        <NodeCard 
+        <UiNodeCard 
           v-for="node in edgeNodes" 
           :key="node.id" 
           :node="node" 
@@ -171,6 +178,13 @@ const {
   error,
   isPolling 
 } = useSystemStats(2000)
+
+// Debug logging
+watchEffect(() => {
+  console.log('Edge Nodes:', edgeNodes.value)
+  console.log('Edge Nodes Length:', edgeNodes.value.length)
+  console.log('Online Nodes:', onlineNodes.value)
+})
 
 // Calculate bar height for chart
 const calculateHeight = (rate: number) => {
