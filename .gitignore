@@ -1,3 +1,7 @@
+﻿# ============================================================
+# JAVA (existing backend)
+# ============================================================
+
 # Compiled class file
 *.class
 
@@ -10,7 +14,7 @@
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
 
-# Package Files #
+# Package Files
 *.jar
 *.war
 *.nar
@@ -19,6 +23,185 @@
 *.tar.gz
 *.rar
 
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+# Virtual machine crash logs
 hs_err_pid*
 replay_pid*
+
+# ============================================================
+# PYTHON
+# ============================================================
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+
+# Virtual environments
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+.venv/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# ============================================================
+# MACHINE LEARNING MODELS & WEIGHTS (stored in MLflow)
+# ============================================================
+
+# Model files - ALL will be stored in MLflow
+*.pkl
+# EXCEPTION: Allow trained ML service models to be committed for easy deployment
+!ml-service/app/models/*.pkl
+*.pickle
+*.h5
+*.hdf5
+*.pb
+*.pt
+*.pth
+*.ckpt
+*.weights
+*.model
+*.joblib
+*.safetensors
+
+# Model directories
+# ml-service/models/ - COMMENTED: Allow ml-service/app/models/*.pkl to be committed
+consumer-worker/models/
+# models/ - COMMENTED: Too broad, blocks ml-service/app/models/*.pkl exception
+checkpoints/
+weights/
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+*.ipynb
+
+# Data files
+*.csv
+*.tsv
+*.dat
+*.data
+*.parquet
+*.feather
+# MongoDB data directories (runtime data, should not be committed)
+# Ignore all contents but keep directory structure with .gitkeep
+data/*
+!data/.gitkeep
+datasets/
+*.db
+*.sqlite
+*.sql
+
+# ============================================================
+# ML EXPERIMENT TRACKING
+# ============================================================
+
+# MLflow
+mlruns/
+mlflow/
+mlartifacts/
+
+# Weights & Biases
+wandb/
+
+# TensorBoard
+runs/
+logs/
+tensorboard/
+
+# DVC (Data Version Control)
+.dvc/
+*.dvc
+
+# ============================================================
+# DOCKER
+# ============================================================
+
+# Docker volumes
+docker-compose.override.yml
+
+# ============================================================
+# ENVIRONMENT & SECRETS
+# ============================================================
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+*.env
+!.env.example
+
+# Secrets
+secrets/
+*.key
+*.pem
+*.crt
+*.cer
+*.p12
+
+# ============================================================
+# PROJECT SPECIFIC
+# ============================================================
+
+# RabbitMQ data
+rabbitmq_data/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.bak
+*.swp
+
+# OS
+Thumbs.db
+.DS_Store

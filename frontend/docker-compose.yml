@@ -1,0 +1,33 @@
+version: "3.8"
+
+services:
+  smart-city-dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: smart-city-dashboard
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - NUXT_PUBLIC_API_BASE=http://localhost:8080
+      - NUXT_API_SECRET=http://smart-city-backend:8080
+    restart: unless-stopped
+    networks:
+      - smart-city-network
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "require('http').get('http://localhost:3000', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  smart-city-network:
+    driver: bridge

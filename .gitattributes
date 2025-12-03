@@ -1,0 +1,6 @@
+# Explicitly mark LICENSE as the only license file
+LICENSE linguist-detectable=true
+
+# Mark COPYRIGHT_NOTICE.txt as documentation, not a license file
+COPYRIGHT_NOTICE.txt linguist-detectable=false linguist-documentation=true
+
