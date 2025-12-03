@@ -401,8 +401,8 @@ Tài liệu đầy đủ về API, kiến trúc, và hướng dẫn phát triể
 
 ## 🤝 Đóng góp cho Dự án
 
-* **Báo lỗi ⚠️:** [Tạo Bug Report](https://github.com/Haui-HIT-H2K/SmartCity-Platform/issues/new)
-* **Đề xuất tính năng:** [Feature Request](https://github.com/Haui-HIT-H2K/SmartCity-Platform/issues/new)
+* **Báo lỗi ⚠️:** [Tạo Bug Report](https://github.com/Haui-HIT-H2K/SmartCity-Platform/issues/new?template=bao-loi.md)
+* **Đề xuất tính năng:** [Feature Request](https://github.com/Haui-HIT-H2K/SmartCity-Platform/issues/new?template=de-xuat-tinh-nang.md)
 
 Mọi đóng góp đều được trân trọng. Vui lòng đọc `CONTRIBUTING.md` trước khi gửi pull request.
 
