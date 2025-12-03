@@ -1,12 +1,12 @@
 # IoT Data Simulator
 
-Python tool để giả lập dữ liệu IoT cảm biến cho Smart City Platform.
+Công cụ Python để giả lập dữ liệu IoT sensor cho Smart City Platform.
 
 ## Tính năng
 
-- ✅ Gửi **40 triệu requests** tới RabbitMQ
-- ✅ Multi-threading (20 threads: 10/edge)
-- ✅ Kết nối tới 2 RabbitMQ Edge Nodes
+- ✅ Gửi **40 triệu request** tới RabbitMQ
+- ✅ Multi-threading (20 thread: 10/edge)
+- ✅ Kết nối tới 2 RabbitMQ Edge Node
 - ✅ Auto-retry khi mất kết nối
 - ✅ Real-time progress tracking
 - ✅ Performance metrics
@@ -20,9 +20,9 @@ pip install -r requirements.txt
 ## Cấu hình
 
 File `config.py` chứa các thông số:
-- `TOTAL_REQUESTS = 40_000_000` - Tổng số messages
-- `NUM_THREADS = 20` - Số threads
-- RabbitMQ connections (Edge 1: port 5672, Edge 2: port 5673)
+- `TOTAL_REQUESTS = 40_000_000` - Tổng số message
+- `NUM_THREADS = 20` - Số thread
+- RabbitMQ connection (Edge 1: port 5672, Edge 2: port 5673)
 
 ## Chạy Simulator
 
@@ -58,4 +58,4 @@ python-data-simulator/
 
 - Đảm bảo RabbitMQ đang chạy trên Docker
 - Port mapping: Edge-1 (5672), Edge-2 (5673)
-- Credentials: `edge_user/edge_pass`
+- Credential: `edge_user/edge_pass`
