@@ -7,7 +7,7 @@ Trains IsolationForest models for anomaly detection on:
 """
 
 import numpy as np
-import pickle
+import joblib
 from pathlib import Path
 from sklearn.ensemble import IsolationForest
 
@@ -47,8 +47,7 @@ temp_model.fit(training_temp)
 
 # Save model
 temp_model_path = models_dir / "temperature_model.pkl"
-with open(temp_model_path, 'wb') as f:
-    pickle.dump(temp_model, f)
+joblib.dump(temp_model, temp_model_path)
 print(f"✓ Temperature model saved: {temp_model_path}")
 
 # Test the model
@@ -82,8 +81,7 @@ humidity_model.fit(training_humidity)
 
 # Save model
 humidity_model_path = models_dir / "humidity_model.pkl"
-with open(humidity_model_path, 'wb') as f:
-    pickle.dump(humidity_model, f)
+joblib.dump(humidity_model, humidity_model_path)
 print(f"✓ Humidity model saved: {humidity_model_path}")
 
 # Test the model
@@ -114,8 +112,7 @@ co2_model.fit(training_co2)
 
 # Save model
 co2_model_path = models_dir / "co2_model.pkl"
-with open(co2_model_path, 'wb') as f:
-    pickle.dump(co2_model, f)
+joblib.dump(co2_model, co2_model_path)
 print(f"✓ CO2 model saved: {co2_model_path}")
 
 # Test the model
