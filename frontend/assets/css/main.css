@@ -21,37 +21,46 @@
 
   body {
     @apply font-sans antialiased min-h-screen;
-    @apply bg-gray-50 text-gray-900 dark:bg-dark dark:text-gray-100;
+    @apply bg-gray-50 text-black dark:bg-dark dark:text-white;
     background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
     transition: background-color 0.3s ease, color 0.3s ease;
+    color: #000000;
   }
 
   body.dark {
     background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
+    color: #ffffff;
   }
 
-  /* Global text contrast improvements for light mode */
+  /* Global text contrast improvements for light mode - High contrast for readability */
   body:not(.dark) {
+    color: #000000;
 
-    /* Make all gray text colors darker in light mode */
-    .text-gray-100 {
-      @apply !text-black;
+    /* Force all gray text colors to black or very dark gray in light mode for high contrast */
+    .text-gray-100,
+    .text-gray-200,
+    .text-gray-300,
+    .text-gray-400,
+    .text-gray-500,
+    .text-gray-600 {
+      @apply !text-gray-900;
     }
 
-    .text-gray-200 {
-      @apply !text-black;
+    /* Make medium gray text darker but not pure black for subtle hierarchy */
+    .text-gray-700 {
+      @apply !text-gray-800;
     }
 
-    .text-gray-300 {
-      @apply !text-black;
-    }
-
-    .text-gray-400 {
-      @apply !text-black;
-    }
-
-    .text-gray-500 {
-      @apply !text-black;
+    /* Ensure headings and important text are pure black */
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    .text-gray-800,
+    .text-gray-900 {
+      @apply !text-black !font-bold;
     }
 
     /* Make table headers and labels more visible */
@@ -61,17 +70,40 @@
     }
 
     label {
-      @apply !text-black;
+      @apply !text-black !font-medium;
     }
 
-    /* Increase overall font weight for better readability */
-    h1,
-    h2,
-    h3,
-    h4,
-    h5,
-    h6 {
-      @apply !font-bold;
+    /* Ensure paragraphs and body text have high contrast */
+    p {
+      @apply !text-gray-900;
+    }
+
+    /* Make links more visible */
+    a {
+      @apply !text-gray-900;
+    }
+
+    /* Ensure all text elements have minimum contrast */
+    span,
+    div,
+    li,
+    td {
+      color: inherit;
+    }
+  }
+
+  /* Force white text in dark mode for all gray text colors */
+  .dark {
+    .text-gray-100,
+    .text-gray-200,
+    .text-gray-300,
+    .text-gray-400,
+    .text-gray-500,
+    .text-gray-600,
+    .text-gray-700,
+    .text-gray-800,
+    .text-gray-900 {
+      @apply !text-white;
     }
   }
 }
