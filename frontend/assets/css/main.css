@@ -21,93 +21,19 @@
 
   body {
     @apply font-sans antialiased min-h-screen;
-    @apply bg-gray-50 text-black dark:bg-dark dark:text-white;
-    background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+    @apply bg-gray-50 text-gray-900 dark:bg-dark dark:text-white;
     transition: background-color 0.3s ease, color 0.3s ease;
-    color: #000000;
   }
 
-  body.dark {
-    background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
-    color: #ffffff;
-  }
-
-  /* Global text contrast improvements for light mode - High contrast for readability */
+  /* Light mode background gradient */
   body:not(.dark) {
-    color: #000000;
-
-    /* Force all gray text colors to black or very dark gray in light mode for high contrast */
-    .text-gray-100,
-    .text-gray-200,
-    .text-gray-300,
-    .text-gray-400,
-    .text-gray-500,
-    .text-gray-600 {
-      color: rgb(17 24 39) !important; /* text-gray-900 */
-    }
-
-    /* Make medium gray text darker but not pure black for subtle hierarchy */
-    .text-gray-700 {
-      color: rgb(31 41 55) !important; /* text-gray-800 */
-    }
-
-    /* Ensure headings and important text are pure black */
-    h1,
-    h2,
-    h3,
-    h4,
-    h5,
-    h6,
-    .text-gray-800,
-    .text-gray-900 {
-      color: rgb(0 0 0) !important; /* text-black */
-      font-weight: 700 !important; /* font-bold */
-    }
-
-    /* Make table headers and labels more visible */
-    th,
-    thead {
-      color: rgb(0 0 0) !important; /* text-black */
-      font-weight: 700 !important; /* font-bold */
-    }
-
-    label {
-      color: rgb(0 0 0) !important; /* text-black */
-      font-weight: 500 !important; /* font-medium */
-    }
-
-    /* Ensure paragraphs and body text have high contrast */
-    p {
-      color: rgb(17 24 39) !important; /* text-gray-900 */
-    }
-
-    /* Make links more visible */
-    a {
-      color: rgb(17 24 39) !important; /* text-gray-900 */
-    }
-
-    /* Ensure all text elements have minimum contrast */
-    span,
-    div,
-    li,
-    td {
-      color: inherit;
-    }
+    background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
   }
 
-  /* Force white text in dark mode for all gray text colors */
-  .dark {
-    .text-gray-100,
-    .text-gray-200,
-    .text-gray-300,
-    .text-gray-400,
-    .text-gray-500,
-    .text-gray-600,
-    .text-gray-700,
-    .text-gray-800,
-    .text-gray-900 {
-      color: rgb(255 255 255) !important; /* text-white */
-    }
+  /* Dark mode background gradient */
+  body.dark,
+  .dark body {
+    background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
   }
 }
 

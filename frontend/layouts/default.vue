@@ -51,8 +51,8 @@
             <User class="w-4 h-4 text-primary" />
           </div>
           <div>
-            <p class="text-sm font-medium text-gray-900 dark:text-gray-300">Admin</p>
-            <p class="text-xs text-gray-600 dark:text-gray-600">System Operator</p>
+            <p class="text-sm font-medium text-gray-900 dark:text-gray-100">Admin</p>
+            <p class="text-xs text-gray-600 dark:text-gray-400">System Operator</p>
           </div>
         </div>
       </div>

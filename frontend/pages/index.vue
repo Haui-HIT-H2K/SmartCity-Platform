@@ -54,18 +54,18 @@
             <div 
               v-for="(snapshot, index) in stats.rateHistory.slice(-10)" 
               :key="index"
-              class="flex justify-between items-center p-2 bg-gray-800 rounded text-sm"
+              class="flex justify-between items-center p-2 bg-gray-100 dark:bg-gray-800 rounded text-sm"
             >
-              <span class="text-gray-400">{{ new Date(snapshot.timestamp).toLocaleTimeString() }}</span>
+              <span class="text-gray-600 dark:text-gray-400">{{ new Date(snapshot.timestamp).toLocaleTimeString() }}</span>
               <div class="flex gap-4">
-                <span class="text-cyan-400">↑ {{ snapshot.incomingRate }}/s</span>
-                <span class="text-green-400">↓ {{ snapshot.processedRate }}/s</span>
+                <span class="text-cyan-600 dark:text-cyan-400">↑ {{ snapshot.incomingRate }}/s</span>
+                <span class="text-green-600 dark:text-green-400">↓ {{ snapshot.processedRate }}/s</span>
               </div>
             </div>
           </div>
 
           <!-- No Data -->
-          <div v-else class="h-64 bg-gray-900/50 rounded-lg flex items-center justify-center">
+          <div v-else class="h-64 bg-gray-100 dark:bg-gray-900/50 rounded-lg flex items-center justify-center">
             <div class="text-center text-gray-500">
               <Activity class="w-12 h-12 mx-auto mb-2 opacity-50" />
               <p>Waiting for rate data...</p>
@@ -113,22 +113,22 @@
     <div class="glass-card p-6">
       <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
         <div>
-          <p class="text-sm text-gray-600 dark:text-gray-500 mb-1">Total Records</p>
+          <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">Total Records</p>
           <p class="text-2xl font-bold text-primary">{{ stats.totalCount.toLocaleString() }}</p>
         </div>
         <div>
-          <p class="text-sm text-gray-500 mb-1">Incoming Rate</p>
+          <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">Incoming Rate</p>
           <p class="text-2xl font-bold text-neon-green">{{ stats.incomingRate }}/s</p>
         </div>
         <div>
-          <p class="text-sm text-gray-500 mb-1">Processed Rate</p>
+          <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">Processed Rate</p>
           <p class="text-2xl font-bold text-neon-green">{{ stats.processedRate }}/s</p>
         </div>
         <div>
-          <p class="text-sm text-gray-500 mb-1">System Health</p>
+          <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">System Health</p>
           <div class="flex items-center justify-center gap-2">
             <div class="w-3 h-3 rounded-full bg-neon-green animate-pulse" />
-            <p class="text-lg font-semibold text-gray-900 dark:text-gray-300">Healthy</p>
+            <p class="text-lg font-semibold text-gray-900 dark:text-gray-100">Healthy</p>
           </div>
         </div>
       </div>
