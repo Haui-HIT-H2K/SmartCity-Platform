@@ -22,30 +22,52 @@ FastAPI service for Smart City sensor anomaly detection supporting **3 metrics**
 
 ---
 
-## 🛠️ Installation
+## 🛠️ Installation & First-Time Setup
 
-### Option 1: Docker (Recommended)
+Thanks to the new `entrypoint.sh`, the service now **self-heals**: every time the container boots it checks for the 3 model files and automatically trains them if they are missing. That means a fresh clone needs almost zero manual work.
+
+### ⚡ Quick Start (Docker Compose – Recommended)
 
 ```bash
-# Build image
-docker build -t ml-service:latest .
-
-# Run container
-docker run -d -p 8000:8000 --name ml-service ml-service:latest
+# From the repository root
+docker compose up -d --build ml-service
 ```
 
-### Option 2: Local Development
+What happens automatically:
+
+- Dependencies are installed inside the container.
+- `entrypoint.sh` looks for `app/models/*.pkl`. If they are missing, it runs `python3 /app/train_models.py` for you.
+- After training (or reusing existing models) it boots FastAPI with Uvicorn.
+
+Useful follow-up commands:
 
 ```bash
-# Install dependencies
+# Tail logs to watch the auto-training output
+docker logs -f smart-city-ml
+
+# Verify models + API status
+curl http://localhost:8000/health
+```
+
+> 💡 Need to rebuild? Just rerun `docker compose build ml-service && docker compose up -d ml-service`. The entrypoint will detect that models already exist and skip retraining.
+
+### 🧑‍💻 Local Development (without Docker)
+
+You still can run the service directly on your machine when debugging models:
+
+```bash
+# 1. Install dependencies
 pip install -r requirements.txt
 
-# Train models (first time only)
+# 2. (Optional) Retrain models if you changed the training script
 python3 train_models.py
 
-# Start server
-uvicorn app:app --reload --host 0.0.0.0 --port 8000
+# 3. Start the API
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
+
+- The repo ships with pre-trained models, so step 2 is optional unless you want to regenerate them.
+- Live reload is enabled so edits under `app/` are picked up instantly.
 
 ---
 

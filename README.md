@@ -118,25 +118,25 @@ Lệnh này sẽ khởi động:
 
 **Lưu ý:** Lần build đầu tiên có thể mất 5-10 phút.
 
-### Bước 3: Train ML Models (Chỉ lần đầu)
+### Bước 3: ML Service tự động train models (Không cần thao tác tay)
+
+Từ thời điểm này, **không cần train/copy models thủ công nữa**. Container `smart-city-ml` đã dùng `entrypoint.sh` để:
+
+- Kiểm tra sự tồn tại của các file model trong `ml-service/app/models/*.pkl`
+- Nếu **chưa có**, tự động gọi `python3 /app/train_models.py` bên trong container
+- Sau đó mới khởi động FastAPI bằng Uvicorn
+
+Vì vậy, sau khi chạy `docker-compose up -d --build`, bạn chỉ cần:
 
 ```bash
-# Cài đặt dependencies
-cd ml-service
-pip install numpy scikit-learn
+# Xem logs ML service để theo dõi quá trình auto-train
+docker logs -f smart-city-ml
 
-# Train models
-python train_models.py
-
-# Copy models vào container
-cd ..
-docker cp ml-service/app/models/temperature_model.pkl smart-city-ml:/app/models/
-docker cp ml-service/app/models/humidity_model.pkl smart-city-ml:/app/models/
-docker cp ml-service/app/models/co2_model.pkl smart-city-ml:/app/models/
-
-# Restart ML service
-docker restart smart-city-ml
+# Kiểm tra health xem models đã load chưa
+curl http://localhost:8000/health
 ```
+
+> Nếu bạn muốn train lại models để thay đổi thuật toán/dữ liệu, xem thêm phần hướng dẫn trong `ml-service/README.md`.
 
 ### Bước 4: Khởi động Data Simulator
 
@@ -319,12 +319,14 @@ docker-compose down -v
 ### ML Service không load models
 
 ```bash
-# Kiểm tra models trong container
-docker exec smart-city-ml ls -lh /app/models/
+# 1. Kiểm tra models trong container
+docker exec smart-city-ml ls -lh /app/app/models/
 
-# Nếu không có, copy lại models
-docker cp ml-service/app/models/*.pkl smart-city-ml:/app/models/
-docker restart smart-city-ml
+# 2. Nếu thư mục trống, rebuild lại ml-service
+docker-compose build --no-cache ml-service
+docker-compose up -d ml-service
+
+# entrypoint.sh sẽ tự động train lại models khi container khởi động
 ```
 
 ### Backend không kết nối được ML Service
