@@ -408,11 +408,6 @@ Mọi đóng góp đều được trân trọng. Vui lòng đọc `CONTRIBUTING.
 
 ---
 
-## Contributors
-<a href="https://github.com/Tên-User-Của-Anh/Tên-Repo-Của-Anh/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=/Haui-HIT-H2K/SmartCity-Platform" />
-</a>
-
 ## 📞 Liên hệ
 
 * **Nguyễn Huy Hoàng:** nguyenhuyhoangpt0402@gmail.com
