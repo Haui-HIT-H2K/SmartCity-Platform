@@ -40,9 +40,9 @@
       </h3>
       
       <UiCard>
-        <div class="p-4 space-y-4">
+        <div class="p-4">
           <!-- Chart Header -->
-          <div class="flex items-center justify-between">
+          <div class="flex items-center justify-between mb-4">
             <p class="text-sm text-gray-400">{{ stats.rateHistory?.length || 0 }} data points</p>
             <div class="flex gap-4 text-xs">
               <div class="flex items-center gap-2">
@@ -56,19 +56,12 @@
             </div>
           </div>
 
-          <!-- Simple Data List (NO CHART - just verify data) -->
-          <div v-if="stats.rateHistory && stats.rateHistory.length > 0" class="space-y-2 max-h-64 overflow-y-auto">
-            <div 
-              v-for="(snapshot, index) in stats.rateHistory.slice(-10)" 
-              :key="index"
-              class="flex justify-between items-center p-2 bg-gray-100 dark:bg-gray-800 rounded text-sm"
-            >
-              <span class="text-gray-600 dark:text-gray-400">{{ new Date(snapshot.timestamp).toLocaleTimeString() }}</span>
-              <div class="flex gap-4">
-                <span class="text-cyan-600 dark:text-cyan-400">↑ {{ snapshot.incomingRate }}/s</span>
-                <span class="text-green-600 dark:text-green-400">↓ {{ snapshot.processedRate }}/s</span>
-              </div>
-            </div>
+          <!-- Chart -->
+          <div v-if="stats.rateHistory && stats.rateHistory.length > 0">
+            <ChartsDataIngestionChart 
+              :rate-history="stats.rateHistory" 
+              height="400px"
+            />
           </div>
 
           <!-- No Data -->
@@ -178,13 +171,6 @@ const {
   error,
   isPolling 
 } = useSystemStats(2000)
-
-// Debug logging
-watchEffect(() => {
-  console.log('Edge Nodes:', edgeNodes.value)
-  console.log('Edge Nodes Length:', edgeNodes.value.length)
-  console.log('Online Nodes:', onlineNodes.value)
-})
 
 // Calculate bar height for chart
 const calculateHeight = (rate: number) => {
