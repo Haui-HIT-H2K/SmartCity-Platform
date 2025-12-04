@@ -1,13 +1,3 @@
-<!--
-
-  Copyright 2025 Haui.HIT - H2K
-
-  Licensed under the Apache License, Version 2.0
-
-  http://www.apache.org/licenses/LICENSE-2.0
-
--->
-
 # Smart City Platform - Core Backend
 
 Nền tảng thu thập và lưu trữ dữ liệu IoT hiệu năng cao cho hạ tầng Smart City, được xây dựng với Spring Boot và có kiến trúc lưu trữ 3 tầng (HOT/WARM/COLD).

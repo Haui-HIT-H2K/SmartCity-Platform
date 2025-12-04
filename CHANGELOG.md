@@ -1,13 +1,3 @@
-<!--
-
-  Copyright 2025 Haui.HIT - H2K
-
-  Licensed under the Apache License, Version 2.0
-
-  http://www.apache.org/licenses/LICENSE-2.0
-
--->
-
 # Lịch sử thay đổi
 
 ## [v1.0.0] - 2025-10-30
