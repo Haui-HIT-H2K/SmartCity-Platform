@@ -1,16 +1,6 @@
-<!--
-
-  Copyright 2025 Haui.HIT - H2K
-
-  Licensed under the Apache License, Version 2.0
-
-  http://www.apache.org/licenses/LICENSE-2.0
-
--->
-
 ---
-sidebar_position: 3
-title: Lộ Trình Phát Triển
+sidebar_position: 7
+title: "7. Lộ Trình Phát Triển (Development Roadmap)"
 ---
 
 Lộ trình phát triển của SmartCity-Platform được chia thành các giai đoạn ngắn, thực tế, tập trung vào việc hoàn thành sản phẩm MVP (Sản phẩm Khả dụng Tối thiểu) cho cuộc thi PMNM 2025, đồng thời đặt nền móng cho sự phát triển bền vững sau này.

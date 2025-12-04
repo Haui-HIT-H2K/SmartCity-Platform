@@ -1,16 +1,6 @@
-<!--
-
-  Copyright 2025 Haui.HIT - H2K
-
-  Licensed under the Apache License, Version 2.0
-
-  http://www.apache.org/licenses/LICENSE-2.0
-
--->
-
 ---
 sidebar_position: 2
-title: Luồng Dữ liệu (Data Flow)
+title: "Luồng Dữ Liệu (Data Flow)"
 ---
 
 Đây là luồng dữ liệu (data flow) End-to-End của hệ thống SmartCity-Platform, kết hợp giữa ý tưởng **DNS Routing & PULL Model** (Tiêu chí 7) và yêu cầu **NGSI-LD** (Tiêu chí Kỹ thuật).

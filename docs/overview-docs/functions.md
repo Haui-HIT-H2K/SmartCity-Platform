@@ -1,16 +1,6 @@
-<!--
-
-  Copyright 2025 Haui.HIT - H2K
-
-  Licensed under the Apache License, Version 2.0
-
-  http://www.apache.org/licenses/LICENSE-2.0
-
--->
-
 ---
-sidebar_position: 2
-title: Chức Năng Chính
+sidebar_position: 6
+title: "6. Chức Năng Chính (Key Features)"
 ---
 
 SmartCity-Platform được xây dựng với một bộ tính năng chuyên biệt, tập trung vào việc thu thập, xử lý và cung cấp dữ liệu đô thị **thời gian thực** một cách **tin cậy** và **hiệu quả**.

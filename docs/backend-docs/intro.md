@@ -1,16 +1,6 @@
-<!--
-
-  Copyright 2025 Haui.HIT - H2K
-
-  Licensed under the Apache License, Version 2.0
-
-  http://www.apache.org/licenses/LICENSE-2.0
-
--->
-
 ---
 sidebar_position: 1
-title: Giới Thiệu Tổng Quan Backend
+title: "Backend - Giới Thiệu (Introduction)"
 ---
 
 Phần **Backend** của **SmartCity-Platform** là (các) dịch vụ microservice do đội phát triển (viết bằng Spring Boot / Python). Dịch vụ này đóng vai trò là **\"bộ não\"** của toàn bộ hệ thống, thực thi logic nghiệp vụ quan trọng nhất để đáp ứng yêu cầu cuộc thi.
