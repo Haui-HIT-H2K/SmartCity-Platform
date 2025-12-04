@@ -194,6 +194,17 @@ SKIP_DIRS = {"node_modules", "build", "dist", ".git", "target", "out", ".gradle"
 
 SKIP_FILE_PATTERNS = (".min.js", ".min.css")
 
+# Config files that should not have SPDX identifier (only comment header)
+# These files have specific formats that don't support SPDX identifier at the top
+SKIP_SPDX_FILES = {
+    "docker-compose.yml", "docker-compose.yaml",
+    "package.json", "package-lock.json",
+    "pom.xml",
+    "application.yml", "application.yaml",
+    "tsconfig.json", "jsconfig.json",
+    "nuxt.config.ts", "vite.config.ts", "webpack.config.js"
+}
+
 
 
 def has_header(text: str) -> bool:
@@ -210,14 +221,8 @@ def has_header(text: str) -> bool:
 
 
 
-def insert_header(text: str, header: str, spdx: bool) -> str:
-
-    prefix = "SPDX-License-Identifier: Apache-2.0\n"
-
-    if spdx:
-
-        return f"{prefix}{header}{text}"
-
+def insert_header(text: str, header: str, spdx: bool, filename: str = "") -> str:
+    # Don't add SPDX identifier - user preference is to only use comment headers
     return f"{header}{text}"
 
 
@@ -258,7 +263,7 @@ def process_file(path: Path, year: str, owner: str, spdx: bool) -> bool:
 
 
 
-    new_content = insert_header(content, header, spdx=spdx)
+    new_content = insert_header(content, header, spdx=spdx, filename=path.name)
 
     path.write_text(new_content, encoding="utf-8")
 
