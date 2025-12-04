@@ -1,3 +1,14 @@
+SPDX-License-Identifier: Apache-2.0
+<!--
+
+  Copyright 2025 Haui.HIT - H2K
+
+  Licensed under the Apache License, Version 2.0
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+-->
+
 # Smart City Platform - Core Backend
 
 A high-performance IoT data ingestion and storage platform for Smart City infrastructure, built with Spring Boot and featuring a 3-tier storage architecture (HOT/WARM/COLD).

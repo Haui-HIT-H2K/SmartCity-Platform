@@ -1,3 +1,10 @@
+SPDX-License-Identifier: Apache-2.0
+# Copyright 2025 Haui.HIT - H2K
+
+# Licensed under the Apache License, Version 2.0
+
+# http://www.apache.org/licenses/LICENSE-2.0
+
 """
 IoT Data Simulator - Main Script
 Giả lập 40 triệu requests tới RabbitMQ với multi-threading

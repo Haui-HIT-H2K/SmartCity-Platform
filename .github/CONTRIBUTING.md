@@ -1,3 +1,14 @@
+SPDX-License-Identifier: Apache-2.0
+<!--
+
+  Copyright 2025 Haui.HIT - H2K
+
+  Licensed under the Apache License, Version 2.0
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+-->
+
 # Những quy định liên quan đến đóng góp dành cho kho code của SmartCity-Platform
 
 Bằng việc tham gia kho code này (coder hoặc tester), bạn đồng ý với các quy định dưới đây:

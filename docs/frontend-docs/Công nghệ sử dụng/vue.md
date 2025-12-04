@@ -1,3 +1,14 @@
+SPDX-License-Identifier: Apache-2.0
+<!--
+
+  Copyright 2025 Haui.HIT - H2K
+
+  Licensed under the Apache License, Version 2.0
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+-->
+
 ---
 sidebar_position: 2
 title: Vue 3
