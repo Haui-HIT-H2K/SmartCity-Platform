@@ -1,13 +1,3 @@
-<!--
-
-  Copyright 2025 Haui.HIT - H2K
-
-  Licensed under the Apache License, Version 2.0
-
-  http://www.apache.org/licenses/LICENSE-2.0
-
--->
-
 # SmartCity-Platform (Bài dự thi Phần Mềm Nguồn Mở 2025)
 
 **Đội:** Haui-HIT-H2K

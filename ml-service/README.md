@@ -1,13 +1,3 @@
-<!--
-
-  Copyright 2025 Haui.HIT - H2K
-
-  Licensed under the Apache License, Version 2.0
-
-  http://www.apache.org/licenses/LICENSE-2.0
-
--->
-
 # ML Service - Multi-Model Anomaly Detection
 
 Service FastAPI cho phát hiện bất thường sensor Smart City hỗ trợ **3 metric**: Temperature, Humidity, và CO2.
