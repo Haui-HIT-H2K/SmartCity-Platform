@@ -8,6 +8,7 @@ title: '[BUG] '
 labels: ['bug']
 
 assignees: ''
+
 ---
 
 | name | about | title | labels | assignees |
