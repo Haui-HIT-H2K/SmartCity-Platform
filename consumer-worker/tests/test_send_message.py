@@ -1,3 +1,10 @@
+SPDX-License-Identifier: Apache-2.0
+# Copyright 2025 Haui.HIT - H2K
+
+# Licensed under the Apache License, Version 2.0
+
+# http://www.apache.org/licenses/LICENSE-2.0
+
 #!/usr/bin/env python3
 """
 Quick test script to send a test message to RabbitMQ

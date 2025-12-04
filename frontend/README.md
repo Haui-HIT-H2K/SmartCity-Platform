@@ -1,3 +1,14 @@
+SPDX-License-Identifier: Apache-2.0
+<!--
+
+  Copyright 2025 Haui.HIT - H2K
+
+  Licensed under the Apache License, Version 2.0
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+-->
+
 # Smart City Dashboard - IoT Monitoring Platform
 
 Dashboard real-time để giám sát và quản lý hạ tầng IoT Smart City, được xây dựng với Nuxt 3 và có giao diện dark UI theo phong cách cyberpunk.

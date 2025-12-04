@@ -8,8 +8,15 @@
         <span class="text-sm text-gray-600 dark:text-gray-500 ml-2">({{ onlineNodes.length }}/{{ edgeNodes.length }} online)</span>
       </h3>
       
+      <!-- Debug Info -->
+      <!-- <div class="mb-4 p-3 bg-yellow-100 dark:bg-yellow-900/20 rounded text-xs">
+        <p><strong>Debug Info:</strong></p>
+        <p>Edge Nodes Length: {{ edgeNodes.length }}</p>
+        <p>Edge Nodes Data: {{ JSON.stringify(edgeNodes) }}</p>
+      </div> -->
+      
       <div v-if="edgeNodes.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        <NodeCard 
+        <UiNodeCard 
           v-for="node in edgeNodes" 
           :key="node.id" 
           :node="node" 
@@ -33,9 +40,9 @@
       </h3>
       
       <UiCard>
-        <div class="p-4 space-y-4">
+        <div class="p-4">
           <!-- Chart Header -->
-          <div class="flex items-center justify-between">
+          <div class="flex items-center justify-between mb-4">
             <p class="text-sm text-gray-400">{{ stats.rateHistory?.length || 0 }} data points</p>
             <div class="flex gap-4 text-xs">
               <div class="flex items-center gap-2">
@@ -49,19 +56,12 @@
             </div>
           </div>
 
-          <!-- Simple Data List (NO CHART - just verify data) -->
-          <div v-if="stats.rateHistory && stats.rateHistory.length > 0" class="space-y-2 max-h-64 overflow-y-auto">
-            <div 
-              v-for="(snapshot, index) in stats.rateHistory.slice(-10)" 
-              :key="index"
-              class="flex justify-between items-center p-2 bg-gray-100 dark:bg-gray-800 rounded text-sm"
-            >
-              <span class="text-gray-600 dark:text-gray-400">{{ new Date(snapshot.timestamp).toLocaleTimeString() }}</span>
-              <div class="flex gap-4">
-                <span class="text-cyan-600 dark:text-cyan-400">↑ {{ snapshot.incomingRate }}/s</span>
-                <span class="text-green-600 dark:text-green-400">↓ {{ snapshot.processedRate }}/s</span>
-              </div>
-            </div>
+          <!-- Chart -->
+          <div v-if="stats.rateHistory && stats.rateHistory.length > 0">
+            <ChartsDataIngestionChart 
+              :rate-history="stats.rateHistory" 
+              height="400px"
+            />
           </div>
 
           <!-- No Data -->
@@ -127,9 +127,23 @@
         <div>
           <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">System Health</p>
           <div class="flex items-center justify-center gap-2">
-            <div class="w-3 h-3 rounded-full bg-neon-green animate-pulse" />
-            <p class="text-lg font-semibold text-gray-900 dark:text-gray-100">Healthy</p>
+            <div 
+              class="w-3 h-3 rounded-full" 
+              :class="[
+                healthColor,
+                backendHealth.status === 'healthy' ? 'animate-pulse' : ''
+              ]"
+            />
+            <p 
+              class="text-lg font-semibold text-gray-900 dark:text-gray-100"
+              :title="backendHealth.message + (backendHealth.responseTime ? ` (${backendHealth.responseTime}ms)` : '')"
+            >
+              {{ healthStatus }}
+            </p>
           </div>
+          <p v-if="backendHealth.responseTime" class="text-xs text-gray-500 dark:text-gray-600 mt-1">
+            {{ backendHealth.responseTime }}ms
+          </p>
         </div>
       </div>
     </div>
@@ -169,7 +183,10 @@ const {
   onlineNodes, 
   lastUpdate, 
   error,
-  isPolling 
+  isPolling,
+  backendHealth,
+  healthStatus,
+  healthColor
 } = useSystemStats(2000)
 
 // Calculate bar height for chart

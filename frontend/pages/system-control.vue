@@ -85,18 +85,32 @@
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
       <div class="glass-card p-6">
         <div class="flex items-center gap-3 mb-3">
-          <Activity class="w-5 h-5 text-neon-green" />
+          <Activity class="w-5 h-5" :class="backendHealth.status === 'healthy' ? 'text-neon-green' : backendHealth.status === 'degraded' ? 'text-yellow-500' : 'text-red-500'" />
           <h4 class="font-semibold text-gray-900 dark:text-gray-200">
             Backend Status
           </h4>
         </div>
         <div class="flex items-center gap-2">
-          <div class="w-3 h-3 rounded-full bg-neon-green animate-pulse" />
-          <span class="text-lg font-medium text-gray-900 dark:text-gray-200"
-            >Connected</span
+          <div 
+            class="w-3 h-3 rounded-full" 
+            :class="[
+              healthColor,
+              backendHealth.status === 'healthy' ? 'animate-pulse' : ''
+            ]"
+          />
+          <span 
+            class="text-lg font-medium text-gray-900 dark:text-gray-200"
+            :title="backendHealth.message + (backendHealth.responseTime ? ` (${backendHealth.responseTime}ms)` : '')"
           >
+            {{ healthStatus }}
+          </span>
         </div>
-        <p class="text-xs text-gray-500 mt-2">http://localhost:8080</p>
+        <p v-if="backendHealth.responseTime" class="text-xs text-gray-500 mt-2">
+          Response: {{ backendHealth.responseTime }}ms
+        </p>
+        <p class="text-xs text-gray-500" :class="!backendHealth.responseTime ? 'mt-2' : ''">
+          {{ config.public.apiBase }}
+        </p>
       </div>
 
       <div class="glass-card p-6">
@@ -268,8 +282,9 @@ definePageMeta({
   layout: "default",
 });
 
+const config = useRuntimeConfig();
 const { syncNow, resetSystem, isLoading } = useSystemControl();
-const { edgeNodes, onlineNodes } = useSystemStats();
+const { edgeNodes, onlineNodes, backendHealth, healthStatus, healthColor } = useSystemStats();
 
 const isSyncing = ref(false);
 const isResetting = ref(false);
