@@ -1,19 +1,14 @@
-<!--
-
-  Copyright 2025 Haui.HIT - H2K
-
-  Licensed under the Apache License, Version 2.0
-
-  http://www.apache.org/licenses/LICENSE-2.0
-
--->
-
 ---
 name: Đề xuất ý tưởng
+
 about: Đề xuất ý tưởng cho dự án SmartCity-Platform
+
 title: '[FEATURE] '
+
 labels: ['enhancement']
+
 assignees: ''
+
 ---
 
 | name | about | title | labels | assignees |
