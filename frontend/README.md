@@ -10,90 +10,90 @@
 
 # Smart City Dashboard - IoT Monitoring Platform
 
-A real-time dashboard for monitoring and managing Smart City IoT infrastructure, built with Nuxt 3 and featuring a cyberpunk-themed dark UI.
+Dashboard real-time để giám sát và quản lý hạ tầng IoT Smart City, được xây dựng với Nuxt 3 và có giao diện dark UI theo phong cách cyberpunk.
 
 ![Dashboard Preview](https://img.shields.io/badge/Status-Production%20Ready-brightgreen)
 ![Nuxt 3](https://img.shields.io/badge/Nuxt-3.x-00DC82)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue)
 
-## 📸 UI Preview
+## 📸 Xem trước Giao diện
 
 ### Dashboard - Real-time Monitoring
 ![Smart City Dashboard](C:/Users/hoang.nguyenhuy3/.gemini/antigravity/brain/f5944823-a01e-4baf-adbe-66dfbce7b099/dashboard_preview_1764209854404.png)
-*Real-time monitoring with edge node status, live charts, and tiered storage statistics*
+*Giám sát real-time với trạng thái edge node, biểu đồ trực tiếp, và thống kê tiered storage*
 
 ### Data Explorer
 ![Data Explorer Page](C:/Users/hoang.nguyenhuy3/.gemini/antigravity/brain/f5944823-a01e-4baf-adbe-66dfbce7b099/data_explorer_1764209886172.png)
-*Advanced data filtering and pagination with professional table design*
+*Lọc dữ liệu nâng cao và phân trang với thiết kế bảng chuyên nghiệp*
 
-## 🚀 Features
+## 🚀 Tính năng
 
 ### Real-time Monitoring
-- **Edge Node Status**: Live monitoring of all edge storage nodes with online/offline indicators
-- **Data Ingestion Visualization**: Real-time line charts showing incoming and processed data rates
-- **Tiered Storage Statistics**: HOT (Redis), WARM (MongoDB), and COLD (MongoDB Archive) data counts
-- **Auto-refresh**: Polls backend API every 2 seconds for latest metrics
+- **Trạng thái Edge Node**: Giám sát trực tiếp tất cả edge storage node với chỉ báo online/offline
+- **Trực quan Data Ingestion**: Biểu đồ đường real-time hiển thị tỷ lệ dữ liệu incoming và processed
+- **Thống kê Tiered Storage**: Số lượng dữ liệu HOT (Redis), WARM (MongoDB), và COLD (MongoDB Archive)
+- **Auto-refresh**: Poll backend API mỗi 2 giây cho metric mới nhất
 
 ### Data Explorer
-- **Advanced Filtering**: Filter by data type (HOT/WARM/COLD) and sensor ID
-- **Paginated Table**: Server-side pagination for efficient data browsing
-- **Detailed View**: Click any record to view full details
-- **Export Ready**: Structured data display for easy export
+- **Lọc Nâng cao**: Lọc theo data type (HOT/WARM/COLD) và sensor ID
+- **Bảng Phân trang**: Server-side pagination để duyệt dữ liệu hiệu quả
+- **Xem Chi tiết**: Click vào bất kỳ record nào để xem chi tiết đầy đủ
+- **Sẵn sàng Export**: Hiển thị dữ liệu có cấu trúc để export dễ dàng
 
 ### System Control
-- **Manual Sync**: Trigger data synchronization from all edge nodes
-- **System Reset**: Clear all data for demo purposes (with confirmation)
-- **Action History**: Track all manual operations with timestamps
-- **Status Monitoring**: Real-time backend connection and node status
+- **Manual Sync**: Trigger đồng bộ dữ liệu từ tất cả edge node
+- **System Reset**: Xóa toàn bộ dữ liệu cho mục đích demo (với xác nhận)
+- **Lịch sử Action**: Theo dõi tất cả thao tác thủ công với timestamp
+- **Giám sát Trạng thái**: Kết nối backend và trạng thái node real-time
 
 ## 🛠️ Tech Stack
 
 - **Framework**: Nuxt 3 (SSR Mode)
 - **Language**: TypeScript
-- **Styling**: TailwindCSS with custom cyberpunk theme
-- **Charts**: ECharts for real-time data visualization
+- **Styling**: TailwindCSS với custom cyberpunk theme
+- **Charts**: ECharts cho trực quan dữ liệu real-time
 - **State Management**: Pinia
 - **Icons**: Lucide Vue Next
 - **HTTP Client**: Nuxt `useFetch` composable
 
-## 📋 Prerequisites
+## 📋 Yêu cầu Hệ thống
 
-- Node.js 20.x or higher
-- npm or yarn
-- Backend API running on `http://localhost:8080` (Spring Boot Smart City Platform)
+- Node.js 20.x hoặc cao hơn
+- npm hoặc yarn
+- Backend API đang chạy trên `http://localhost:8080` (Spring Boot Smart City Platform)
 
-## 🔧 Installation
+## 🔧 Cài đặt
 
-1. **Clone the repository**
+1. **Clone repository**
 ```bash
 git clone <repository-url>
 cd FE-MNM
 ```
 
-2. **Install dependencies**
+2. **Cài đặt dependencies**
 ```bash
 npm install
 ```
 
-3. **Configure environment variables**
+3. **Cấu hình biến môi trường**
 ```bash
 cp .env.example .env
-# Edit .env to configure API base URL if needed
+# Chỉnh sửa .env để cấu hình API base URL nếu cần
 ```
 
-4. **Start development server**
+4. **Khởi động development server**
 ```bash
 npm run dev
 ```
 
-The dashboard will be available at `http://localhost:3000`
+Dashboard sẽ khả dụng tại `http://localhost:3000`
 
-## 📦 Available Scripts
+## 📦 Các Script có sẵn
 
-- `npm run dev` - Start development server with hot reload
-- `npm run build` - Build for production
-- `npm run preview` - Preview production build locally
-- `npm run generate` - Generate static site (if needed)
+- `npm run dev` - Khởi động development server với hot reload
+- `npm run build` - Build cho production
+- `npm run preview` - Xem trước production build ở local
+- `npm run generate` - Tạo static site (nếu cần)
 
 ## 🐳 Docker Deployment
 
@@ -102,23 +102,23 @@ The dashboard will be available at `http://localhost:3000`
 docker build -t smart-city-dashboard .
 ```
 
-### Run with Docker
+### Chạy với Docker
 ```bash
 docker run -p 3000:3000 smart-city-dashboard
 ```
 
-### Using Docker Compose
+### Sử dụng Docker Compose
 ```bash
 docker-compose up -d
 ```
 
-## 🏗️ Project Structure
+## 🏗️ Cấu trúc Project
 
 ```
 FE-MNM/
 ├── assets/
 │   └── css/
-│       └── main.css              # Global styles and Tailwind config
+│       └── main.css              # Global styles và Tailwind config
 ├── components/
 │   ├── charts/
 │   │   └── RealtimeLineChart.vue # Real-time data chart
@@ -134,7 +134,7 @@ FE-MNM/
 │   ├── useSystemStats.ts         # System statistics polling
 │   └── useSystemControl.ts       # System control actions
 ├── layouts/
-│   └── default.vue               # Default layout with sidebar
+│   └── default.vue               # Default layout với sidebar
 ├── pages/
 │   ├── index.vue                 # Dashboard homepage
 │   ├── data-explorer.vue         # Data browsing page
@@ -150,32 +150,32 @@ FE-MNM/
 
 ## 🎨 Design Theme
 
-The dashboard features a **cyberpunk/Smart City aesthetic**:
+Dashboard có **cyberpunk/Smart City aesthetic**:
 
-- **Color Palette**: 
+- **Bảng màu**: 
   - Primary: Neon Blue (`#00f0ff`)
   - Accents: Neon Green, Purple, Pink
-  - Background: Dark gradients (`#0a0e27` to `#1a1f3a`)
+  - Background: Dark gradient (`#0a0e27` đến `#1a1f3a`)
   
-- **Effects**:
-  - Glassmorphism cards with backdrop blur
-  - Neon glow shadows on interactive elements
-  - Smooth animations and transitions
-  - Pulse animations for online indicators
+- **Hiệu ứng**:
+  - Glassmorphism card với backdrop blur
+  - Neon glow shadow trên interactive element
+  - Animation và transition mượt mà
+  - Pulse animation cho online indicator
 
-- **Typography**: Inter font family for clean, modern text
+- **Typography**: Font family Inter cho text hiện đại, rõ ràng
 
 ## 📡 API Integration
 
-The dashboard connects to the following backend endpoints:
+Dashboard kết nối tới các backend endpoint sau:
 
-- `GET /api/stats` - System statistics (HOT/WARM/COLD counts, rates)
-- `GET /api/nodes` - Edge node status and information
-- `GET /api/data` - Paginated city data records with filters
+- `GET /api/stats` - Thống kê hệ thống (HOT/WARM/COLD count, rate)
+- `GET /api/nodes` - Trạng thái và thông tin edge node
+- `GET /api/data` - Phân trang city data record với filter
 - `POST /api/sync/trigger` - Trigger manual data synchronization
-- `POST /api/system/reset` - Reset system data (demo purposes)
+- `POST /api/system/reset` - Reset system data (mục đích demo)
 
-API requests are proxied through Nuxt to avoid CORS issues. Configure the proxy in `nuxt.config.ts`:
+API request được proxy qua Nuxt để tránh vấn đề CORS. Cấu hình proxy trong `nuxt.config.ts`:
 
 ```typescript
 nitro: {
@@ -190,21 +190,21 @@ nitro: {
 
 ## 🔄 Real-time Updates
 
-The dashboard uses polling to achieve real-time updates:
+Dashboard sử dụng polling để đạt được cập nhật real-time:
 
-1. **System Stats**: Polls every 2 seconds via `useSystemStats` composable
-2. **Chart Updates**: Automatically updates when new data arrives
-3. **Auto-cleanup**: Polling stops when component unmounts
+1. **System Stats**: Poll mỗi 2 giây qua `useSystemStats` composable
+2. **Chart Update**: Tự động cập nhật khi dữ liệu mới đến
+3. **Auto-cleanup**: Dừng polling khi component unmount
 
-## 🌐 Browser Support
+## 🌐 Hỗ trợ Trình duyệt
 
 - Chrome/Edge (latest)
 - Firefox (latest)
 - Safari (latest)
 
-## 📝 Environment Variables
+## 📝 Biến Môi trường
 
-Create a `.env` file based on `.env.example`:
+Tạo file `.env` dựa trên `.env.example`:
 
 ```env
 # API Configuration
@@ -216,115 +216,115 @@ NODE_ENV=development
 
 ## 🚀 Production Deployment
 
-1. Build the application:
+1. Build ứng dụng:
 ```bash
 npm run build
 ```
 
-2. Start the production server:
+2. Khởi động production server:
 ```bash
 node .output/server/index.mjs
 ```
 
-Or use Docker for containerized deployment (see Docker section above).
+Hoặc sử dụng Docker cho containerized deployment (xem phần Docker ở trên).
 
-## 📚 Implementation Walkthrough
+## 📚 Chi tiết Triển khai
 
-### Component Architecture
+### Kiến trúc Component
 
 #### UI Components
 
 **Card Component** - [components/ui/Card.vue](file:///c:/Users/hoang.nguyenhuy3/FE-MNM/components/ui/Card.vue)
-- Base glassmorphism card with variants (default, primary, success, danger)
-- Supports title, icon, and custom content slots
-- Hover effects with neon glow
+- Base glassmorphism card với variant (default, primary, success, danger)
+- Hỗ trợ title, icon, và custom content slot
+- Hover effect với neon glow
 
 **StatCard Component** - [components/ui/StatCard.vue](file:///c:/Users/hoang.nguyenhuy3/FE-MNM/components/ui/StatCard.vue)
-- Large number display for KPIs with animated counters
-- Color variants for HOT (red), WARM (yellow), COLD (blue) data tiers
-- Trend indicators and subtitle support
+- Hiển thị số lớn cho KPI với animated counter
+- Color variant cho HOT (đỏ), WARM (vàng), COLD (xanh) data tier
+- Trend indicator và subtitle support
 
 **NodeCard Component** - [components/ui/NodeCard.vue](file:///c:/Users/hoang.nguyenhuy3/FE-MNM/components/ui/NodeCard.vue)
-- Edge node status display with pulse animations
-- Shows host:port, status badge, and last ping time
-- Differentiates online (green glow) vs offline (dimmed) nodes
+- Hiển thị trạng thái edge node với pulse animation
+- Hiển thị host:port, status badge, và last ping time
+- Phân biệt online (green glow) vs offline (dimmed) node
 
 **Button Component** - [components/ui/Button.vue](file:///c:/Users/hoang.nguyenhuy3/FE-MNM/components/ui/Button.vue)
-- Multiple variants: primary, danger, ghost, secondary
-- Size options: small, medium, large
-- Loading state with spinner, icon placement support
+- Nhiều variant: primary, danger, ghost, secondary
+- Tùy chọn size: small, medium, large
+- Loading state với spinner, icon placement support
 
 **RealtimeLineChart** - [components/charts/RealtimeLineChart.vue](file:///c:/Users/hoang.nguyenhuy3/FE-MNM/components/charts/RealtimeLineChart.vue)
-- ECharts integration with dark cyberpunk theme
+- Tích hợp ECharts với dark cyberpunk theme
 - Dual-line chart (Incoming Rate vs Processed Rate)
-- Auto-scrolling time axis with gradient fills
-- Maintains rolling window of 30 data points
+- Auto-scrolling time axis với gradient fill
+- Duy trì rolling window 30 data point
 
 ### State Management (Pinia)
 
 #### System Store - [stores/system.ts](file:///c:/Users/hoang.nguyenhuy3/FE-MNM/stores/system.ts)
 
 **State:**
-- `stats`: HOT/WARM/COLD counts, incoming/processed rates
-- `edgeNodes`: Array of edge node configurations
+- `stats`: HOT/WARM/COLD count, incoming/processed rate
+- `edgeNodes`: Mảng edge node configuration
 - `isLoading`, `error`, `lastUpdate`: UI state
 
 **Actions:**
-- `fetchStats()`: Poll system statistics from backend
-- `fetchEdgeNodes()`: Get edge node status
+- `fetchStats()`: Poll system statistics từ backend
+- `fetchEdgeNodes()`: Lấy trạng thái edge node
 - `syncData()`: Trigger manual data synchronization
 
 **Getters:**
-- `onlineNodes`: Filters nodes with status 'online'
-- `offlineNodes`: Filters nodes with status 'offline'
-- `hasActiveNodes`: Boolean check for any active nodes
+- `onlineNodes`: Lọc node với status 'online'
+- `offlineNodes`: Lọc node với status 'offline'
+- `hasActiveNodes`: Kiểm tra boolean cho node hoạt động
 
 #### Data Store - [stores/data.ts](file:///c:/Users/hoang.nguyenhuy3/FE-MNM/stores/data.ts)
 
 **State:**
-- `data`: Array of CityData records
+- `data`: Mảng CityData record
 - `filter`: Type, sensorId, page, pageSize
 - `total`, `totalPages`: Pagination metadata
 
 **Actions:**
-- `fetchData()`: GET /api/data with filters
-- `setFilter()`: Update filter criteria
-- `nextPage()`, `prevPage()`, `goToPage()`: Pagination controls
+- `fetchData()`: GET /api/data với filter
+- `setFilter()`: Cập nhật filter criteria
+- `nextPage()`, `prevPage()`, `goToPage()`: Pagination control
 
 ### Composables
 
 **useSystemStats** - [composables/useSystemStats.ts](file:///c:/Users/hoang.nguyenhuy3/FE-MNM/composables/useSystemStats.ts)
-- Auto-polling every 2 seconds (configurable)
-- Lifecycle management: starts on mount, stops on unmount
-- Returns reactive computed properties for stats, nodes, errors
+- Auto-polling mỗi 2 giây (có thể cấu hình)
+- Lifecycle management: bắt đầu khi mount, dừng khi unmount
+- Trả về reactive computed property cho stats, node, error
 
 **useSystemControl** - [composables/useSystemControl.ts](file:///c:/Users/hoang.nguyenhuy3/FE-MNM/composables/useSystemControl.ts)
 - `syncNow()`: Trigger manual data sync
-- `resetSystem()`: Clear all data with confirmation
-- Handles success/error states with notifications
+- `resetSystem()`: Xóa toàn bộ dữ liệu với xác nhận
+- Xử lý success/error state với notification
 
-### Page Implementations
+### Triển khai Page
 
 #### Dashboard (index.vue)
-- Grid of edge node status cards
-- Real-time line chart for data ingestion
-- Three stat cards for HOT/WARM/COLD data
-- Auto-refresh every 2 seconds
-- Error handling with visual alerts
+- Grid của edge node status card
+- Real-time line chart cho data ingestion
+- Ba stat card cho HOT/WARM/COLD data
+- Auto-refresh mỗi 2 giây
+- Xử lý lỗi với visual alert
 
 #### Data Explorer (data-explorer.vue)
-- Filter controls (type dropdown, sensor ID input)
-- Paginated data table with colored type badges
-- Server-side pagination with page controls
-- Loading states and empty state handling
+- Filter control (type dropdown, sensor ID input)
+- Paginated data table với colored type badge
+- Server-side pagination với page control
+- Loading state và empty state handling
 
 #### System Control (system-control.vue)
-- Manual sync action with loading indicator
-- System reset with confirmation modal
-- Action history tracking (last 10 operations)
-- System status indicators
+- Manual sync action với loading indicator
+- System reset với confirmation modal
+- Action history tracking (10 operation gần nhất)
+- System status indicator
 
-### Styling Approach
+### Cách tiếp cận Styling
 
 **Glassmorphism Effect:**
 ```css
@@ -350,72 +350,72 @@ Or use Docker for containerized deployment (see Docker section above).
 ```
 
 **Animations:**
-- Pulse effects for online status indicators
-- Fade-in animations for stat cards
-- Smooth transitions on all interactive elements
-- Loading spinners for async operations
+- Pulse effect cho online status indicator
+- Fade-in animation cho stat card
+- Smooth transition trên tất cả interactive element
+- Loading spinner cho async operation
 
-### Quick Start Guide
+### Hướng dẫn Bắt đầu Nhanh
 
-1. **Ensure Backend is Running:**
+1. **Đảm bảo Backend đang chạy:**
    ```bash
-   # Spring Boot backend should be on port 8080
+   # Spring Boot backend nên ở port 8080
    curl http://localhost:8080/api/stats
    ```
 
-2. **Start Dashboard:**
+2. **Khởi động Dashboard:**
    ```bash
    npm run dev
-   # Dashboard runs on http://localhost:3000
+   # Dashboard chạy trên http://localhost:3000
    ```
 
-3. **Navigate Features:**
-   - **Dashboard**: Real-time monitoring homepage
-   - **Data Explorer**: Browse and filter IoT data
-   - **System Control**: Manual sync and system management
+3. **Điều hướng Tính năng:**
+   - **Dashboard**: Homepage giám sát real-time
+   - **Data Explorer**: Duyệt và lọc IoT data
+   - **System Control**: Manual sync và quản lý hệ thống
 
-4. **Test Real-time Updates:**
-   - Trigger data sync from System Control
-   - Watch charts update automatically on Dashboard
-   - Filter data in Data Explorer
+4. **Test Real-time Update:**
+   - Trigger data sync từ System Control
+   - Xem chart tự động cập nhật trên Dashboard
+   - Lọc dữ liệu trong Data Explorer
 
-### Troubleshooting
+### Xử lý Sự cố
 
-**Backend Connection Issues:**
-- Verify backend is running: `curl http://localhost:8080/api/stats`
-- Check proxy configuration in `nuxt.config.ts`
-- Review browser console for CORS errors
+**Vấn đề Kết nối Backend:**
+- Kiểm tra backend đang chạy: `curl http://localhost:8080/api/stats`
+- Kiểm tra cấu hình proxy trong `nuxt.config.ts`
+- Review browser console tìm lỗi CORS
 
-**Build Errors:**
-- Clear `.nuxt` folder: `rm -rf .nuxt`
-- Reinstall dependencies: `npm install`
-- Check Node.js version: `node --version` (should be 20.x+)
+**Lỗi Build:**
+- Xóa folder `.nuxt`: `rm -rf .nuxt`
+- Cài đặt lại dependencies: `npm install`
+- Kiểm tra phiên bản Node.js: `node --version` (nên là 20.x+)
 
-**Styling Issues:**
-- Verify Tailwind is configured: check `tailwind.config.js`
-- Clear browser cache
-- Check that `assets/css/main.css` is imported
+**Vấn đề Styling:**
+- Kiểm tra Tailwind đã được cấu hình: kiểm tra `tailwind.config.js`
+- Xóa browser cache
+- Kiểm tra `assets/css/main.css` đã được import
 
-## 🤝 Integration with Backend
+## 🤝 Tích hợp với Backend
 
-This dashboard is designed to work with the Smart City Platform backend (Spring Boot). Ensure the backend is running and accessible before starting the dashboard.
+Dashboard này được thiết kế để hoạt động với Smart City Platform backend (Spring Boot). Đảm bảo backend đang chạy và có thể truy cập trước khi khởi động dashboard.
 
-Backend features required:
+Các tính năng backend cần thiết:
 - Dynamic Edge Node Discovery (DNS Registry)
 - RabbitMQ Data Ingestion
 - 3-Tier Storage (Redis + MongoDB)
-- REST API endpoints for stats and data retrieval
+- REST API endpoint cho stats và data retrieval
 
-## 📄 License
+## 📄 Giấy phép
 
-MIT License - feel free to use this project for your own purposes.
+MIT License - thoải mái sử dụng project này cho mục đích của bạn.
 
 ## 👨‍💻 Development
 
-Built with ❤️ for the OLP 2025 Smart City Platform project.
+Được xây dựng với ❤️ cho dự án OLP 2025 Smart City Platform.
 
-For issues or questions, please open an issue in the repository.
+Nếu có vấn đề hoặc câu hỏi, vui lòng mở issue trong repository.
 
 ---
 
-**Note**: This is a monitoring dashboard. For data simulation and backend services, refer to the corresponding Python Data Simulator and Spring Boot Backend repositories.
+**Lưu ý**: Đây là monitoring dashboard. Đối với data simulation và backend service, tham khảo các repository Python Data Simulator và Spring Boot Backend tương ứng.

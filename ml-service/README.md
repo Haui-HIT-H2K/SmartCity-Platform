@@ -10,78 +10,78 @@
 
 # ML Service - Multi-Model Anomaly Detection
 
-FastAPI service for Smart City sensor anomaly detection supporting **3 metrics**: Temperature, Humidity, and CO2.
+Service FastAPI cho phát hiện bất thường sensor Smart City hỗ trợ **3 metric**: Temperature, Humidity, và CO2.
 
-## 🚀 Features
+## 🚀 Tính năng
 
-- ✅ **Multi-Model Support**: 3 IsolationForest models for different sensor types
-- ✅ **RESTful API**: FastAPI with automatic OpenAPI documentation
-- ✅ **Semantic Web**: Returns Schema.org URIs for interoperability
-- ✅ **Docker Ready**: Containerized deployment
-- ✅ **Health Monitoring**: Track model loading status
-
----
-
-## 📊 Supported Metrics
-
-| Metric | Range (Simulator) | Model | Status |
-|--------|------------------|-------|--------|
-| **Temperature** | 15-45°C | IsolationForest | ✅ Trained |
-| **Humidity** | 30-95% | IsolationForest | ✅ Trained |
-| **CO2** | 350-1000 ppm | IsolationForest | ✅ Trained |
+- ✅ **Hỗ trợ Multi-Model**: 3 model IsolationForest cho các loại sensor khác nhau
+- ✅ **RESTful API**: FastAPI với automatic OpenAPI documentation
+- ✅ **Semantic Web**: Trả về Schema.org URI cho khả năng tương tác
+- ✅ **Sẵn sàng Docker**: Containerized deployment
+- ✅ **Giám sát Health**: Theo dõi trạng thái loading model
 
 ---
 
-## 🛠️ Installation & First-Time Setup
+## 📊 Metric được Hỗ trợ
 
-Thanks to the new `entrypoint.sh`, the service now **self-heals**: every time the container boots it checks for the 3 model files and automatically trains them if they are missing. That means a fresh clone needs almost zero manual work.
+| Metric | Phạm vi (Simulator) | Model | Trạng thái |
+|--------|---------------------|-------|-----------|
+| **Temperature** | 15-45°C | IsolationForest | ✅ Đã train |
+| **Humidity** | 30-95% | IsolationForest | ✅ Đã train |
+| **CO2** | 350-1000 ppm | IsolationForest | ✅ Đã train |
 
-### ⚡ Quick Start (Docker Compose – Recommended)
+---
+
+## 🛠️ Cài đặt & Thiết lập Lần đầu
+
+Nhờ có `entrypoint.sh` mới, service hiện **tự động khắc phục**: mỗi khi container khởi động, nó kiểm tra 3 file model và tự động train nếu bị thiếu. Điều đó có nghĩa là clone mới hầu như không cần thao tác thủ công.
+
+### ⚡ Bắt đầu Nhanh (Docker Compose – Khuyến nghị)
 
 ```bash
-# From the repository root
+# Từ thư mục gốc repository
 docker compose up -d --build ml-service
 ```
 
-What happens automatically:
+Điều gì xảy ra tự động:
 
-- Dependencies are installed inside the container.
-- `entrypoint.sh` looks for `app/models/*.pkl`. If they are missing, it runs `python3 /app/train_models.py` for you.
-- After training (or reusing existing models) it boots FastAPI with Uvicorn.
+- Dependency được cài đặt bên trong container.
+- `entrypoint.sh` tìm kiếm `app/models/*.pkl`. Nếu bị thiếu, nó chạy `python3 /app/train_models.py` cho bạn.
+- Sau khi training (hoặc sử dụng lại model hiện có) nó khởi động FastAPI với Uvicorn.
 
-Useful follow-up commands:
+Các lệnh hữu ích tiếp theo:
 
 ```bash
-# Tail logs to watch the auto-training output
+# Tail log để xem output auto-training
 docker logs -f smart-city-ml
 
-# Verify models + API status
+# Kiểm tra model + API status
 curl http://localhost:8000/health
 ```
 
-> 💡 Need to rebuild? Just rerun `docker compose build ml-service && docker compose up -d ml-service`. The entrypoint will detect that models already exist and skip retraining.
+> 💡 Cần rebuild? Chỉ cần chạy lại `docker compose build ml-service && docker compose up -d ml-service`. Entrypoint sẽ phát hiện model đã tồn tại và bỏ qua việc retrain.
 
-### 🧑‍💻 Local Development (without Docker)
+### 🧑‍💻 Local Development (không dùng Docker)
 
-You still can run the service directly on your machine when debugging models:
+Bạn vẫn có thể chạy service trực tiếp trên máy khi debug model:
 
 ```bash
-# 1. Install dependencies
+# 1. Cài đặt dependencies
 pip install -r requirements.txt
 
-# 2. (Optional) Retrain models if you changed the training script
+# 2. (Tùy chọn) Retrain model nếu bạn thay đổi training script
 python3 train_models.py
 
-# 3. Start the API
+# 3. Khởi động API
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-- The repo ships with pre-trained models, so step 2 is optional unless you want to regenerate them.
-- Live reload is enabled so edits under `app/` are picked up instantly.
+- Repository đi kèm với pre-trained model, nên bước 2 là tùy chọn trừ khi bạn muốn tạo lại chúng.
+- Live reload được bật nên chỉnh sửa trong `app/` được nhận ngay lập tức.
 
 ---
 
-## 📚 API Usage
+## 📚 Cách sử dụng API
 
 ### Health Check
 
@@ -114,7 +114,7 @@ Content-Type: application/json
 {
   "source": "sensor",
   "value": 28.5,
-  "metric_type": "temperature"  // "temperature", "humidity", or "co2"
+  "metric_type": "temperature"  // "temperature", "humidity", hoặc "co2"
 }
 ```
 
@@ -142,17 +142,17 @@ Content-Type: application/json
 
 ---
 
-## 🧪 Examples
+## 🧪 Ví dụ
 
 ### Temperature Detection
 
 ```bash
-# Normal temperature
+# Temperature bình thường
 curl -X POST http://localhost:8000/predict \
   -H "Content-Type: application/json" \
   -d '{"source":"sensor","value":28.5,"metric_type":"temperature"}'
 
-# High temperature (anomaly)
+# Temperature cao (anomaly)
 curl -X POST http://localhost:8000/predict \
   -H "Content-Type: application/json" \
   -d '{"source":"sensor","value":80.0,"metric_type":"temperature"}'
@@ -161,12 +161,12 @@ curl -X POST http://localhost:8000/predict \
 ### Humidity Detection
 
 ```bash
-# Normal humidity
+# Humidity bình thường
 curl -X POST http://localhost:8000/predict \
   -H "Content-Type: application/json" \
   -d '{"source":"sensor","value":65,"metric_type":"humidity"}'
 
-# Low humidity (anomaly)
+# Humidity thấp (anomaly)
 curl -X POST http://localhost:8000/predict \
   -H "Content-Type: application/json" \
   -d '{"source":"sensor","value":10,"metric_type":"humidity"}'
@@ -175,12 +175,12 @@ curl -X POST http://localhost:8000/predict \
 ### CO2 Detection
 
 ```bash
-# Normal CO2
+# CO2 bình thường
 curl -X POST http://localhost:8000/predict \
   -H "Content-Type: application/json" \
   -d '{"source":"sensor","value":420,"metric_type":"co2"}'
 
-# High CO2 (anomaly)
+# CO2 cao (anomaly)
 curl -X POST http://localhost:8000/predict \
   -H "Content-Type: application/json" \
   -d '{"source":"sensor","value":2000,"metric_type":"co2"}'
@@ -189,7 +189,7 @@ curl -X POST http://localhost:8000/predict \
 ### Backward Compatibility
 
 ```bash
-# Without metric_type (defaults to temperature)
+# Không có metric_type (mặc định là temperature)
 curl -X POST http://localhost:8000/predict \
   -H "Content-Type: application/json" \
   -d '{"source":"sensor","value":28.5}'
@@ -199,28 +199,28 @@ curl -X POST http://localhost:8000/predict \
 
 ## 🤖 Model Training
 
-Models are trained using `train_models.py` with synthetic data based on simulator ranges:
+Model được train bằng `train_models.py` với synthetic data dựa trên phạm vi simulator:
 
 ```bash
 python3 train_models.py
 ```
 
-**Training Parameters:**
+**Tham số Training:**
 - **Algorithm**: IsolationForest (sklearn)
-- **Samples**: 1,000 per model
+- **Samples**: 1,000 mỗi model
 - **Contamination**: 5%
 - **Estimators**: 100
 
-**Generated Files:**
+**File được Tạo:**
 - `temperature_model.pkl` (1.4MB)
 - `humidity_model.pkl` (1.4MB)
 - `co2_model.pkl` (1.4MB)
 
 ---
 
-## 🔗 Integration with python-data-simulator
+## 🔗 Tích hợp với python-data-simulator
 
-The ml-service is designed to work with data from `python-data-simulator`:
+ML-service được thiết kế để làm việc với dữ liệu từ `python-data-simulator`:
 
 **Simulator Output:**
 ```json
@@ -235,8 +235,8 @@ The ml-service is designed to work with data from `python-data-simulator`:
 }
 ```
 
-**Transformation Required:**
-Split into 3 API calls (one per metric) via a consumer worker:
+**Transformation Cần thiết:**
+Tách thành 3 API call (một cho mỗi metric) qua consumer worker:
 ```python
 # Temperature
 POST /predict {"source":"sensor","value":28.3,"metric_type":"temperature"}
@@ -250,7 +250,7 @@ POST /predict {"source":"sensor","value":420,"metric_type":"co2"}
 
 ---
 
-## 📁 Project Structure
+## 📁 Cấu trúc Project
 
 ```
 ml-service/
@@ -262,28 +262,28 @@ ml-service/
 ├── temperature_model.pkl    # Trained temperature model
 ├── humidity_model.pkl       # Trained humidity model
 ├── co2_model.pkl           # Trained CO2 model
-└── README.md               # This file
+└── README.md               # File này
 ```
 
 ---
 
 ## 🌐 API Documentation
 
-Once running, visit:
+Khi đang chạy, truy cập:
 - **Swagger UI**: http://localhost:8000/docs
 - **ReDoc**: http://localhost:8000/redoc
 
 ---
 
-## 🔧 Configuration
+## 🔧 Cấu hình
 
-### Environment Variables
+### Biến Môi trường
 
 ```bash
-# Optional: Port configuration
+# Tùy chọn: Cấu hình port
 export PORT=8000
 
-# Optional: Model paths
+# Tùy chọn: Model path
 export TEMP_MODEL_PATH=temperature_model.pkl
 export HUMIDITY_MODEL_PATH=humidity_model.pkl
 export CO2_MODEL_PATH=co2_model.pkl
@@ -291,45 +291,45 @@ export CO2_MODEL_PATH=co2_model.pkl
 
 ---
 
-## 🐛 Troubleshooting
+## 🐛 Xử lý Sự cố
 
-### Models not loading
+### Model không load
 
 ```bash
-# Check model files exist
+# Kiểm tra file model tồn tại
 ls -lh *.pkl
 
-# Retrain models if missing
+# Retrain model nếu thiếu
 python3 train_models.py
 ```
 
-### Import errors
+### Lỗi Import
 
 ```bash
-# Reinstall dependencies
+# Cài đặt lại dependencies
 pip install --no-cache-dir -r requirements.txt
 ```
 
-### Port already in use
+### Port đã được sử dụng
 
 ```bash
-# Change port
+# Đổi port
 uvicorn app:app --port 8001
 ```
 
 ---
 
-## 📈 Performance
+## 📈 Hiệu năng
 
-- **Prediction latency**: ~5-10ms per request
-- **Throughput**: ~100-200 requests/second
-- **Memory usage**: ~150MB (3 models loaded)
+- **Prediction latency**: ~5-10ms mỗi request
+- **Throughput**: ~100-200 request/giây
+- **Memory usage**: ~150MB (3 model đã load)
 
 ---
 
 ## 🎯 Roadmap
 
-- [ ] Multi-variate anomaly detection (combined features)
+- [ ] Multi-variate anomaly detection (combined feature)
 - [ ] Online learning / model retraining
 - [ ] Batch prediction endpoint
 - [ ] Historical data analysis
@@ -337,7 +337,7 @@ uvicorn app:app --port 8001
 
 ---
 
-## 📄 License
+## 📄 Giấy phép
 
 Apache 2.0 License
 
@@ -347,4 +347,4 @@ Apache 2.0 License
 
 Smart City Platform Team
 
-**Last Updated**: 2025-11-28
+**Cập nhật lần cuối**: 2025-11-28

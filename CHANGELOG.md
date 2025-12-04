@@ -66,3 +66,9 @@
   - Health Checks: Auto-restart on failure
   - Volume Persistence: Data persistence cho databases
 
+## [v2.0.1] - 2025-12-04
+### Đã thêm (Added)
+- Redesign the chart interface displaying pull data
+- Add a license at the top of each source file
+- Improve system performance using streaming methods
+- Fix the error of adding a License at the beginning of each code file
