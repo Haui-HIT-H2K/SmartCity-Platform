@@ -24,6 +24,16 @@
         >
           {{ record.type }}
         </span>
+        <UiButton
+          variant="outline"
+          size="sm"
+          @click="downloadRecord"
+          :disabled="isDownloading"
+          class="flex items-center gap-2"
+        >
+          <Download :class="isDownloading ? 'animate-bounce' : ''" class="w-4 h-4" />
+          <span>{{ isDownloading ? 'Downloading...' : 'Download' }}</span>
+        </UiButton>
       </div>
     </div>
 
@@ -174,6 +184,7 @@ import {
   FileText,
   AlertCircle,
   RefreshCw,
+  Download,
 } from "lucide-vue-next";
 import type { DataType } from "~/stores/data";
 
@@ -192,6 +203,36 @@ const {
   error,
   refresh,
 } = await useFetch(`/api/record/${id}`);
+
+// Download state
+const isDownloading = ref(false);
+
+// Download function - uses localhost:8080 for browser downloads
+const downloadRecord = async () => {
+  if (isDownloading.value) return;
+  
+  try {
+    isDownloading.value = true;
+    
+    // Always use localhost:8080 for browser downloads (not Docker hostname)
+    const backendUrl = 'http://localhost:8080';
+    const downloadUrl = `${backendUrl}/api/data/${id}/download`;
+    
+    console.log('Download URL:', downloadUrl);
+    
+    // Create temporary anchor and trigger download
+    const link = document.createElement('a');
+    link.href = downloadUrl;
+    link.download = `record-${id}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  } catch (error) {
+    console.error('Error downloading record:', error);
+  } finally {
+    isDownloading.value = false;
+  }
+};
 
 // Utility functions
 const getTypeBadgeClass = (type: DataType) => {
