@@ -466,8 +466,8 @@ docker exec -it core-mongo-warm mongosh
 ```yaml
 # Use environment file
 environment:
-  - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD}
-  - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASSWORD}
+  - MONGO_INITDB_ROOT_PASSWORD=${'${MONGO_PASSWORD}'}
+  - RABBITMQ_DEFAULT_PASS=${'${RABBITMQ_PASSWORD}'}
 ```
 
 **2. Network Isolation**

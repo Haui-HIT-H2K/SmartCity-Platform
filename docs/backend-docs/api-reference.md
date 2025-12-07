@@ -194,7 +194,7 @@ Content-Type: application/json
 
 ---
 
-### PUT /api/nodes/{name}/toggle
+### PUT /api/nodes/\{name\}/toggle
 
 Toggle trạng thái enabled/disabled của một edge node.
 
@@ -214,7 +214,7 @@ PUT /api/nodes/Subnet-CauGiay/toggle
 
 ---
 
-### DELETE /api/nodes/{name}
+### DELETE /api/nodes/\{name\}
 
 Xóa một edge node khỏi hệ thống.
 

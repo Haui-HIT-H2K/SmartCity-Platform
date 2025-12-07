@@ -211,7 +211,7 @@ const addNode = async () => {
 
 ```typescript
 const toggleNode = async (name: string) => {
-  await $fetch(`/api/nodes/${name}/toggle`, {
+  await $fetch(`/api/nodes/${'${name}'}/toggle`, {
     method: 'PUT',
   });
   await fetchNodes();
@@ -226,7 +226,7 @@ const toggleNode = async (name: string) => {
 ```typescript
 const deleteNode = async () => {
   if (!deleteConfirm.value) return;
-  await $fetch(`/api/nodes/${deleteConfirm.value}`, {
+  await $fetch(`/api/nodes/${'${deleteConfirm.value}'}`, {
     method: 'DELETE',
   });
   deleteConfirm.value = null;
@@ -249,9 +249,8 @@ Nuxt server routes proxy requests đến backend:
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig();
   const backendUrl = config.public.apiBase || "http://localhost:8080";
-  const nodes = await $fetch(`${backendUrl}/api/nodes`);
+  const nodes = await $fetch(`${'${backendUrl}'}/api/nodes`);
   return nodes;
-});
 ```
 
 ### POST Route
@@ -263,7 +262,7 @@ export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig();
   const backendUrl = config.public.apiBase || "http://localhost:8080";
   const body = await readBody(event);
-  const response = await $fetch(`${backendUrl}/api/nodes`, {
+  const response = await $fetch(`${'${backendUrl}'}/api/nodes`, {
     method: "POST",
     body,
   });
@@ -280,7 +279,7 @@ export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig();
   const backendUrl = config.public.apiBase || "http://localhost:8080";
   const name = getRouterParam(event, "name");
-  const response = await $fetch(`${backendUrl}/api/nodes/${name}/toggle`, {
+  const response = await $fetch(`${'${backendUrl}'}/api/nodes/${'${name}'}/toggle`, {
     method: "PUT",
   });
   return response;
@@ -296,7 +295,7 @@ export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig();
   const backendUrl = config.public.apiBase || "http://localhost:8080";
   const name = getRouterParam(event, "name");
-  const response = await $fetch(`${backendUrl}/api/nodes/${name}`, {
+  const response = await $fetch(`${'${backendUrl}'}/api/nodes/${'${name}'}`, {
     method: "DELETE",
   });
   return response;
@@ -348,7 +347,7 @@ Offline: bg-gray-500/20 text-gray-400 border-gray-500/40
 
 - Desktop (≥1024px): Full table layout
 - Tablet (768px-1023px): Scrollable table
-- Mobile (<768px): Should implement card layout (future enhancement)
+- Mobile (&lt;768px): Should implement card layout (future enhancement)
 
 ---
 
