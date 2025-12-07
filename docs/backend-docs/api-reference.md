@@ -94,11 +94,11 @@ GET /api/stats
 
 ---
 
-## Node Management Endpoints
+## Edge Storage Management Endpoints
 
 ### GET /api/nodes
 
-Liệt kê tất cả RabbitMQ edge nodes.
+Liệt kê tất cả Edge Storage nodes với thông tin chi tiết.
 
 **Request:**
 ```http
@@ -109,18 +109,133 @@ GET /api/nodes
 ```json
 [
   {
-    "host": "rabbitmq-edge-1",
+    "id": "subnet-caugiay",
+    "name": "Subnet-CauGiay",
+    "host": "rabbit-edge-1",
     "port": 5672,
+    "enabled": true,
     "status": "online",
-    "lastPing": "2025-12-04T22:56:58Z"
+    "lastPing": "2025-12-07T23:30:00Z"
   },
   {
-    "host": "rabbitmq-edge-2",
-    "port": 5673,
+    "id": "subnet-thanhxuan",
+    "name": "Subnet-ThanhXuan",
+    "host": "rabbit-edge-2",
+    "port": 5672,
+    "enabled": true,
     "status": "online",
-    "lastPing": "2025-12-04T22:56:59Z"
+    "lastPing": "2025-12-07T23:30:00Z"
   }
 ]
+```
+
+**Fields:**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | string | Unique identifier (lowercase, hyphenated) |
+| `name` | string | Display name của edge node |
+| `host` | string | Hostname hoặc IP address của RabbitMQ |
+| `port` | integer | Port number của RabbitMQ |
+| `enabled` | boolean | Trạng thái kích hoạt của node |
+| `status` | string | Trạng thái kết nối: "online" hoặc "offline" |
+| `lastPing` | string | Timestamp của lần ping cuối cùng |
+
+---
+
+### POST /api/nodes
+
+Tạo mới một Edge Storage node.
+
+**Request:**
+```http
+POST /api/nodes
+Content-Type: application/json
+
+{
+  "name": "Subnet-HaDong",
+  "host": "rabbit-edge-3",
+  "port": 5672,
+  "queueName": "city-data-queue-3",
+  "username": "edge_user",
+  "password": "edge_pass"
+}
+```
+
+**Request Body:**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `name` | string | Yes | Tên edge node (VD: "Subnet-HaDong") |
+| `host` | string | Yes | Hostname của RabbitMQ |
+| `port` | integer | Yes | Port number (thường là 5672) |
+| `queueName` | string | No | Tên queue (auto-generated nếu không cung cấp) |
+| `username` | string | No | RabbitMQ username (mặc định từ config) |
+| `password` | string | No | RabbitMQ password (mặc định từ config) |
+
+**Response:** `201 Created`
+```json
+{
+  "id": "subnet-hadong",
+  "name": "Subnet-HaDong",
+  "host": "rabbit-edge-3",
+  "port": 5672,
+  "status": "online",
+  "enabled": true
+}
+```
+
+**Error Response:** `409 Conflict`
+```json
+{
+  "error": "Node with name 'Subnet-HaDong' already exists"
+}
+```
+
+---
+
+### PUT /api/nodes/{name}/toggle
+
+Toggle trạng thái enabled/disabled của một edge node.
+
+**Request:**
+```http
+PUT /api/nodes/Subnet-CauGiay/toggle
+```
+
+**Response:** `200 OK`
+```json
+{
+  "name": "Subnet-CauGiay",
+  "enabled": false,
+  "status": "offline"
+}
+```
+
+---
+
+### DELETE /api/nodes/{name}
+
+Xóa một edge node khỏi hệ thống.
+
+**Request:**
+```http
+DELETE /api/nodes/Subnet-HaDong
+```
+
+**Response:** `200 OK`
+```json
+{
+  "message": "Node deleted successfully",
+  "name": "Subnet-HaDong"
+}
+```
+
+**Error Response:** `404 Not Found`
+```json
+{
+  "error": "Node 'Subnet-HaDong' not found"
+}
 ```
 
 ---

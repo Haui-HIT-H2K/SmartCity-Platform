@@ -9,6 +9,7 @@ const sidebars: SidebarsConfig = {
     "functional-requirements",
     "non-functional-requirements",
     "functions",
+    "edge-storage-management",
     "roadmap",
   ],
 };
