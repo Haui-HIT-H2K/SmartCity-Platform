@@ -25,10 +25,10 @@ const config: Config = {
   tagline: "Hệ thống chia sẻ thông tin nguồn mở Smart City tuân thủ NGSI-LD",
   favicon: "img/favicon.ico",
 
-  url: "https://Haui-HIT-NhoNguoiYeuCu.github.io",
+  url: "https://haui-hit-h2k.github.io",
   baseUrl: "/SmartCity-Platform/",
 
-  organizationName: "Haui-HIT-NhoNguoiYeuCu",
+  organizationName: "haui-hit-h2k",
   projectName: "SmartCity-Platform",
 
   onBrokenLinks: "throw",
