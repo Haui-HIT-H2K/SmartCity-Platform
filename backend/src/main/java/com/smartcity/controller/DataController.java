@@ -36,6 +36,8 @@ import com.smartcity.service.CityDataQueryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.CacheControl;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -96,6 +98,32 @@ public class DataController {
         }
     }
     
+    @GetMapping("/{id}/download")
+    public ResponseEntity<?> downloadById(@PathVariable String id) {
+        log.info("Downloading record with ID: {}", id);
+        
+        try {
+            Object record = cityDataQueryService.getById(id);
+            
+            if (record == null) {
+                log.warn("Record not found with ID: {}", id);
+                return ResponseEntity.notFound().build();
+            }
+            
+            // Set headers for file download
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.setContentDispositionFormData("attachment", "record-" + id + ".json");
+            
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(record);
+        } catch (Exception e) {
+            log.error("Error downloading record with ID {}: {}", id, e.getMessage());
+            return ResponseEntity.internalServerError().body("Error downloading record");
+        }
+    }
+    
     /**
      * Generate ETag from response hash for cache validation
      */
@@ -103,4 +131,3 @@ public class DataController {
         return "\"" + Integer.toHexString(response.hashCode()) + "\"";
     }
 }
-
