@@ -62,3 +62,16 @@
 - Add a license at the top of each source file
 - Improve system performance using streaming methods
 - Fix the error of adding a License at the beginning of each code file
+
+## [v2.1.1] - 2025-12-08
+### Đã thêm (Added)
+- chore: remove SPDX license identifiers from project files as per new policy by @hoangnh0402 in #18
+- Remove copyright block from issue templates by @hoangnh0402 in #19
+- Fix link to CONTRIBUTING guidelines by @hoangnh0402 in #20
+- docs: Add initial project documentation covering overview, backend, frontend, ML/AI by @hoangnh0402 in #22
+- fix: Update GitHub Pages URL to match actual deployment (haui-hit-h2k) by @hoangnh0402 in #23
+- feat: Add DataController for city data API with endpoints for pagination, filtering, and data export by @hoangnh0402 in #24
+- feat: add record detail page with data display and download functionality by @hoangnh0402 in #25
+- feat: Add comprehensive edge node management with dedicated frontend UI and backend CRUD APIs by @hoangnh0402 in #26
+- Develop by @hoangnh0402 in #27
+- feat: Add comprehensive documentation for Edge Storage Management, including SRS updates by @hoangnh0402 in #28
