@@ -42,6 +42,16 @@
           <Settings class="w-5 h-5" />
           <span class="font-medium">System Control</span>
         </NuxtLink>
+
+        <NuxtLink
+          to="/nodes"
+          class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-300"
+          active-class="bg-primary/20 text-primary border border-primary/40"
+          inactive-class="text-gray-600 dark:text-gray-400 hover:bg-light-lighter dark:hover:bg-dark-lighter hover:text-gray-900 dark:hover:text-gray-200"
+        >
+          <HardDrive class="w-5 h-5" />
+          <span class="font-medium">Edge Storage</span>
+        </NuxtLink>
       </nav>
 
       <!-- Footer -->
@@ -114,6 +124,7 @@ import {
   Zap,
   Sun,
   Moon,
+  HardDrive,
 } from 'lucide-vue-next'
 
 const route = useRoute()
@@ -125,6 +136,7 @@ const pageTitle = computed(() => {
     '/': 'Real-time Monitoring',
     '/data-explorer': 'Data Explorer',
     '/system-control': 'System Control',
+    '/nodes': 'Edge Storage Management',
   }
   return titles[route.path] || 'Dashboard'
 })
@@ -140,3 +152,4 @@ onMounted(() => {
   setInterval(updateTime, 1000)
 })
 </script>
+

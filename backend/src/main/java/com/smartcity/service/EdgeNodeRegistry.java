@@ -134,4 +134,61 @@ public class EdgeNodeRegistry {
                 .findFirst()
                 .orElse(null);
     }
+    
+    /**
+     * Add new Edge Node
+     * 
+     * @param node New edge node to add
+     * @return true if added successfully, false if node with same name already exists
+     */
+    public synchronized boolean addNode(EdgeNodeConfig.EdgeNode node) {
+        // Check if node with same name already exists
+        if (getNodeByName(node.getName()) != null) {
+            log.warn("Cannot add node: Node with name '{}' already exists", node.getName());
+            return false;
+        }
+        
+        edgeNodeConfig.getNodes().add(node);
+        log.info("Added new edge node: {} | {}:{}", node.getName(), node.getHost(), node.getPort());
+        return true;
+    }
+    
+    /**
+     * Update node enabled status (Toggle enable/disable)
+     * 
+     * @param name Node name
+     * @param enabled New enabled status
+     * @return true if updated successfully, false if node not found
+     */
+    public synchronized boolean updateNodeStatus(String name, boolean enabled) {
+        EdgeNodeConfig.EdgeNode node = getNodeByName(name);
+        if (node == null) {
+            log.warn("Cannot update status: Node '{}' not found", name);
+            return false;
+        }
+        
+        node.setEnabled(enabled);
+        log.info("Updated node '{}' status to: {}", name, enabled ? "ENABLED" : "DISABLED");
+        return true;
+    }
+    
+    /**
+     * Delete Edge Node
+     * 
+     * @param name Node name to delete
+     * @return true if deleted successfully, false if node not found
+     */
+    public synchronized boolean deleteNode(String name) {
+        EdgeNodeConfig.EdgeNode node = getNodeByName(name);
+        if (node == null) {
+            log.warn("Cannot delete: Node '{}' not found", name);
+            return false;
+        }
+        
+        boolean removed = edgeNodeConfig.getNodes().remove(node);
+        if (removed) {
+            log.info("Deleted edge node: {}", name);
+        }
+        return removed;
+    }
 }
