@@ -25,6 +25,9 @@ class PredictionOutput(BaseModel):
     desc: str  # Description
     metric_type: Optional[str] = None  # Echo back for sensors
     value: Optional[float] = None  # Echo back for sensors
+    confidence: Optional[float] = None  # Confidence score (0-1) for human-in-the-loop
+    anomaly_score: Optional[float] = None  # IsolationForest anomaly score
+    feature_distance: Optional[float] = None  # Distance from training distribution
 
 
 class HealthResponse(BaseModel):
