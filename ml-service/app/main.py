@@ -7,7 +7,7 @@
 """
 FastAPI Application for ML anomaly detection service
 Refactored version with modular structure
-Enhanced with Human-in-the-Loop for unknown event detection
+  Enhanced with Human-in-the-Loop for unknown event detection
 """
 import logging
 import asyncio
@@ -30,6 +30,9 @@ models = {}
 # Global UnknownEventDB instance
 unknown_db = None
 
+# Global retraining worker
+worker = None
+
 # Thread pool for async database writes
 executor = ThreadPoolExecutor(max_workers=2)
 
@@ -37,7 +40,7 @@ executor = ThreadPoolExecutor(max_workers=2)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Load models and initialize unknown event handling on startup"""
-    global models, unknown_db
+    global models, unknown_db, worker
     
     logger.info("Loading ML models...")
     models.update(load_all_models())
@@ -48,9 +51,24 @@ async def lifespan(app: FastAPI):
     unknown_db = UnknownEventDB()
     logger.info("Unknown Events Database ready")
     
+    # Start background retraining worker
+    from app.worker import RetrainingWorker
+    worker = RetrainingWorker(
+        unknown_db=unknown_db,
+        models=models,
+        check_interval=3600  # Check every hour
+    )
+    worker.start()
+    logger.info("✅ Background retraining worker started (check every 1h)")
+    
     yield
     
     # Cleanup on shutdown
+    if worker:
+        worker.stop()
+        worker.join(timeout=5)  # Wait max 5s for worker to stop
+        logger.info("Retraining worker stopped")
+    
     executor.shutdown(wait=True)
     models.clear()
     logger.info("Models unloaded, executor shutdown")

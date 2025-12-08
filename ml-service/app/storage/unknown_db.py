@@ -163,3 +163,23 @@ class UnknownEventDB:
         conn.close()
         
         return results
+    
+    def mark_used_for_training(self, event_ids):
+        """Mark events as used for training"""
+        if not event_ids:
+            return
+            
+        conn = sqlite3.connect(str(self.db_path))
+        cursor = conn.cursor()
+        
+        placeholders = ','.join(['?' for _ in event_ids])
+        cursor.execute(f"""
+            UPDATE unknown_events
+            SET used_for_training = 1
+            WHERE id IN ({placeholders})
+        """, event_ids)
+        
+        conn.commit()
+        conn.close()
+        
+        logger.info(f"Marked {len(event_ids)} events as used for training")
