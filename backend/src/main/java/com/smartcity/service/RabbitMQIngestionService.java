@@ -168,11 +168,14 @@ public class RabbitMQIngestionService {
         
         try {
             // Tạo connection động dựa vào node config
-            connectionFactory = createConnectionFactory(node);
+            connectionFactory = getOrCreateConnectionFactory(node);
             rabbitTemplate = new RabbitTemplate(connectionFactory);
             
             // Set MessageConverter để deserialize JSON
             rabbitTemplate.setMessageConverter(messageConverter);
+            
+            // Set receive timeout ngắn để không chờ lâu (100ms thay vì default)
+            rabbitTemplate.setReceiveTimeout(100);
             
             // Set default queue
             String queueName = node.getQueueName() != null ? 
@@ -181,6 +184,7 @@ public class RabbitMQIngestionService {
             
             int receivedCount = 0;
             
+            // STEP 1: Pull all messages first (without classifying)
             // Loop để lấy messages cho đến khi:
             // 1. Đạt max batch size
             // 2. Queue rỗng (receiveAndConvert trả về null)
@@ -212,36 +216,49 @@ public class RabbitMQIngestionService {
                 }
                 
                 if (cityData != null) {
-                    // CRITICAL: Classify data using ML Service before storing
-                    try {
-                        com.smartcity.model.DataType dataType = mlServiceClient.classifyData(cityData);
-                        cityData.setDataType(dataType);
-                        
-                        if (receivedCount % 100 == 0 && receivedCount > 0) {
-                            log.debug("[{}] - Classified {} messages (last: {})", 
-                                    node.getName(), receivedCount, dataType);
-                        }
-                    } catch (Exception e) {
-                        log.error("[{}] - Error classifying data, defaulting to COLD: {}", 
-                                node.getName(), e.getMessage());
-                        cityData.setDataType(com.smartcity.model.DataType.COLD);
-                    }
-                    
+                    // Don't classify here - defer to batch
                     batchData.add(cityData);
                     receivedCount++;
                     
-                    // Log mỗi 100 messages
-                    if (receivedCount % 100 == 0) {
-                        log.debug("[{}] - Received {} messages...", 
+                    // Log mỗi 500 messages
+                    if (receivedCount % 500 == 0) {
+                        log.debug("[{}] - Pulled {} messages...", 
                                 node.getName(), receivedCount);
                     }
                 }
                 
-                // Đạt batch size mong muốn
+                // Đạt batch size mong muốn - break để tăng tốc
                 if (receivedCount >= batchSize) {
                     log.debug("[{}] - Reached target batch size: {}", 
                             node.getName(), batchSize);
-                    // Có thể break hoặc tiếp tục đến maxBatchSize
+                    break;
+                }
+            }
+            
+            // STEP 2: Batch classify all messages at once
+            if (!batchData.isEmpty()) {
+                long classifyStart = System.currentTimeMillis();
+                
+                try {
+                    List<com.smartcity.model.DataType> dataTypes = 
+                            mlServiceClient.classifyDataBatch(batchData);
+                    
+                    // Apply classifications to each CityData
+                    for (int i = 0; i < batchData.size() && i < dataTypes.size(); i++) {
+                        batchData.get(i).setDataType(dataTypes.get(i));
+                    }
+                    
+                    long classifyTime = System.currentTimeMillis() - classifyStart;
+                    log.info("[{}] - Batch classified {} messages in {}ms", 
+                            node.getName(), batchData.size(), classifyTime);
+                    
+                } catch (Exception e) {
+                    log.error("[{}] - Error batch classifying, defaulting all to COLD: {}", 
+                            node.getName(), e.getMessage());
+                    // Default all to COLD
+                    for (CityData data : batchData) {
+                        data.setDataType(com.smartcity.model.DataType.COLD);
+                    }
                 }
             }
             
@@ -249,31 +266,41 @@ public class RabbitMQIngestionService {
             log.error("[{}] - Error pulling batch: {}", node.getName(), e.getMessage());
             throw new RuntimeException("Failed to pull from " + node.getName(), e);
             
-        } finally {
-            // Đóng connection
-            if (connectionFactory != null) {
-                connectionFactory.destroy();
-            }
         }
+        // Note: Don't destroy connection - it's pooled now
         
         return batchData;
     }
+    /**
+     * Connection pool để tránh tạo/hủy connection mỗi lần pull
+     * Key: host:port
+     */
+    private final java.util.concurrent.ConcurrentHashMap<String, CachingConnectionFactory> 
+            connectionPool = new java.util.concurrent.ConcurrentHashMap<>();
 
     /**
-     * Tạo RabbitMQ ConnectionFactory động từ node config
+     * Get or create connection factory for edge node (pooled)
      */
-    private CachingConnectionFactory createConnectionFactory(EdgeNodeConfig.EdgeNode node) {
-        CachingConnectionFactory factory = new CachingConnectionFactory();
-        factory.setHost(node.getHost());
-        factory.setPort(node.getPort());
+    private CachingConnectionFactory getOrCreateConnectionFactory(EdgeNodeConfig.EdgeNode node) {
+        String key = node.getHost() + ":" + node.getPort();
         
-        // Use credentials từ node, hoặc default
-        if (node.getUsername() != null && node.getPassword() != null) {
-            factory.setUsername(node.getUsername());
-            factory.setPassword(node.getPassword());
-        }
-        
-        return factory;
+        return connectionPool.computeIfAbsent(key, k -> {
+            log.info("Creating new connection to {}:{}", node.getHost(), node.getPort());
+            CachingConnectionFactory factory = new CachingConnectionFactory();
+            factory.setHost(node.getHost());
+            factory.setPort(node.getPort());
+            
+            // Use credentials từ node, hoặc default
+            if (node.getUsername() != null && node.getPassword() != null) {
+                factory.setUsername(node.getUsername());
+                factory.setPassword(node.getPassword());
+            }
+            
+            // Configure channel cache size for better performance
+            factory.setChannelCacheSize(10);
+            
+            return factory;
+        });
     }
 
     /**

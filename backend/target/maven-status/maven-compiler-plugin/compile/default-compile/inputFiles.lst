@@ -1,4 +1,5 @@
 C:\Users\hoang\SmartCity-Platform\backend\src\main\java\com\smartcity\model\User.java
+C:\Users\hoang\SmartCity-Platform\backend\src\main\java\com\smartcity\dto\PublishDataRequest.java
 C:\Users\hoang\SmartCity-Platform\backend\src\main\java\com\smartcity\config\RedisConfig.java
 C:\Users\hoang\SmartCity-Platform\backend\src\main\java\com\smartcity\dto\SignupRequest.java
 C:\Users\hoang\SmartCity-Platform\backend\src\main\java\com\smartcity\SmartCityApplication.java
@@ -11,13 +12,16 @@ C:\Users\hoang\SmartCity-Platform\backend\src\main\java\com\smartcity\controller
 C:\Users\hoang\SmartCity-Platform\backend\src\main\java\com\smartcity\service\RabbitMQIngestionService.java
 C:\Users\hoang\SmartCity-Platform\backend\src\main\java\com\smartcity\config\RabbitMQConfig.java
 C:\Users\hoang\SmartCity-Platform\backend\src\main\java\com\smartcity\dto\JwtResponse.java
+C:\Users\hoang\SmartCity-Platform\backend\src\main\java\com\smartcity\service\OtpService.java
 C:\Users\hoang\SmartCity-Platform\backend\src\main\java\com\smartcity\controller\DataController.java
+C:\Users\hoang\SmartCity-Platform\backend\src\main\java\com\smartcity\service\EmailService.java
 C:\Users\hoang\SmartCity-Platform\backend\src\main\java\com\smartcity\controller\SyncController.java
 C:\Users\hoang\SmartCity-Platform\backend\src\main\java\com\smartcity\repository\UserRepository.java
 C:\Users\hoang\SmartCity-Platform\backend\src\main\java\com\smartcity\config\EdgeNodeConfig.java
 C:\Users\hoang\SmartCity-Platform\backend\src\main\java\com\smartcity\config\WebSecurityConfig.java
 C:\Users\hoang\SmartCity-Platform\backend\src\main\java\com\smartcity\controller\StatsController.java
 C:\Users\hoang\SmartCity-Platform\backend\src\main\java\com\smartcity\dto\DataPageResponse.java
+C:\Users\hoang\SmartCity-Platform\backend\src\main\java\com\smartcity\controller\PublishController.java
 C:\Users\hoang\SmartCity-Platform\backend\src\main\java\com\smartcity\dto\CityDataResponse.java
 C:\Users\hoang\SmartCity-Platform\backend\src\main\java\com\smartcity\model\Role.java
 C:\Users\hoang\SmartCity-Platform\backend\src\main\java\com\smartcity\security\jwt\AuthEntryPointJwt.java

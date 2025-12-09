@@ -173,4 +173,127 @@ public class MLServiceClient {
             return null;
         }
     }
+
+    /**
+     * Batch classify multiple CityData using ML Service batch endpoint.
+     * Optimized for high-throughput ingestion.
+     * 
+     * @param dataList List of CityData to classify
+     * @return List of DataType (same order as input)
+     */
+    public java.util.List<DataType> classifyDataBatch(java.util.List<CityData> dataList) {
+        java.util.List<DataType> results = new java.util.ArrayList<>();
+        
+        if (dataList == null || dataList.isEmpty()) {
+            return results;
+        }
+        
+        try {
+            // Build batch request items
+            java.util.List<Map<String, Object>> items = new java.util.ArrayList<>();
+            
+            for (CityData cityData : dataList) {
+                Map<String, Object> payload = cityData.getPayload();
+                if (payload == null || payload.isEmpty()) {
+                    items.add(null); // Mark as null for later
+                    continue;
+                }
+                
+                // Extract metric type and value
+                String metricType = null;
+                Double value = null;
+                
+                if (payload.containsKey("temperature")) {
+                    metricType = "temperature";
+                    value = getDoubleValue(payload.get("temperature"));
+                } else if (payload.containsKey("humidity")) {
+                    metricType = "humidity";
+                    value = getDoubleValue(payload.get("humidity"));
+                } else if (payload.containsKey("co2")) {
+                    metricType = "co2";
+                    value = getDoubleValue(payload.get("co2"));
+                }
+                
+                if (metricType != null && value != null) {
+                    Map<String, Object> item = new HashMap<>();
+                    item.put("metric_type", metricType);
+                    item.put("value", value);
+                    items.add(item);
+                } else {
+                    items.add(null);
+                }
+            }
+            
+            // Filter out nulls for batch request, track indices
+            java.util.List<Map<String, Object>> validItems = new java.util.ArrayList<>();
+            java.util.List<Integer> validIndices = new java.util.ArrayList<>();
+            
+            for (int i = 0; i < items.size(); i++) {
+                if (items.get(i) != null) {
+                    validItems.add(items.get(i));
+                    validIndices.add(i);
+                }
+            }
+            
+            // Initialize results with COLD defaults
+            for (int i = 0; i < dataList.size(); i++) {
+                results.add(DataType.COLD);
+            }
+            
+            if (validItems.isEmpty()) {
+                log.warn("No valid items to classify in batch");
+                return results;
+            }
+            
+            // Call ML batch endpoint
+            String endpoint = mlServiceUrl + "/predict/batch";
+            
+            Map<String, Object> requestBody = new HashMap<>();
+            requestBody.put("items", validItems);
+            
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            
+            HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, headers);
+            
+            ResponseEntity<Map> response = restTemplate.exchange(
+                    endpoint,
+                    HttpMethod.POST,
+                    requestEntity,
+                    Map.class
+            );
+            
+            if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
+                Map<String, Object> responseBody = response.getBody();
+                java.util.List<Map<String, Object>> batchResults = 
+                        (java.util.List<Map<String, Object>>) responseBody.get("results");
+                
+                if (batchResults != null && batchResults.size() == validItems.size()) {
+                    for (int i = 0; i < batchResults.size(); i++) {
+                        Map<String, Object> result = batchResults.get(i);
+                        String label = (String) result.get("label");
+                        int originalIndex = validIndices.get(i);
+                        
+                        // Map label to DataType
+                        if ("HOT".equals(label)) {
+                            results.set(originalIndex, DataType.HOT);
+                        } else if ("WARM".equals(label)) {
+                            results.set(originalIndex, DataType.WARM);
+                        }
+                        // COLD is already default
+                    }
+                }
+                
+                log.debug("Batch classified {} items successfully", validItems.size());
+            } else {
+                log.warn("ML batch service returned non-OK status: {}", response.getStatusCode());
+            }
+            
+        } catch (Exception e) {
+            log.error("Error in batch classification: {}", e.getMessage());
+            // Results already initialized with COLD defaults
+        }
+        
+        return results;
+    }
 }
