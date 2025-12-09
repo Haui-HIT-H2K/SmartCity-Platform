@@ -165,21 +165,39 @@ const sendingOtp = ref(false)
 const otpSent = ref(false)
 const otpVerified = ref(false)
 const countdown = ref(0)
-const generatedOtp = ref('')
+const verifyingOtp = ref(false)
 
-// Watch OTP input to auto-verify
-watch(() => form.value.otp, (newOtp) => {
-  if (newOtp.length === 6) {
-    if (newOtp === generatedOtp.value) {
-      otpVerified.value = true
-      error.value = ''
-    } else {
+// Watch OTP input to auto-verify when 6 digits entered
+watch(() => form.value.otp, async (newOtp) => {
+  if (newOtp.length === 6 && otpSent.value && !verifyingOtp.value) {
+    verifyingOtp.value = true
+    error.value = ''
+    
+    try {
+      const response: any = await $fetch('http://localhost:8080/api/auth/verify-otp', {
+        method: 'POST',
+        body: {
+          email: form.value.email,
+          otp: newOtp
+        }
+      })
+      
+      if (response && response.verified) {
+        otpVerified.value = true
+        error.value = ''
+      } else {
+        otpVerified.value = false
+        error.value = response?.message || 'Mã OTP không đúng hoặc đã hết hạn'
+      }
+    } catch (err: any) {
       otpVerified.value = false
-      error.value = 'Mã OTP không đúng'
+      error.value = 'Không thể xác thực OTP. Vui lòng thử lại.'
+    } finally {
+      verifyingOtp.value = false
     }
-  } else {
+  } else if (newOtp.length < 6) {
     otpVerified.value = false
-    if (error.value === 'Mã OTP không đúng') {
+    if (error.value === 'Mã OTP không đúng hoặc đã hết hạn' || error.value === 'Không thể xác thực OTP. Vui lòng thử lại.') {
       error.value = ''
     }
   }
@@ -195,37 +213,29 @@ const sendOtp = async () => {
   error.value = ''
 
   try {
-    // Generate 6-digit OTP
-    generatedOtp.value = Math.floor(100000 + Math.random() * 900000).toString()
-    
-    // Simulate sending OTP to email (in real app, call backend API)
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    
-    // For demo purposes, show OTP in console (remove in production)
-    console.log('OTP sent to', form.value.email, ':', generatedOtp.value)
-    
-    // Call backend to send email (uncomment when backend has email service)
-    // await useFetch('http://localhost:8080/api/auth/send-otp', {
-    //   method: 'POST',
-    //   body: {
-    //     email: form.value.email,
-    //     otp: generatedOtp.value
-    //   }
-    // })
-
-    otpSent.value = true
-    
-    // Start countdown
-    countdown.value = 60
-    const timer = setInterval(() => {
-      countdown.value--
-      if (countdown.value <= 0) {
-        clearInterval(timer)
+    const response: any = await $fetch('http://localhost:8080/api/auth/send-otp', {
+      method: 'POST',
+      body: {
+        email: form.value.email
       }
-    }, 1000)
+    })
+
+    if (response) {
+      otpSent.value = true
+      
+      // Start countdown
+      countdown.value = 60
+      const timer = setInterval(() => {
+        countdown.value--
+        if (countdown.value <= 0) {
+          clearInterval(timer)
+        }
+      }, 1000)
+    }
 
   } catch (err: any) {
-    error.value = 'Không thể gửi mã OTP. Vui lòng thử lại.'
+    console.error('Send OTP error:', err)
+    error.value = err.data?.message || 'Không thể gửi mã OTP. Vui lòng thử lại.'
   } finally {
     sendingOtp.value = false
   }
