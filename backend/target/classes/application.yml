@@ -1,5 +1,18 @@
+# Copyright 2025 Haui.HIT - H2K
+# Licensed under the Apache License, Version 2.0
+# http://www.apache.org/licenses/LICENSE-2.0
+
 server:
   port: 8080
+  compression:
+    enabled: true
+    mime-types:
+      - application/json
+      - application/xml
+      - text/html
+      - text/xml
+      - text/plain
+    min-response-size: 1024  # Compress responses > 1KB
 
 spring:
   application:
@@ -9,7 +22,7 @@ spring:
   # - docker: Backend chạy trong Docker container (cùng network với services)
   # - local: Backend chạy ngoài Docker (development mode)
   profiles:
-    active: local
+    active: docker
 
   # Data Configuration (Redis + MongoDB)
   data:
@@ -101,6 +114,34 @@ ingestion:
 redis:
   hot-data:
     ttl: 3600                 # TTL = 1 giờ (seconds)
+
+# ML Service Configuration
+ml:
+  service:
+    url: http://smart-city-ml:8000  # ML Service URL (Docker network)
+
+# ============================================================
+# EDGE NODE REGISTRY (DNS-like Configuration)
+# Quản lý danh sách Edge Storage động
+# ============================================================
+app:
+  edge:
+    nodes:
+      - name: "Subnet-CauGiay"
+        host: "rabbit-edge-1"
+        port: 5672
+        queue-name: "city-data-queue-1"
+        username: "edge_user"
+        password: "edge_pass"
+        enabled: true
+        
+      - name: "Subnet-ThanhXuan"
+        host: "rabbit-edge-2"
+        port: 5672
+        queue-name: "city-data-queue-2"
+        username: "edge_user"
+        password: "edge_pass"
+        enabled: true
 
 ---
 # ============================================================
