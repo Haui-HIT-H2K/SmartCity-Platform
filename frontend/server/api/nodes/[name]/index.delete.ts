@@ -8,10 +8,13 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  */
 
+import { getAuthHeaders } from "~/server/utils/auth";
+
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig();
   const backendUrl = config.public.apiBase || "http://localhost:8080";
   const name = getRouterParam(event, "name");
+  const headers = getAuthHeaders(event);
   
   if (!name) {
     throw createError({
@@ -23,6 +26,7 @@ export default defineEventHandler(async (event) => {
   try {
     const response = await $fetch(`${backendUrl}/api/nodes/${name}`, {
       method: "DELETE",
+      headers,
     });
     return response;
   } catch (error: any) {

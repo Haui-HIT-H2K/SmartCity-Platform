@@ -23,11 +23,11 @@ public class DataInitializer implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         // Check if admin exists
-        if (!userRepository.existsByUsername("admin")) {
-            User admin = new User("admin", encoder.encode("admin123"));
+        if (!userRepository.existsByUsername("admin@vti.com.vn")) {
+            User admin = new User("admin@vti.com.vn", encoder.encode("Admin@123"));
             admin.setRoles(new HashSet<>(Collections.singletonList(Role.ROLE_ADMIN)));
             userRepository.save(admin);
-            System.out.println("Default admin user created: admin / admin123");
+            System.out.println("Default admin user created: admin@vti.com.vn / Admin@123");
         }
     }
 }

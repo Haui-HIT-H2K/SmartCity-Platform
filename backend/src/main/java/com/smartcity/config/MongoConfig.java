@@ -107,7 +107,7 @@ public class MongoConfig {
      * MongoTemplate cho Warm Storage
      * Sử dụng để lưu dữ liệu WARM (dữ liệu tuần)
      */
-    @Bean(name = "warmMongoTemplate")
+    @Bean(name = {"warmMongoTemplate", "mongoTemplate"})
     @Primary
     public MongoTemplate warmMongoTemplate() {
         log.info("Creating Warm MongoTemplate for database: {}", warmDatabase);
