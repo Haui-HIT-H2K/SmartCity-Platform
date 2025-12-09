@@ -22,6 +22,7 @@ import {
   getQuery,
   readBody,
   createError,
+  getCookie,
 } from "h3";
 
 // Proxy all /api/* requests to backend
@@ -43,6 +44,12 @@ export default defineEventHandler(async (event) => {
       if (key !== "host" && value !== undefined) {
         headers[key] = value;
       }
+    }
+
+    // Get auth token from cookie and add as Authorization header
+    const authToken = getCookie(event, 'auth_token');
+    if (authToken) {
+      headers['Authorization'] = `Bearer ${authToken}`;
     }
 
     const response = await $fetch(targetUrl, {

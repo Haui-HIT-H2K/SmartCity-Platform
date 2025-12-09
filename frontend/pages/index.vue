@@ -174,6 +174,7 @@ import {
 
 definePageMeta({
   layout: 'default',
+  middleware: 'auth'
 })
 
 // Use the composable to get real-time data

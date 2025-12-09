@@ -190,6 +190,7 @@ import { Plus, Trash2, Database } from 'lucide-vue-next';
 
 definePageMeta({
   layout: 'default',
+  middleware: 'auth'
 });
 
 // State

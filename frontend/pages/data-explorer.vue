@@ -270,6 +270,7 @@ import type { CityData, DataType } from "~/stores/data";
 
 definePageMeta({
   layout: "default",
+  middleware: 'auth'
 });
 
 const dataStore = useDataStore();

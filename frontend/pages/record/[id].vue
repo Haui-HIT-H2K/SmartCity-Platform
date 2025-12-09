@@ -190,6 +190,7 @@ import type { DataType } from "~/stores/data";
 
 definePageMeta({
   layout: "default",
+  middleware: 'auth'
 });
 
 const route = useRoute();

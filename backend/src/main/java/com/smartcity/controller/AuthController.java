@@ -9,6 +9,7 @@ import com.smartcity.model.User;
 import com.smartcity.repository.UserRepository;
 import com.smartcity.security.jwt.JwtUtils;
 import com.smartcity.security.services.UserDetailsImpl;
+import com.smartcity.service.OtpService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -38,6 +40,9 @@ public class AuthController {
 
     @Autowired
     JwtUtils jwtUtils;
+
+    @Autowired
+    OtpService otpService;
 
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
@@ -95,5 +100,48 @@ public class AuthController {
         userRepository.save(user);
 
         return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
+    }
+
+    /**
+     * Send OTP to email for verification
+     */
+    @PostMapping("/send-otp")
+    public ResponseEntity<?> sendOtp(@RequestBody Map<String, String> request) {
+        String email = request.get("email");
+        
+        if (email == null || email.isEmpty()) {
+            return ResponseEntity.badRequest()
+                    .body(new MessageResponse("Email is required"));
+        }
+
+        boolean sent = otpService.generateAndSendOtp(email);
+        
+        if (sent) {
+            return ResponseEntity.ok(new MessageResponse("OTP sent successfully"));
+        } else {
+            return ResponseEntity.internalServerError()
+                    .body(new MessageResponse("Failed to send OTP. Please try again."));
+        }
+    }
+
+    /**
+     * Verify OTP code
+     */
+    @PostMapping("/verify-otp")
+    public ResponseEntity<?> verifyOtp(@RequestBody Map<String, String> request) {
+        String email = request.get("email");
+        String otp = request.get("otp");
+        
+        if (email == null || email.isEmpty() || otp == null || otp.isEmpty()) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("verified", false, "message", "Email and OTP are required"));
+        }
+
+        boolean verified = otpService.verifyOtp(email, otp);
+        
+        return ResponseEntity.ok(Map.of(
+                "verified", verified,
+                "message", verified ? "OTP verified successfully" : "Invalid or expired OTP"
+        ));
     }
 }
