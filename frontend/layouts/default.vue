@@ -36,6 +36,17 @@
           <span class="font-medium">Data Explorer</span>
         </NuxtLink>
 
+        <!-- Publish Data - All users -->
+        <NuxtLink
+          to="/publish"
+          class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-300"
+          active-class="bg-primary/20 text-primary border border-primary/40"
+          inactive-class="text-gray-600 dark:text-gray-400 hover:bg-light-lighter dark:hover:bg-dark-lighter hover:text-gray-900 dark:hover:text-gray-200"
+        >
+          <Upload class="w-5 h-5" />
+          <span class="font-medium">Publish Data</span>
+        </NuxtLink>
+
         <!-- System Control - Admin only -->
         <NuxtLink
           v-if="authStore.isAdmin"
@@ -142,7 +153,8 @@ import {
   Moon,
   HardDrive,
   LogOut,
-  LogIn
+  LogIn,
+  Upload
 } from 'lucide-vue-next'
 import { useAuthStore } from '~/stores/auth';
 
@@ -156,6 +168,7 @@ const pageTitle = computed(() => {
   const titles: Record<string, string> = {
     '/': 'Real-time Monitoring',
     '/data-explorer': 'Data Explorer',
+    '/publish': 'Publish Data',
     '/system-control': 'System Control',
     '/nodes': 'Edge Storage Management',
   }
