@@ -1,5 +1,7 @@
 # SmartCity-Platform (Bài dự thi Phần Mềm Nguồn Mở 2025)
 
+🇻🇳 Tiếng Việt | 🇬🇧 [English](./README_EN.md)
+
 **Đội:** Haui-HIT-H2K
 
 **Trường:** Trường Công Nghệ Thông Tin và Truyền Thông (SICT) - Đại Học Công Nghiệp Hà Nội
