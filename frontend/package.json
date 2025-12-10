@@ -13,6 +13,7 @@
     "@nuxtjs/tailwindcss": "^6.14.0",
     "@pinia/nuxt": "^0.9.0",
     "echarts": "^5.5.0",
+    "leaflet": "^1.9.4",
     "lucide-vue-next": "^0.555.0",
     "nuxt": "^4.2.1",
     "pinia": "^2.1.7",

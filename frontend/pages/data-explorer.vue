@@ -188,7 +188,14 @@
                   {{ item.location.lat.toFixed(4) }},
                   {{ item.location.lng.toFixed(4) }}
                 </span>
-                <span v-else class="text-gray-500 dark:text-gray-600">N/A</span>
+                <button
+                  v-else
+                  @click.stop="openMapModal(item)"
+                  class="inline-flex items-center justify-center p-2 rounded-lg hover:bg-primary/10 transition-colors group"
+                  title="Xem vị trí trên bản đồ"
+                >
+                  <MapPin class="w-4 h-4 text-primary group-hover:scale-110 transition-transform" />
+                </button>
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-center">
                 <button
@@ -269,6 +276,14 @@
         </UiButton>
       </div>
     </div>
+
+    <!-- Map Location Modal -->
+    <MapLocationModal
+      :show="showMapModal"
+      :sensor-id="selectedSensorId"
+      :location="selectedLocation"
+      @close="closeMapModal"
+    />
   </div>
 </template>
 
@@ -280,6 +295,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Eye,
+  MapPin,
 } from "lucide-vue-next";
 import { useDataStore } from "~/stores/data";
 import type { CityData, DataType } from "~/stores/data";
@@ -293,8 +309,80 @@ const dataStore = useDataStore();
 const router = useRouter();
 
 // Local filter state
-const selectedType = ref<DataType | "">("");
+const selectedType = ref<DataType | "">(""); 
 const sensorIdInput = ref("");
+
+// Map modal state
+interface LocationData {
+  lat: number;
+  lng: number;
+}
+
+const showMapModal = ref(false);
+const selectedSensorId = ref("");
+const selectedLocation = ref<LocationData | null>(null);
+
+// Generate a deterministic location within Thanh Xuan & Cau Giay districts (Hanoi) based on sensor ID
+const generateLocationFromSensorId = (sensorId: string): LocationData => {
+  // Thanh Xuan & Cau Giay districts, Hanoi bounds
+  // Thanh Xuan: ~20.985-21.005°N, 105.79-105.82°E
+  // Cau Giay: ~21.01-21.05°N, 105.76-105.80°E
+  const HANOI_BOUNDS = {
+    minLat: 20.985, maxLat: 21.05,
+    minLng: 105.76, maxLng: 105.82
+  };
+  
+  // Create a simple hash from sensor ID for deterministic results
+  let hash = 0;
+  for (let i = 0; i < sensorId.length; i++) {
+    const char = sensorId.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // Convert to 32-bit integer
+  }
+  
+  // Use hash to generate lat/lng within Hanoi bounds
+  const normalizedHash = Math.abs(hash) / 2147483647; // Normalize to 0-1
+  const lat = HANOI_BOUNDS.minLat + (normalizedHash * (HANOI_BOUNDS.maxLat - HANOI_BOUNDS.minLat));
+  
+  // Use a different transformation for longitude
+  const lngHash = Math.abs((hash * 31) & 0x7FFFFFFF) / 2147483647;
+  const lng = HANOI_BOUNDS.minLng + (lngHash * (HANOI_BOUNDS.maxLng - HANOI_BOUNDS.minLng));
+  
+  return { lat, lng };
+};
+
+// Open map modal with sensor location
+const openMapModal = (item: CityData) => {
+  selectedSensorId.value = item.sourceId || item.id || "Unknown";
+  
+  // Check if item has location data in payload
+  if (item.payload) {
+    const lat = item.payload.latitude || item.payload.lat;
+    const lng = item.payload.longitude || item.payload.lng || item.payload.lon;
+    
+    if (lat !== undefined && lng !== undefined) {
+      selectedLocation.value = {
+        lat: Number(lat),
+        lng: Number(lng)
+      };
+    } else {
+      // Generate location from sensor ID
+      selectedLocation.value = generateLocationFromSensorId(selectedSensorId.value);
+    }
+  } else {
+    // Generate location from sensor ID
+    selectedLocation.value = generateLocationFromSensorId(selectedSensorId.value);
+  }
+  
+  showMapModal.value = true;
+};
+
+// Close map modal
+const closeMapModal = () => {
+  showMapModal.value = false;
+  selectedLocation.value = null;
+  selectedSensorId.value = "";
+};
 
 // Computed from store
 const data = computed(() => dataStore.data);
