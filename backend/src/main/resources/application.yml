@@ -107,7 +107,7 @@ ingestion:
     
   # Scheduling configuration
   schedule:
-    fixed-rate: 10000         # 10 giây (milliseconds)
+    fixed-rate: 5000          # 5 giây (tối ưu từ 10 giây)
     initial-delay: 5000       # Delay 5 giây khi khởi động
 
 # Redis TTL Configuration

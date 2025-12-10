@@ -8,12 +8,17 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  */
 
+import { getAuthHeaders } from "~/server/utils/auth";
+
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig();
   const backendUrl = config.public.apiBase || "http://localhost:8080";
+  const headers = getAuthHeaders(event);
   
   try {
-    const nodes = await $fetch(`${backendUrl}/api/nodes`);
+    const nodes = await $fetch(`${backendUrl}/api/nodes`, {
+      headers,
+    });
     return nodes;
   } catch (error: any) {
     console.error("Error fetching nodes:", error);

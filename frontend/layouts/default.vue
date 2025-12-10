@@ -1,3 +1,19 @@
+<!--
+  Copyright 2025 Haui.HIT - H2K
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+
 <template>
   <div class="min-h-screen flex bg-gradient-cyber dark:bg-gradient-cyber">
     <!-- Sidebar -->
@@ -13,7 +29,9 @@
 
       <!-- Navigation -->
       <nav class="flex-1 space-y-2">
+        <!-- Dashboard - Admin only -->
         <NuxtLink
+          v-if="authStore.isAdmin"
           to="/"
           class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-300 group"
           active-class="bg-primary/20 text-primary border border-primary/40"
@@ -23,6 +41,7 @@
           <span class="font-medium">Dashboard</span>
         </NuxtLink>
 
+        <!-- Data Explorer - All users -->
         <NuxtLink
           to="/data-explorer"
           class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-300"
@@ -33,7 +52,20 @@
           <span class="font-medium">Data Explorer</span>
         </NuxtLink>
 
+        <!-- Publish Data - All users -->
         <NuxtLink
+          to="/publish"
+          class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-300"
+          active-class="bg-primary/20 text-primary border border-primary/40"
+          inactive-class="text-gray-600 dark:text-gray-400 hover:bg-light-lighter dark:hover:bg-dark-lighter hover:text-gray-900 dark:hover:text-gray-200"
+        >
+          <Upload class="w-5 h-5" />
+          <span class="font-medium">Publish Data</span>
+        </NuxtLink>
+
+        <!-- System Control - Admin only -->
+        <NuxtLink
+          v-if="authStore.isAdmin"
           to="/system-control"
           class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-300"
           active-class="bg-primary/20 text-primary border border-primary/40"
@@ -43,7 +75,9 @@
           <span class="font-medium">System Control</span>
         </NuxtLink>
 
+        <!-- Edge Storage - Admin only -->
         <NuxtLink
+          v-if="authStore.isAdmin"
           to="/nodes"
           class="flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-300"
           active-class="bg-primary/20 text-primary border border-primary/40"
@@ -56,14 +90,23 @@
 
       <!-- Footer -->
       <div class="mt-auto pt-6 border-t border-light-border dark:border-dark-border">
-        <div class="flex items-center gap-3 px-4 py-2">
+        <div v-if="authStore.isAuthenticated" class="flex items-center gap-3 px-4 py-2">
           <div class="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
             <User class="w-4 h-4 text-primary" />
           </div>
-          <div>
-            <p class="text-sm font-medium text-gray-900 dark:text-gray-100">Admin</p>
-            <p class="text-xs text-gray-600 dark:text-gray-400">System Operator</p>
+          <div class="flex-1 min-w-0">
+            <p class="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{{ authStore.user?.username }}</p>
+            <p class="text-xs text-gray-600 dark:text-gray-400 truncate">{{ authStore.isAdmin ? 'Administrator' : 'User' }}</p>
           </div>
+          <button @click="handleLogout" class="p-1.5 rounded-lg hover:bg-red-50 text-red-500 hover:text-red-600 transition-colors" title="Sign out">
+            <LogOut class="w-4 h-4" />
+          </button>
+        </div>
+         <div v-else class="px-4 py-2">
+          <NuxtLink to="/login" class="flex items-center justify-center gap-2 w-full py-2 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors">
+            <LogIn class="w-4 h-4" />
+            <span class="text-sm font-medium">Sign In</span>
+          </NuxtLink>
         </div>
       </div>
     </aside>
@@ -125,9 +168,15 @@ import {
   Sun,
   Moon,
   HardDrive,
+  LogOut,
+  LogIn,
+  Upload
 } from 'lucide-vue-next'
+import { useAuthStore } from '~/stores/auth';
 
 const route = useRoute()
+const router = useRouter()
+const authStore = useAuthStore()
 const currentTime = ref('')
 const { theme, toggleTheme, isDark } = useTheme()
 
@@ -135,6 +184,7 @@ const pageTitle = computed(() => {
   const titles: Record<string, string> = {
     '/': 'Real-time Monitoring',
     '/data-explorer': 'Data Explorer',
+    '/publish': 'Publish Data',
     '/system-control': 'System Control',
     '/nodes': 'Edge Storage Management',
   }
@@ -145,6 +195,10 @@ const pageTitle = computed(() => {
 const updateTime = () => {
   const now = new Date()
   currentTime.value = now.toLocaleTimeString('en-US', { hour12: false })
+}
+
+const handleLogout = () => {
+  authStore.logout()
 }
 
 onMounted(() => {

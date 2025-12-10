@@ -16,9 +16,13 @@
 
  */
 
+import { getAuthHeaders } from "~/server/utils/auth";
+
 export default defineEventHandler(async (event) => {
   const id = getRouterParam(event, "id");
   const config = useRuntimeConfig();
+  const headers = getAuthHeaders(event);
+  
   if (!id) {
     throw createError({
       statusCode: 400,
@@ -30,7 +34,9 @@ export default defineEventHandler(async (event) => {
     // Get headers for forwarding
     const backendUrl = config.apiSecret || "http://smart-city-backend:8080";
 
-    const record = await $fetch(`${backendUrl}/api/data/${id}`);
+    const record = await $fetch(`${backendUrl}/api/data/${id}`, {
+      headers,
+    });
 
     return record;
   } catch (error: any) {

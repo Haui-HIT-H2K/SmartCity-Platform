@@ -8,14 +8,18 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  */
 
+import { getAuthHeaders } from "~/server/utils/auth";
+
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig();
   const backendUrl = config.public.apiBase || "http://localhost:8080";
   const body = await readBody(event);
+  const headers = getAuthHeaders(event);
   
   try {
     const response = await $fetch(`${backendUrl}/api/nodes`, {
       method: "POST",
+      headers,
       body,
     });
     return response;
