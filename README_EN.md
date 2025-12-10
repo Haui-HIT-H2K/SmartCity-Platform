@@ -9,7 +9,7 @@
 [![Documentation](https://img.shields.io/badge/Documentation-View_Site-blue?style=for-the-badge)](https://Haui-HIT-H2K.github.io/SmartCity-Platform/)
 [![License](https://img.shields.io/badge/License-Apache_2.0-yellow.svg?style=for-the-badge)](./LICENSE)
 
-A Smart City application built on an open data platform.
+Smart Urban Data Platform with Distributed Edge Storage Architecture and Intelligent Tiered Data Storage.
 
 ## Introduction about SmartCity-Platform
 
@@ -28,11 +28,13 @@ This project builds a **Smart Urban Data Platform** with Tiered Storage Architec
 ### Key Features
 
 1. **ML-Driven Data Classification:** Uses Machine Learning (IsolationForest) to automatically classify sensor data into 3 levels:
+
    - **HOT** - Abnormal/urgent data requiring immediate processing
-   - **WARM** - Important data needing long-term storage  
+   - **WARM** - Important data needing long-term storage
    - **COLD** - Normal data for archival purposes
 
 2. **Pull-based Architecture:** Backend actively PULLS data from Edge Storage (RabbitMQ), ensuring:
+
    - No system overload during data spikes
    - Efficient batch processing (5000 messages/batch)
    - Resilient - continues operating when edge nodes fail
@@ -45,18 +47,64 @@ This project builds a **Smart Urban Data Platform** with Tiered Storage Architec
 
 ```mermaid
 graph LR
-    A[Python IoT Simulator] -->|Publish| B[RabbitMQ Edge Storage]
-    B -->|Pull Batch| C[Spring Boot Backend]
-    C -->|Classify| D[ML Service FastAPI]
-    D -->|HOT/WARM/COLD| C
-    C -->|HOT| E[Redis Cache]
-    C -->|WARM/COLD| F[MongoDB]
-    E -->|Query| G[NuxtJS Frontend]
-    F -->|Query| G
-    
-    style D fill:#90EE90
-    style E fill:#ff6b6b
-    style F fill:#4169E1
+    subgraph DataGen["📡 Data Generation"]
+        A["🐍 Python IoT<br/>Simulator"]
+    end
+
+    subgraph EdgeStorage["💾 Edge Storage"]
+        B["🐰 RabbitMQ<br/>Node 1"]
+        L["🐰 RabbitMQ<br/>Node 2"]
+    end
+
+    subgraph CoreProcessing["⚙️ Core Processing"]
+        C["☕ Spring Boot<br/>Backend"]
+    end
+
+    subgraph MLLayer["🤖 ML Classification"]
+        D["🧠 FastAPI<br/>ML Service"]
+    end
+
+    subgraph TieredStorage["🗄️ Tiered Storage"]
+        E["🔥 Redis<br/>HOT"]
+        K["📦 MongoDB<br/>WARM"]
+        F["❄️ MongoDB<br/>COLD"]
+    end
+
+    subgraph Presentation["🖥️ Presentation"]
+        G["🌐 NuxtJS<br/>Frontend"]
+    end
+
+    %% Data Flow: Generation → Edge
+    A -->|"Publish"| B
+    A -->|"Publish"| L
+
+    %% Data Flow: Edge → Backend
+    B -->|"Pull Batch"| C
+    L -->|"Pull Batch"| C
+
+    %% ML Classification Flow (2 separate arrows)
+    C -->|"📤 Send CLassically Data"| D
+    D -->|"📥 HOT/WARM/COLD"| C
+
+    %% Tiered Storage Routing
+    C -->|"🔥 HOT"| E
+    C -->|"📦 WARM"| K
+    C -->|"❄️ COLD"| F
+
+    %% API Layer
+    C -->|"REST API"| G
+
+
+    %% Styling
+    style A fill:#3776AB,stroke:#FFD43B,stroke-width:2px,color:#fff
+    style B fill:#FF6600,stroke:#333,stroke-width:2px,color:#fff
+    style L fill:#FF6600,stroke:#333,stroke-width:2px,color:#fff
+    style C fill:#6DB33F,stroke:#333,stroke-width:2px,color:#fff
+    style D fill:#009688,stroke:#333,stroke-width:2px,color:#fff
+    style E fill:#DC382D,stroke:#333,stroke-width:2px,color:#fff
+    style K fill:#4DB33D,stroke:#333,stroke-width:2px,color:#fff
+    style F fill:#4169E1,stroke:#333,stroke-width:2px,color:#fff
+    style G fill:#00DC82,stroke:#333,stroke-width:2px,color:#000
 ```
 
 ### Detailed Data Flow
@@ -77,12 +125,10 @@ graph LR
   - Redis Integration (Hot Storage)
   - MongoDB Multi-Datasource (Warm/Cold Storage)
   - REST API for Frontend
-  
 - **ML Service:** FastAPI (Python)
   - scikit-learn IsolationForest models
   - 3 trained models: temperature, humidity, CO2
   - REST endpoint `/predict` for classification
-  
 - **Frontend:** NuxtJS 3 (Vue.js)
   - Real-time dashboard
   - Data explorer with pagination
@@ -120,6 +166,7 @@ docker-compose up -d --build
 ```
 
 This command will start:
+
 - 2x RabbitMQ nodes (Edge Storage)
 - Redis (HOT storage)
 - 2x MongoDB instances (WARM/COLD)
@@ -176,14 +223,14 @@ curl http://localhost:8000/health
 
 ## 🌐 Access Interfaces
 
-| Service | URL | Description |
-|---------|-----|-------------|
-| **Frontend Dashboard** | http://localhost:3000 | Main interface displaying data |
-| **Data Explorer** | http://localhost:3000/data-explorer | Explore data with pagination |
-| **Backend API** | http://localhost:8080 | RESTful API endpoints |
-| **ML Service** | http://localhost:8000/docs | FastAPI Swagger docs |
-| **RabbitMQ Management** | http://localhost:15672 | user: `edge_user`, pass: `edge_pass` |
-| **Mongo Express** | http://localhost:8081 | MongoDB admin UI |
+| Service                 | URL                                 | Description                          |
+| ----------------------- | ----------------------------------- | ------------------------------------ |
+| **Frontend Dashboard**  | http://localhost:3000               | Main interface displaying data       |
+| **Data Explorer**       | http://localhost:3000/data-explorer | Explore data with pagination         |
+| **Backend API**         | http://localhost:8080               | RESTful API endpoints                |
+| **ML Service**          | http://localhost:8000/docs          | FastAPI Swagger docs                 |
+| **RabbitMQ Management** | http://localhost:15672              | user: `edge_user`, pass: `edge_pass` |
+| **Mongo Express**       | http://localhost:8081               | MongoDB admin UI                     |
 
 ## 📊 ML Classification Architecture
 
@@ -194,11 +241,9 @@ The system uses 3 trained IsolationForest models:
 1. **Temperature Model** (1.5 MB)
    - Training range: 15-35°C (normal urban)
    - Detects: Extreme heat/cold anomalies
-   
 2. **Humidity Model** (1.59 MB)
    - Training range: 30-80% (normal range)
    - Detects: Unusual humidity spikes
-   
 3. **CO2 Model** (1.9 MB)
    - Training range: 350-900 ppm
    - Detects: Dangerous CO2 levels
@@ -253,18 +298,18 @@ SmartCity-Platform/
 ```yaml
 spring:
   profiles:
-    active: docker  # Important: use 'docker' profile for container deployment
+    active: docker # Important: use 'docker' profile for container deployment
 
 ml:
   service:
-    url: http://smart-city-ml:8000  # ML service URL
+    url: http://smart-city-ml:8000 # ML service URL
 
 ingestion:
   batch:
-    size: 1000          # Messages per batch
-    max-size: 5000      # Max batch size
+    size: 1000 # Messages per batch
+    max-size: 5000 # Max batch size
   schedule:
-    fixed-rate: 10000   # Pull every 10 seconds
+    fixed-rate: 10000 # Pull every 10 seconds
 ```
 
 ### Data Simulator (config.py)
@@ -286,6 +331,7 @@ curl -X POST http://localhost:8000/predict \
 ```
 
 Expected response:
+
 ```json
 {
   "label": "HOT",
@@ -312,6 +358,7 @@ docker logs smart-city-backend --tail 100 -f
 ```
 
 Look for:
+
 - `Data classification completed: HOT=X, WARM=Y, COLD=Z`
 - `Successfully stored X HOT records to Redis`
 - `Successfully bulk inserted X COLD records`
@@ -344,12 +391,14 @@ docker-compose up -d ml-service
 ### Backend cannot connect to ML Service
 
 Check `application.yml` to ensure:
+
 - Profile = `docker` (not `local`)
 - ML service URL = `http://smart-city-ml:8000`
 
 ### Frontend not displaying data
 
 Check backend API:
+
 ```bash
 curl http://localhost:8080/api/data
 ```
@@ -357,11 +406,13 @@ curl http://localhost:8080/api/data
 ### MongoDB restarting continuously (Database Corruption)
 
 **Symptoms:**
+
 - Containers `core-mongo-warm` or `core-mongo-cold` restart continuously
 - Logs show errors: `WT_TRY_SALVAGE: database corruption detected` or `WT_PANIC: WiredTiger library panic`
 - Error: `Detected unclean shutdown - Lock file is not empty`
 
 **Cause:**
+
 - Container stopped unexpectedly (unclean shutdown)
 - Database files corrupted because WiredTiger cannot read metadata
 - Lock files not cleared properly
@@ -369,12 +420,14 @@ curl http://localhost:8080/api/data
 **Solution:**
 
 **Method 1: Use automatic script (Recommended)**
+
 ```powershell
 # Run corruption fix script
 .\fix-mongodb-corruption.ps1
 ```
 
 **Method 2: Manual**
+
 ```powershell
 # 1. Stop MongoDB containers
 docker-compose stop core-mongo-warm core-mongo-cold
@@ -396,11 +449,13 @@ docker logs core-mongo-cold --follow
 ```
 
 **Note:**
+
 - ⚠️ **Warning:** Deleting data directories will erase all current data
 - Backup data before deleting if you have important data
 - After deletion, MongoDB will automatically initialize a new database when the container starts
 
 **Prevention:**
+
 - Always stop containers properly: `docker-compose down` (don't use kill/force stop)
 - Avoid sudden shutdowns while containers are running
 - `data/` directory is added to `.gitignore` to avoid committing database files to Git
@@ -419,8 +474,8 @@ Complete documentation on API, architecture, and development guides:
 
 ## 🤝 Contributing to the Project
 
-* **Report bugs ⚠️:** [Create Bug Report](https://github.com/Haui-HIT-H2K/SmartCity-Platform/issues/new?template=bao-loi.md)
-* **Feature suggestions:** [Feature Request](https://github.com/Haui-HIT-H2K/SmartCity-Platform/issues/new?template=de-xuat-tinh-nang.md)
+- **Report bugs ⚠️:** [Create Bug Report](https://github.com/Haui-HIT-H2K/SmartCity-Platform/issues/new?template=bao-loi.md)
+- **Feature suggestions:** [Feature Request](https://github.com/Haui-HIT-H2K/SmartCity-Platform/issues/new?template=de-xuat-tinh-nang.md)
 
 All contributions are appreciated. Please read **Guidelines:** [CONTRIBUTING](https://github.com/Haui-HIT-H2K/SmartCity-Platform/blob/main/.github/ISSUE_TEMPLATE.md) before submitting a pull request.
 
@@ -428,9 +483,9 @@ All contributions are appreciated. Please read **Guidelines:** [CONTRIBUTING](ht
 
 ## 📞 Contact
 
-* **Nguyen Huy Hoang:** nguyenhuyhoangpt0402@gmail.com
-* **Tran Danh Khang:** trandanhkhang482004@gmail.com
-* **Nguyen Huy Hoang:** nguyenhuyhoangqbx5@gmail.com
+- **Nguyen Huy Hoang:** nguyenhuyhoangpt0402@gmail.com
+- **Tran Danh Khang:** trandanhkhang482004@gmail.com
+- **Nguyen Huy Hoang:** nguyenhuyhoangqbx5@gmail.com
 
 ---
 

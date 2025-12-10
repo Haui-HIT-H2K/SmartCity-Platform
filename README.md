@@ -9,7 +9,7 @@
 [![Documentation](https://img.shields.io/badge/Documentation-View_Site-blue?style=for-the-badge)](https://Haui-HIT-H2K.github.io/SmartCity-Platform/)
 [![License](https://img.shields.io/badge/License-Apache_2.0-yellow.svg?style=for-the-badge)](./LICENSE)
 
-Bài dự thi Xây dựng ứng dụng thành phố thông minh dựa trên nền tảng dữ liệu mở.
+Bài dự thi Nền tảng Dữ liệu Đô thị Thông minh với Kiến trúc Lưu trữ Biên Phân tán và Phân lớp Dữ liệu Thông minh.
 
 ## 💡 Ý tưởng Cốt lõi
 
@@ -35,18 +35,64 @@ Dự án này xây dựng một **Nền tảng Dữ liệu Đô thị Thông min
 
 ```mermaid
 graph LR
-    A[Python IoT Simulator] -->|Publish| B[RabbitMQ Edge Storage]
-    B -->|Pull Batch| C[Spring Boot Backend]
-    C -->|Classify| D[ML Service FastAPI]
-    D -->|HOT/WARM/COLD| C
-    C -->|HOT| E[Redis Cache]
-    C -->|WARM/COLD| F[MongoDB]
-    E -->|Query| G[NuxtJS Frontend]
-    F -->|Query| G
-    
-    style D fill:#90EE90
-    style E fill:#ff6b6b
-    style F fill:#4169E1
+    subgraph DataGen["📡 Data Generation"]
+        A["🐍 Python IoT<br/>Simulator"]
+    end
+
+    subgraph EdgeStorage["💾 Edge Storage"]
+        B["🐰 RabbitMQ<br/>Node 1"]
+        L["🐰 RabbitMQ<br/>Node 2"]
+    end
+
+    subgraph CoreProcessing["⚙️ Core Processing"]
+        C["☕ Spring Boot<br/>Backend"]
+    end
+
+    subgraph MLLayer["🤖 ML Classification"]
+        D["🧠 FastAPI<br/>ML Service"]
+    end
+
+    subgraph TieredStorage["🗄️ Tiered Storage"]
+        E["🔥 Redis<br/>HOT"]
+        K["📦 MongoDB<br/>WARM"]
+        F["❄️ MongoDB<br/>COLD"]
+    end
+
+    subgraph Presentation["🖥️ Presentation"]
+        G["🌐 NuxtJS<br/>Frontend"]
+    end
+
+    %% Data Flow: Generation → Edge
+    A -->|"Publish"| B
+    A -->|"Publish"| L
+
+    %% Data Flow: Edge → Backend
+    B -->|"Pull Batch"| C
+    L -->|"Pull Batch"| C
+
+    %% ML Classification Flow (2 separate arrows)
+    C -->|"📤 Send CLassically Data"| D
+    D -->|"📥 HOT/WARM/COLD"| C
+
+    %% Tiered Storage Routing
+    C -->|"🔥 HOT"| E
+    C -->|"📦 WARM"| K
+    C -->|"❄️ COLD"| F
+
+    %% API Layer
+    C -->|"REST API"| G
+
+
+    %% Styling
+    style A fill:#3776AB,stroke:#FFD43B,stroke-width:2px,color:#fff
+    style B fill:#FF6600,stroke:#333,stroke-width:2px,color:#fff
+    style L fill:#FF6600,stroke:#333,stroke-width:2px,color:#fff
+    style C fill:#6DB33F,stroke:#333,stroke-width:2px,color:#fff
+    style D fill:#009688,stroke:#333,stroke-width:2px,color:#fff
+    style E fill:#DC382D,stroke:#333,stroke-width:2px,color:#fff
+    style K fill:#4DB33D,stroke:#333,stroke-width:2px,color:#fff
+    style F fill:#4169E1,stroke:#333,stroke-width:2px,color:#fff
+    style G fill:#00DC82,stroke:#333,stroke-width:2px,color:#000
 ```
 
 ### Luồng Dữ liệu Chi tiết
