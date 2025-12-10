@@ -86,6 +86,9 @@ public class MLServiceClient {
             } else if (payload.containsKey("humidity")) {
                 metricType = "humidity";
                 value = getDoubleValue(payload.get("humidity"));
+            } else if (payload.containsKey("co2_level")) {
+                metricType = "co2";
+                value = getDoubleValue(payload.get("co2_level"));
             } else if (payload.containsKey("co2")) {
                 metricType = "co2";
                 value = getDoubleValue(payload.get("co2"));
@@ -209,6 +212,9 @@ public class MLServiceClient {
                 } else if (payload.containsKey("humidity")) {
                     metricType = "humidity";
                     value = getDoubleValue(payload.get("humidity"));
+                } else if (payload.containsKey("co2_level")) {
+                    metricType = "co2";
+                    value = getDoubleValue(payload.get("co2_level"));
                 } else if (payload.containsKey("co2")) {
                     metricType = "co2";
                     value = getDoubleValue(payload.get("co2"));

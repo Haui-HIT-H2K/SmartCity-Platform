@@ -51,17 +51,48 @@ class SensorSimulator(threading.Thread):
     def generate_sensor_data(self):
         """
         Sinh dữ liệu cảm biến giả (tối ưu tốc độ)
+        Hỗ trợ inject anomaly để tạo dữ liệu bất thường
         """
         sensor_id = f"SENSOR_{random.randint(1, config.NUM_SENSORS):03d}"
+        
+        # Check if we should inject anomaly
+        inject_anomaly = (
+            config.INJECT_ANOMALY and 
+            random.random() < config.ANOMALY_PROBABILITY
+        )
+        
+        if inject_anomaly:
+            # Generate anomaly data (extreme values for HOT classification)
+            # Randomly choose high or low anomaly for each metric
+            if random.random() < 0.5:
+                temperature = round(random.uniform(config.ANOMALY_TEMP_HIGH - 10, config.ANOMALY_TEMP_HIGH), 1)
+            else:
+                temperature = round(random.uniform(config.ANOMALY_TEMP_LOW, config.ANOMALY_TEMP_LOW + 10), 1)
+            
+            if random.random() < 0.5:
+                humidity = random.randint(config.ANOMALY_HUMIDITY_HIGH - 10, config.ANOMALY_HUMIDITY_HIGH)
+            else:
+                humidity = random.randint(config.ANOMALY_HUMIDITY_LOW, config.ANOMALY_HUMIDITY_LOW + 10)
+            
+            if random.random() < 0.5:
+                co2_level = random.randint(config.ANOMALY_CO2_HIGH - 500, config.ANOMALY_CO2_HIGH)
+            else:
+                co2_level = random.randint(config.ANOMALY_CO2_LOW, config.ANOMALY_CO2_LOW + 100)
+        else:
+            # Generate normal data
+            temperature = round(random.uniform(config.TEMP_MIN, config.TEMP_MAX), 1)
+            humidity = random.randint(config.HUMIDITY_MIN, config.HUMIDITY_MAX)
+            co2_level = random.randint(config.CO2_MIN, config.CO2_MAX)
         
         data = {
             "sourceId": sensor_id,
             "payload": {
-                "temperature": round(random.uniform(config.TEMP_MIN, config.TEMP_MAX), 1),
-                "humidity": random.randint(config.HUMIDITY_MIN, config.HUMIDITY_MAX),
-                "co2_level": random.randint(config.CO2_MIN, config.CO2_MAX)
+                "temperature": temperature,
+                "humidity": humidity,
+                "co2_level": co2_level
             },
-            "timestamp": int(time.time() * 1000)  # Unix time milliseconds
+            "timestamp": int(time.time() * 1000),  # Unix time milliseconds
+            "is_anomaly": inject_anomaly  # Flag for debugging (optional)
         }
         
         return json.dumps(data)
@@ -170,6 +201,19 @@ def main():
     print(f"Number of Threads: {config.NUM_THREADS}")
     print(f"Edge Node 1: {config.EDGE1_HOST}:{config.EDGE1_PORT} → {config.EDGE1_QUEUE}")
     print(f"Edge Node 2: {config.EDGE2_HOST}:{config.EDGE2_PORT} → {config.EDGE2_QUEUE}")
+    
+    # Show anomaly injection status
+    if config.INJECT_ANOMALY:
+        print("-" * 80)
+        print("🔥 ANOMALY INJECTION: ENABLED")
+        print(f"   Probability: {config.ANOMALY_PROBABILITY * 100:.0f}% of data will be anomalies")
+        print(f"   Expected HOT records: ~{int(config.TOTAL_REQUESTS * config.ANOMALY_PROBABILITY):,}")
+        print("-" * 80)
+    else:
+        print("-" * 80)
+        print("✓ ANOMALY INJECTION: DISABLED (all normal data)")
+        print("-" * 80)
+    
     print("=" * 80)
     
     # Chia quota cho mỗi thread

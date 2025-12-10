@@ -6,6 +6,7 @@ C:\Users\hoang\SmartCity-Platform\backend\src\main\java\com\smartcity\SmartCityA
 C:\Users\hoang\SmartCity-Platform\backend\src\main\java\com\smartcity\config\RestConfiguration.java
 C:\Users\hoang\SmartCity-Platform\backend\src\main\java\com\smartcity\model\DataType.java
 C:\Users\hoang\SmartCity-Platform\backend\src\main\java\com\smartcity\security\jwt\AuthTokenFilter.java
+C:\Users\hoang\SmartCity-Platform\backend\src\main\java\com\smartcity\service\SystemHealthService.java
 C:\Users\hoang\SmartCity-Platform\backend\src\main\java\com\smartcity\service\CityDataQueryService.java
 C:\Users\hoang\SmartCity-Platform\backend\src\main\java\com\smartcity\dto\MessageResponse.java
 C:\Users\hoang\SmartCity-Platform\backend\src\main\java\com\smartcity\controller\NodesController.java

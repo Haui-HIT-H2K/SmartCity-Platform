@@ -32,16 +32,21 @@ package com.smartcity.service;
 
 import com.smartcity.model.CityData;
 import com.smartcity.model.DataType;
+import com.smartcity.service.SystemHealthService.HealthStatus;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.BulkOperations;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -59,6 +64,10 @@ public class DataRoutingService {
     private final MongoTemplate warmMongoTemplate;
     private final MongoTemplate coldMongoTemplate;
     private final RedisTemplate<String, Object> redisTemplate;
+    private final SystemHealthService healthService;
+    
+    // Collection name for deferred data (persistent queue)
+    private static final String DEFERRED_COLLECTION = "deferred_data";
     
     @Value("${redis.hot-data.ttl}")
     private long hotDataTtl;
@@ -66,14 +75,17 @@ public class DataRoutingService {
     public DataRoutingService(
             @Qualifier("warmMongoTemplate") MongoTemplate warmMongoTemplate,
             @Qualifier("coldMongoTemplate") MongoTemplate coldMongoTemplate,
-            RedisTemplate<String, Object> redisTemplate) {
+            RedisTemplate<String, Object> redisTemplate,
+            SystemHealthService healthService) {
         this.warmMongoTemplate = warmMongoTemplate;
         this.coldMongoTemplate = coldMongoTemplate;
         this.redisTemplate = redisTemplate;
+        this.healthService = healthService;
     }
 
     /**
      * Route và lưu trữ một batch dữ liệu
+     * Health-aware: Defers COLD/WARM data based on system health status
      * 
      * @param batchData List các CityData cần lưu trữ
      */
@@ -83,8 +95,13 @@ public class DataRoutingService {
             return;
         }
         
+        // Get current health status and allowed data types
+        HealthStatus health = healthService.getCurrentHealth();
+        Set<DataType> allowedTypes = healthService.getAllowedDataTypes();
+        
         log.info("========================================");
         log.info("Starting data routing for {} records", batchData.size());
+        log.info("System Health: {} | Allowed types: {}", health, allowedTypes);
         log.info("========================================");
         
         try {
@@ -124,10 +141,27 @@ public class DataRoutingService {
             log.info("Data classification completed: HOT={}, WARM={}, COLD={}", 
                     hotList.size(), warmList.size(), coldList.size());
             
-            // Bước 2: Lưu trữ vào các storage tiers
+            // Bước 2: Lưu trữ dựa trên health status
+            // HOT data luôn được lưu (highest priority)
             storeHotData(hotList);
-            storeWarmData(warmList);
-            storeColdData(coldList);
+            
+            // WARM data: lưu nếu allowed, nếu không thì defer
+            if (allowedTypes.contains(DataType.WARM)) {
+                storeWarmData(warmList);
+            } else if (!warmList.isEmpty()) {
+                deferData(warmList, DataType.WARM);
+                log.warn("Health {}: Deferred {} WARM records to persistent queue", 
+                        health, warmList.size());
+            }
+            
+            // COLD data: lưu nếu allowed, nếu không thì defer
+            if (allowedTypes.contains(DataType.COLD)) {
+                storeColdData(coldList);
+            } else if (!coldList.isEmpty()) {
+                deferData(coldList, DataType.COLD);
+                log.warn("Health {}: Deferred {} COLD records to persistent queue", 
+                        health, coldList.size());
+            }
             
             log.info("========================================");
             log.info("Data routing completed successfully");
@@ -352,6 +386,116 @@ public class DataRoutingService {
         } catch (Exception e) {
             log.error("Error bulk inserting COLD data to MongoDB: {}", e.getMessage(), e);
             // Log error nhưng không throw
+        }
+    }
+
+    /**
+     * Defer data to persistent MongoDB queue when health is degraded/down
+     * Data will be processed when health recovers
+     * 
+     * @param dataList List of CityData to defer
+     * @param originalType Original DataType for later routing
+     */
+    private void deferData(List<CityData> dataList, DataType originalType) {
+        if (dataList == null || dataList.isEmpty()) {
+            return;
+        }
+        
+        try {
+            for (CityData data : dataList) {
+                // Keep original type for later processing
+                data.setDataType(originalType);
+            }
+            
+            // Use bulk insert for performance
+            BulkOperations bulkOps = warmMongoTemplate.bulkOps(
+                    BulkOperations.BulkMode.UNORDERED,
+                    CityData.class,
+                    DEFERRED_COLLECTION);
+            bulkOps.insert(dataList);
+            bulkOps.execute();
+            
+            log.info("Deferred {} {} records to persistent queue '{}'", 
+                    dataList.size(), originalType, DEFERRED_COLLECTION);
+                    
+        } catch (Exception e) {
+            log.error("Error deferring {} data: {}", originalType, e.getMessage(), e);
+            // Critical: Try to save individually as fallback
+            for (CityData data : dataList) {
+                try {
+                    warmMongoTemplate.save(data, DEFERRED_COLLECTION);
+                } catch (Exception ex) {
+                    log.error("Failed to defer data {}: {}", data.getId(), ex.getMessage());
+                }
+            }
+        }
+    }
+
+    /**
+     * Scheduled task to process deferred data when health recovers
+     * Runs every 30 seconds
+     */
+    @Scheduled(fixedRate = 30000)
+    public void processDeferredData() {
+        try {
+            HealthStatus health = healthService.getCurrentHealth();
+            
+            // Count deferred documents
+            long deferredCount = warmMongoTemplate.count(new Query(), DEFERRED_COLLECTION);
+            
+            if (deferredCount == 0) {
+                // No deferred data, nothing to do
+                return;
+            }
+            
+            log.info("Checking deferred data: {} records pending, Health: {}", deferredCount, health);
+            
+            if (health == HealthStatus.UP) {
+                // Process ALL deferred data (COLD + WARM)
+                List<CityData> deferred = warmMongoTemplate.findAll(CityData.class, DEFERRED_COLLECTION);
+                
+                if (!deferred.isEmpty()) {
+                    log.info("Health UP - Processing {} deferred records", deferred.size());
+                    
+                    // Separate by type
+                    List<CityData> warmDeferred = deferred.stream()
+                            .filter(d -> d.getDataType() == DataType.WARM)
+                            .collect(Collectors.toList());
+                    List<CityData> coldDeferred = deferred.stream()
+                            .filter(d -> d.getDataType() == DataType.COLD)
+                            .collect(Collectors.toList());
+                    
+                    // Store to appropriate tiers
+                    if (!warmDeferred.isEmpty()) {
+                        storeWarmData(warmDeferred);
+                    }
+                    if (!coldDeferred.isEmpty()) {
+                        storeColdData(coldDeferred);
+                    }
+                    
+                    // Clear deferred collection
+                    warmMongoTemplate.dropCollection(DEFERRED_COLLECTION);
+                    log.info("Successfully processed deferred data: {} WARM, {} COLD", 
+                            warmDeferred.size(), coldDeferred.size());
+                }
+                
+            } else if (health == HealthStatus.DEGRADED) {
+                // Only process deferred WARM data (COLD storage still unavailable)
+                Query warmQuery = Query.query(Criteria.where("dataType").is(DataType.WARM.name()));
+                List<CityData> deferredWarm = warmMongoTemplate.find(warmQuery, CityData.class, DEFERRED_COLLECTION);
+                
+                if (!deferredWarm.isEmpty()) {
+                    log.info("Health DEGRADED - Processing {} deferred WARM records", deferredWarm.size());
+                    storeWarmData(deferredWarm);
+                    warmMongoTemplate.remove(warmQuery, DEFERRED_COLLECTION);
+                    log.info("Processed {} deferred WARM records", deferredWarm.size());
+                }
+            }
+            // If DOWN: Do nothing, keep data in persistent queue
+            
+        } catch (Exception e) {
+            log.error("Error processing deferred data: {}", e.getMessage(), e);
+            // Will retry on next scheduled run
         }
     }
 }

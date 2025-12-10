@@ -11,7 +11,9 @@ com\smartcity\config\WebSecurityConfig.class
 com\smartcity\service\CityDataQueryService$DataSlice.class
 com\smartcity\config\EdgeNodeConfig.class
 com\smartcity\config\RabbitMQConfig.class
+com\smartcity\service\SystemHealthService$HealthStatus.class
 com\smartcity\service\CityDataQueryService.class
+com\smartcity\service\SystemHealthService.class
 com\smartcity\model\CityData$CityDataBuilder.class
 com\smartcity\security\jwt\AuthEntryPointJwt.class
 com\smartcity\security\jwt\JwtUtils.class
@@ -44,6 +46,7 @@ com\smartcity\security\jwt\AuthTokenFilter.class
 com\smartcity\controller\AuthController.class
 com\smartcity\dto\JwtResponse.class
 com\smartcity\security\services\UserDetailsImpl.class
+com\smartcity\service\SystemHealthService$1.class
 com\smartcity\repository\UserRepository.class
 com\smartcity\service\EdgeNodeRegistry.class
 com\smartcity\controller\StatsController.class
