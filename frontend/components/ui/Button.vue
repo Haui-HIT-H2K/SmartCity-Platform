@@ -1,3 +1,18 @@
+<!--
+  Copyright 2025 Haui.HIT - H2K
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
 <template>
   <button
     :type="type"
@@ -6,112 +21,104 @@
     :class="[sizeClass, variantClass]"
     @click="handleClick"
   >
-    <component 
-      v-if="iconLeft && !loading" 
-      :is="iconLeft" 
-      :class="iconSize"
-    />
-    
-    <svg 
+    <component v-if="iconLeft && !loading" :is="iconLeft" :class="iconSize" />
+
+    <svg
       v-if="loading"
       class="animate-spin"
       :class="iconSize"
-      xmlns="http://www.w3.org/2000/svg" 
-      fill="none" 
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
       viewBox="0 0 24 24"
     >
-      <circle 
-        class="opacity-25" 
-        cx="12" 
-        cy="12" 
-        r="10" 
-        stroke="currentColor" 
+      <circle
+        class="opacity-25"
+        cx="12"
+        cy="12"
+        r="10"
+        stroke="currentColor"
         stroke-width="4"
       />
-      <path 
-        class="opacity-75" 
-        fill="currentColor" 
+      <path
+        class="opacity-75"
+        fill="currentColor"
         d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
       />
     </svg>
-    
+
     <span>
       <slot />
     </span>
-    
-    <component 
-      v-if="iconRight && !loading" 
-      :is="iconRight" 
-      :class="iconSize"
-    />
+
+    <component v-if="iconRight && !loading" :is="iconRight" :class="iconSize" />
   </button>
 </template>
 
 <script setup lang="ts">
-import type { Component } from 'vue'
+import type { Component } from "vue";
 
 interface Props {
-  variant?: 'primary' | 'danger' | 'ghost' | 'secondary'
-  size?: 'sm' | 'md' | 'lg'
-  type?: 'button' | 'submit' | 'reset'
-  disabled?: boolean
-  loading?: boolean
-  iconLeft?: Component
-  iconRight?: Component
+  variant?: "primary" | "danger" | "ghost" | "secondary";
+  size?: "sm" | "md" | "lg";
+  type?: "button" | "submit" | "reset";
+  disabled?: boolean;
+  loading?: boolean;
+  iconLeft?: Component;
+  iconRight?: Component;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  variant: 'primary',
-  size: 'md',
-  type: 'button',
+  variant: "primary",
+  size: "md",
+  type: "button",
   disabled: false,
   loading: false,
-})
+});
 
 const emit = defineEmits<{
-  click: [event: MouseEvent]
-}>()
+  click: [event: MouseEvent];
+}>();
 
 const handleClick = (event: MouseEvent) => {
   if (!props.disabled && !props.loading) {
-    emit('click', event)
+    emit("click", event);
   }
-}
+};
 
 const sizeClass = computed(() => {
   switch (props.size) {
-    case 'sm':
-      return 'px-4 py-2 text-sm'
-    case 'lg':
-      return 'px-8 py-4 text-lg'
+    case "sm":
+      return "px-4 py-2 text-sm";
+    case "lg":
+      return "px-8 py-4 text-lg";
     default:
-      return 'px-6 py-3 text-base'
+      return "px-6 py-3 text-base";
   }
-})
+});
 
 const iconSize = computed(() => {
   switch (props.size) {
-    case 'sm':
-      return 'w-4 h-4'
-    case 'lg':
-      return 'w-6 h-6'
+    case "sm":
+      return "w-4 h-4";
+    case "lg":
+      return "w-6 h-6";
     default:
-      return 'w-5 h-5'
+      return "w-5 h-5";
   }
-})
+});
 
 const variantClass = computed(() => {
   switch (props.variant) {
-    case 'primary':
-      return 'btn-primary'
-    case 'danger':
-      return 'btn-danger'
-    case 'ghost':
-      return 'btn-ghost'
-    case 'secondary':
-      return 'bg-dark-card text-gray-300 hover:bg-dark-lighter border border-dark-border'
+    case "primary":
+      return "btn-primary";
+    case "danger":
+      return "btn-danger";
+    case "ghost":
+      return "btn-ghost";
+    case "secondary":
+      return "bg-dark-card text-gray-300 hover:bg-dark-lighter border border-dark-border";
     default:
-      return 'btn-primary'
+      return "btn-primary";
   }
-})
+});
 </script>
