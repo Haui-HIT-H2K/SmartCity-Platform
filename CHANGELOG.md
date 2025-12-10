@@ -75,3 +75,15 @@
 - feat: Add comprehensive edge node management with dedicated frontend UI and backend CRUD APIs by @hoangnh0402 in #26
 - Develop by @hoangnh0402 in #27
 - feat: Add comprehensive documentation for Edge Storage Management, including SRS updates by @hoangnh0402 in #28
+
+## [v3.0.0] - 2025-12-10
+### Đã thêm (Added)
+- feat: add human-in-the-loop for unknown event detection by @HoangTechCS-AIE in #29
+- feat: Implement JWT-based authentication and authorization with Spring Security by @hoangnh0402 in #30
+- Hoangnh0402/frontend/smartcity v1 by @hoangnh0402 in #31
+- feat: Implement data publishing feature with single and batch upload functionality by @hoangnh0402 in #32
+- Develop by @hoangnh0402 in #33
+- feat: add license on header file by @hoangnh0402 in #34
+- feat: update login API endpoint to use relative path and add signin handler by @hoangnh0402 in #36
+- feat: Implement System Health Service for monitoring and data type management by @hoangnh0402 in #37
+- feat: Integrate Leaflet for map visualization and add location modal by @hoangnh0402 in #38
