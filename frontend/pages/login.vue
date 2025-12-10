@@ -135,7 +135,7 @@ const handleLogin = async () => {
   error.value = ''
 
   try {
-    const response: any = await $fetch('http://localhost:8080/api/auth/signin', {
+    const response: any = await $fetch('/api/auth/signin', {
       method: 'POST',
       body: {
         username: form.value.email,
