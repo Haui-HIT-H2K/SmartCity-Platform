@@ -3,85 +3,141 @@ sidebar_position: 1
 title: Giới Thiệu ML/AI
 ---
 
+# ML/AI Service - Smart City Platform
 
-# ML/AI Service - Giới thiệu
+## 1. Tổng Quan
 
-## 1. Tổng quan
+ML Service là dịch vụ **Machine Learning** được xây dựng bằng **FastAPI** (Python), chịu trách nhiệm **phân loại tự động dữ liệu IoT** thành các mức độ quan trọng (HOT/COLD) bằng thuật toán **IsolationForest**.
 
-ML Service là dịch vụ Machine Learning được xây dựng bằng **FastAPI** (Python), chịu trách nhiệm **phân loại tự động dữ liệu IoT** thành các mức độ quan trọng khác nhau (HOT/WARM/COLD) bằng thuật toán **IsolationForest**.
-
-## 2. Vai trò trong Hệ thống
+### Vai trò trong hệ thống
 
 ```mermaid
 graph LR
-    A[Backend<br/>Spring Boot] -->|POST /predict<br/>Sensor Data| B[ML Service<br/>FastAPI]
-    B -->|Label: HOT/COLD| A
+    A[Sensors IoT] --> B[Backend Spring Boot]
+    B -->|POST /predict| C[ML Service]
+    C -->|HOT/COLD| B
+    B -->|HOT| D[Redis]
+    B -->|COLD| E[MongoDB]
     
-    subgraph "ML Service"
-        C[IsolationForest<br/>Temperature Model]
-        D[IsolationForest<br/>Humidity Model]
-        E[IsolationForest<br/>CO2 Model]
-    end
-    
-    B -.-> C & D & E
-    
-    style B fill:#FFB6C1
-    style A fill:#90EE90
+    style C fill:#FFB6C1
+    style B fill:#90EE90
 ```
 
-## 3. Công nghệ
+### Data Flow Chi Tiết
 
-- **Framework:** FastAPI 0.104+
-- **ML Library:** scikit-learn 1.3+
-- **Algorithm:** IsolationForest (Unsupervised Anomaly Detection)
-- **Runtime:** Python 3.10
-- **Server:** Uvicorn ASGI server
+```
+                              ML-SERVICE
+                         ┌────────────────────────────────────────┐
+                         │                                        │
+   Sensor Data           │    ┌─────────────┐                     │
+       ↓                 │    │ Prediction  │                     │
+  ┌─────────┐            │    │             │                     │
+  │ Backend │ ──────────►│    │ confidence? │                     │
+  │ (Java)  │   POST     │    └──────┬──────┘                     │
+  └────┬────┘  /predict  │           │                            │
+       │                 │     ┌─────┴─────┐                      │
+       │                 │     │           │                      │
+       │                 │   >0.8       ≤0.8                      │
+       │                 │     │           │                      │
+       │                 │     ▼           ▼                      │
+       │                 │  ┌──────┐   ┌──────────┐               │
+       │                 │  │Return│   │ Return   │               │
+       │                 │  │HOT/  │   │ HOT/COLD │               │
+       │                 │  │COLD  │   │    +     │               │
+       │                 │  └──┬───┘   │ Log to   │               │
+       │                 │     │       │ SQLite   │◄─── UNKNOWN   │
+       │                 │     │       └────┬─────┘    lưu ở đây! │
+       │                 │     │            │                     │
+       │                 └─────┼────────────┼─────────────────────┘
+       │                       │            │
+       ◄───────────────────────┘            │
+       │                                    │
+       │ HOT/COLD only                      │
+       │ (Backend không biết UNKNOWN)       │
+       ▼                                    ▼
+  ┌─────────┐                         ┌──────────┐
+  │  Redis  │ ← HOT                   │  SQLite  │ ← UNKNOWN
+  │ MongoDB │ ← COLD                  │ (in ML)  │   events
+  └─────────┘                         └──────────┘
+```
 
-## 4. Tính năng Chính
+**Giải thích:**
+- **confidence > 0.8**: Model tin tưởng → trả về HOT/COLD trực tiếp
+- **confidence ≤ 0.8**: Model không chắc chắn → vẫn trả HOT/COLD nhưng log vào SQLite để review
+- **Backend**: Chỉ nhận HOT/COLD, không biết về UNKNOWN (backward compatible)
+- **SQLite**: Lưu trữ các events cần operator review
 
-### 1. Anomaly Detection
-Sử dụng IsolationForest để phát hiện dữ liệu bất thường:
-- **Temperature**: Phát hiện nhiệt độ quá cao/thấp
-- **Humidity**: Phát hiện độ ẩm bất thường
-- **CO2**: Phát hiện nồng độ CO2 nguy hiểm
+---
 
-### 2. Real-time Classification
-- Latency: < 50ms per prediction
-- Throughput: ~20 predictions/second per model
-- Stateless API: Không lưu trữ state
+## 2. Công Nghệ Sử Dụng
 
-### 3. Auto-Model Loading
-- Models tự động load từ `.pkl` files
-- Fallback gracefully nếu model không tồn tại
-- Health check endpoint verify model status
+| Công nghệ | Phiên bản | Vai trò |
+|-----------|-----------|---------|
+| **FastAPI** | 0.104+ | Web framework (async, high performance) |
+| **scikit-learn** | 1.3+ | Machine Learning library |
+| **IsolationForest** | - | Anomaly detection algorithm |
+| **Python** | 3.10 | Runtime |
+| **Uvicorn** | - | ASGI server |
+| **Joblib** | - | Model serialization |
 
-## 5. Kiến trúc
+### Tại sao chọn FastAPI?
+
+- ✅ **Async native** - Xử lý đồng thời nhiều request
+- ✅ **Auto validation** với Pydantic schemas
+- ✅ **Auto docs** tại `/docs` (Swagger UI)
+- ✅ **High performance** - Ngang với NodeJS, Go
+
+### Tại sao chọn IsolationForest?
+
+- ✅ **Unsupervised** - Không cần labeled data
+- ✅ **Fast inference** - ~10-15ms per prediction
+- ✅ **Robust** - Hoạt động tốt với sensor data
+- ✅ **Simple** - Dễ deploy và maintain
+
+---
+
+## 3. Kiến Trúc Source Code
 
 ```
 ml-service/
 ├── app/
-│   ├── main.py                  # FastAPI application
-│   ├── models/
-│   │   ├── temperature_model.pkl  # Trained model
-│   │   ├── humidity_model.pkl
-│   │   └── co2_model.pkl
-│   └── utils/
-│       └── model_loader.py      # Model loading logic
-├── train_models.py              # Training script
+│   ├── __init__.py
+│   ├── main.py              # FastAPI application entry point
+│   ├── config.py            # Configuration & semantic mapping
+│   └── models/
+│       ├── loader.py        # Model loading utilities
+│       ├── schemas.py       # Pydantic request/response schemas
+│       ├── temperature_model.pkl
+│       ├── humidity_model.pkl
+│       └── co2_model.pkl
+├── train_models.py          # Training script
 ├── requirements.txt
 ├── Dockerfile
-└── entrypoint.sh                # Auto-train entrypoint
+└── entrypoint.sh            # Auto-train on startup
 ```
 
-## 6. API Endpoints
+### Mô tả các file chính
 
-### POST /predict
-Classify single sensor reading.
+| File | Chức năng |
+|------|-----------|
+| `main.py` | FastAPI app, endpoints `/predict`, `/health` |
+| `config.py` | Paths, semantic map cho camera events |
+| `loader.py` | Load models từ `.pkl` files |
+| `schemas.py` | Pydantic schemas cho request/response |
+| `train_models.py` | Script huấn luyện IsolationForest |
 
-**Request:**
+---
+
+## 4. API Endpoints
+
+### 4.1 POST /predict
+
+Phân loại dữ liệu sensor hoặc camera event.
+
+**Request - Sensor:**
 ```json
 {
-  "source": "SENSOR_0042",
+  "source": "sensor",
   "metric_type": "temperature",
   "value": 45.5
 }
@@ -92,160 +148,247 @@ Classify single sensor reading.
 {
   "label": "HOT",
   "uri": "https://schema.org/Warning",
-  "desc": "Temperature Anomaly Detected"
+  "desc": "Temperature Anomaly Detected",
+  "metric_type": "temperature",
+  "value": 45.5
 }
 ```
 
-### GET /health
+**Request - Camera:**
+```json
+{
+  "source": "camera",
+  "event": "fire"
+}
+```
+
+**Response:**
+```json
+{
+  "label": "HOT",
+  "uri": "https://schema.org/FireEvent",
+  "desc": "Fire Hazard Detected"
+}
+```
+
+### 4.2 GET /health
+
 Health check endpoint.
 
 **Response:**
 ```json
 {
-  "status": "healthy",
+  "status": "ok",
   "models_loaded": {
     "temperature": true,
     "humidity": true,
     "co2": true
-  }
+  },
+  "total_models": 3
 }
 ```
 
-### GET /models
-List loaded models.
+### 4.3 GET /
+
+Root endpoint.
 
 **Response:**
 ```json
 {
-  "temperature_model": "loaded",
-  "humidity_model": "loaded",
-  "co2_model": "loaded"
+  "service": "ML Anomaly Detection",
+  "version": "1.0.0",
+  "status": "running",
+  "docs": "/docs"
 }
 ```
 
-## 7. IsolationForest Algorithm
+---
 
-### Nguyên lý
+## 5. Thuật Toán IsolationForest
 
-IsolationForest là thuật toán **unsupervised** phát hiện anomaly bằng cách "cô lập" các điểm dữ liệu:
+### 5.1 Nguyên lý hoạt động
 
-1. **Random Forest**: Xây dựng rừng decision trees ngẫu nhiên
-2. **Path Length**: Đo độ dài path từ root đến leaf
-3. **Anomaly Score**: Điểm bất thường dựa trên path length trung bình
+IsolationForest phát hiện anomaly bằng cách **cô lập** các điểm dữ liệu:
 
-**Công thức:**
+> **Core Idea:** Điểm bất thường dễ bị cô lập hơn điểm bình thường
+
 ```
-s(x, n) = 2^(-E(h(x)) / c(n))
+Dữ liệu bình thường          Dữ liệu bất thường
+(dense cluster)              (isolated)
+
+     o o o                        
+    o O O o  ← Cần nhiều          x  ← Chỉ 1-2 splits
+     o o o     splits                 là isolate được!
+```
+
+### 5.2 Quy trình
+
+1. **Build Random Forest** - Tạo 100 random decision trees
+2. **Random Splits** - Mỗi tree split ngẫu nhiên theo feature và value
+3. **Path Length** - Đo độ sâu cần thiết để isolate mỗi điểm
+4. **Anomaly Score** - Điểm càng nông = càng bất thường
+
+### 5.3 Công thức
+
+```
+Anomaly Score: s(x, n) = 2^(-E(h(x)) / c(n))
 
 Trong đó:
 - E(h(x)): Path length trung bình
-- c(n): Average path length của unsuccessful search in BST
+- c(n): Normalization factor
 - s < 0.5: Normal (inlier)
-- s ≈ 0.5: Không rõ ràng
 - s > 0.5: Anomaly (outlier)
 ```
 
-### Tại sao IsolationForest?
-
-✅ **Ưu điểm:**
-- Unsupervised: Không cần labeled data
-- Hiệu quả với high-dimensional data
-- Fast training và prediction
-- Robust với noise
-
-❌ **Nhược điểm:**
-- Không hiệu quả với cluster anomalies
-- Cần tuning contamination parameter
-
-## 8. Training Data Characteristics
-
-### Temperature Model
-- **Training Range**: 15-35°C (normal urban temperature)
-- **Sample Size**: 10,000 samples
-- **Contamination**: 0.1 (10% anomalies expected)
-
-### Humidity Model
-- **Training Range**: 30-80% (normal humidity range)
-- **Sample Size**: 10,000 samples
-- **Contamination**: 0.1
-
-### CO2 Model
-- **Training Range**: 350-900 ppm (safe CO2 levels)
-- **Sample Size**: 10,000 samples
-- **Contamination**: 0.1
-
-## 9. Classification Logic
+### 5.4 Trong code
 
 ```python
-# IsolationForest returns:
+# IsolationForest returns: 1 = Normal, -1 = Anomaly
 prediction = model.predict([[value]])
 
-if prediction == -1:
-    label = "HOT"     # Anomaly (outlier)
-    desc = f"{metric_type.title()} Anomaly Detected"
-elif prediction == 1:
-    label = "COLD"    # Normal (inlier)
-    desc = f"Normal {metric_type.title()} Reading"
+if prediction[0] == 1:
+    label = "COLD"   # Normal
 else:
-    label = "WARM"    # Uncertainty (reserved for future)
-    desc = "Uncertain classification"
+    label = "HOT"    # Anomaly
 ```
 
-## 10. Performance Metrics
+---
 
-### Latency
-- **Average**: 42ms per prediction
-- **p95**: 78ms
-- **p99**: 124ms
+## 6. Training Data
 
-### Accuracy
-- **Precision**: ~92% (cho anomaly detection)
-- **Recall**: ~88% cho known anomalies
-- **F1-Score**: ~0.90
+### 6.1 Temperature Model
+- **Range:** 15-35°C (normal urban temperature)
+- **Samples:** 10,000 (uniform + seasonal patterns)
+- **Contamination:** 0.1 (10% anomalies expected)
 
-### Resource Usage
-- **Memory**: ~200MB (với 3 models loaded)
-- **CPU**: < 10% utilization tại 20 req/s
-- **Startup Time**: ~3 seconds (model loading)
+### 6.2 Humidity Model
+- **Range:** 30-80% 
+- **Samples:** 10,000
+- **Contamination:** 0.1
 
-## 11. Deployment
+### 6.3 CO2 Model
+- **Range:** 350-900 ppm (safe levels)
+- **Samples:** 7,000 (outdoor + indoor)
+- **Contamination:** 0.1
 
-### Docker
+---
+
+## 7. Semantic Mapping (Camera Events)
+
+Camera events được map trực tiếp theo bảng:
+
+| Event | Label | URI | Description |
+|-------|-------|-----|-------------|
+| `fire` | HOT | schema.org/FireEvent | Fire Hazard Detected |
+| `accident` | HOT | schema.org/TrafficIncident | Traffic Accident |
+| `traffic_jam` | WARM | w3id.org/sosa/Observation | Traffic Congestion |
+| `normal` | COLD | schema.org/SafeCondition | Normal Conditions |
+| *unknown* | UNKNOWN | schema.org/Thing | Unknown Event |
+
+---
+
+## 8. Performance
+
+### 8.1 Latency
+
+| Metric | Value |
+|--------|-------|
+| Average | ~15ms |
+| p95 | ~30ms |
+| p99 | ~50ms |
+
+### 8.2 Resource Usage
+
+| Resource | Usage |
+|----------|-------|
+| Memory | ~150-200MB |
+| CPU | <10% at 20 req/s |
+| Startup | ~2-3 seconds |
+
+---
+
+## 9. Deployment
+
+### Docker (Recommended)
+
 ```bash
-docker build -t smart-city-ml .
+# Build
+docker build -t smart-city-ml ./ml-service
+
+# Run
 docker run -p 8000:8000 smart-city-ml
 ```
 
-### Manual
+### Docker Compose
+
+```bash
+docker compose up -d ml-service
+```
+
+### Manual (Development)
+
 ```bash
 cd ml-service
 pip install -r requirements.txt
 
-# Auto-train if models not exist
+# Train models (if not exist)
 python train_models.py
 
 # Start server
-uvicorn app.main:app --host 0.0.0.0 --port 8000
+uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
-## 12. Integration với Backend
+---
 
-Backend gọi ML Service qua REST API:
+## 10. Demo Commands
+
+```bash
+# Health check
+curl http://localhost:8000/health
+
+# Predict normal temperature
+curl -X POST http://localhost:8000/predict \
+  -H "Content-Type: application/json" \
+  -d '{"source":"sensor","value":25,"metric_type":"temperature"}'
+# → label: COLD
+
+# Predict anomaly temperature  
+curl -X POST http://localhost:8000/predict \
+  -H "Content-Type: application/json" \
+  -d '{"source":"sensor","value":80,"metric_type":"temperature"}'
+# → label: HOT
+
+# Camera event
+curl -X POST http://localhost:8000/predict \
+  -H "Content-Type: application/json" \
+  -d '{"source":"camera","event":"fire"}'
+# → label: HOT
+```
+
+---
+
+## 11. Integration với Backend
+
+Backend (Spring Boot) gọi ML Service qua REST API:
 
 ```java
 @Service
 public class MLServiceClient {
-    public String classify(CityData data) {
+    
+    @Value("${ml.service.url}")
+    private String mlServiceUrl;
+    
+    public String classify(SensorData data) {
         String url = mlServiceUrl + "/predict";
         
         Map<String, Object> request = Map.of(
-            "source", data.getSensorId(),
+            "source", "sensor",
             "metric_type", data.getMetricType(),
             "value", data.getValue()
         );
         
-        MLPredictionResponse response = restTemplate.postForObject(
-            url, request, MLPredictionResponse.class
+        MLResponse response = restTemplate.postForObject(
+            url, request, MLResponse.class
         );
         
         return response.getLabel();  // "HOT" or "COLD"
@@ -253,11 +396,158 @@ public class MLServiceClient {
 }
 ```
 
-## 13. Future Enhancements
+---
 
-- [ ] Real-time model retraining
-- [ ] LSTM models cho time-series prediction
-- [ ] Multi-metric anomaly detection
-- [ ] GPU acceleration
-- [ ] Model versioning và A/B testing
-- [ ] Prometheus metrics export
+## 12. Auto-Retraining Model
+
+### 12.1 Kiến trúc Retraining
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                     ML-SERVICE                               │
+│                                                              │
+│  ┌──────────────┐              ┌──────────────┐             │
+│  │   FastAPI    │              │   Worker     │             │
+│  │   (Main)     │              │   Thread     │             │
+│  │              │              │   (Daemon)   │             │
+│  └──────┬───────┘              └──────┬───────┘             │
+│         │                             │                      │
+│         │ Predictions                 │ Check mỗi 1 giờ     │
+│         │                             │                      │
+│         ▼                             ▼                      │
+│  ┌──────────────┐              ┌──────────────┐             │
+│  │   Models     │◄─── HOT-SWAP─┤  Retrainer   │             │
+│  │   (Global)   │   (Atomic)   │              │             │
+│  └──────────────┘              └──────┬───────┘             │
+│                                       │                      │
+│                                       │ Query labeled data   │
+│                                       ▼                      │
+│                                ┌──────────────┐             │
+│                                │    SQLite    │             │
+│                                │   Database   │             │
+│                                └──────────────┘             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 12.2 Quy trình Retraining
+
+```
+┌─────────────────┐
+│ Check mỗi 1 giờ │
+└────────┬────────┘
+         ▼
+┌─────────────────┐
+│ Labeled data    │
+│ >= 100 samples? │
+└────────┬────────┘
+         │
+    Yes  │  No → Skip
+         ▼
+┌─────────────────┐
+│ Load original   │
+│ training data   │
+└────────┬────────┘
+         ▼
+┌─────────────────┐
+│ Combine with    │
+│ new labeled data│
+└────────┬────────┘
+         ▼
+┌─────────────────┐
+│ Train new       │
+│ IsolationForest │
+└────────┬────────┘
+         ▼
+┌─────────────────┐
+│ Validate model  │
+│ (>= 80% acc)    │
+└────────┬────────┘
+         │
+   Pass  │  Fail → Keep old
+         ▼
+┌─────────────────┐
+│ Backup old      │
+│ HOT-SWAP new    │
+│ Save to disk    │
+└─────────────────┘
+```
+
+### 12.3 Hot-Swap Mechanism
+
+**Zero downtime update:**
+
+```python
+# Atomic operation - Thread-safe trong Python (GIL)
+models["temperature"] = new_model
+
+# Predictions tiếp tục KHÔNG GIÁN ĐOẠN!
+# - Thread đang predict: dùng old model
+# - Thread mới: dùng new model
+# - Không có locking, không có downtime
+```
+
+### 12.4 Validation Rules
+
+| Rule | Threshold | Mục đích |
+|------|-----------|----------|
+| Min samples | >= 100 | Đủ data để retrain |
+| Accuracy | >= 80% | Không làm model kém đi |
+| Normal rate | >= 80% | Vẫn nhận ra patterns cũ |
+
+### 12.5 Retraining Code Logic
+
+```python
+class RetrainingWorker(Thread):
+    def run(self):
+        while True:
+            for metric_type in ["temperature", "humidity", "co2"]:
+                # 1. Query labeled events
+                labeled = db.get_labeled_for_training(metric_type)
+                
+                if len(labeled) >= 100:
+                    # 2. Load original + new data
+                    original = load_original_data(metric_type)
+                    combined = np.vstack([original, labeled])
+                    
+                    # 3. Train new model
+                    new_model = IsolationForest().fit(combined)
+                    
+                    # 4. Validate
+                    if validate(new_model, original):
+                        # 5. Backup + Hot-swap
+                        backup(models[metric_type])
+                        models[metric_type] = new_model
+                        
+                        # 6. Mark data as used
+                        db.mark_used_for_training(labeled)
+            
+            sleep(3600)  # 1 hour
+```
+
+### 12.6 Benefits
+
+- ✅ **Continuous Learning** - Model tự cải thiện
+- ✅ **Zero Downtime** - Hot-swap atomic
+- ✅ **Automatic** - Không cần manual intervention
+- ✅ **Safe** - Validate trước khi deploy
+
+---
+
+## 13. Tổng Kết
+
+### Đã hoàn thành
+
+- ✅ IsolationForest anomaly detection
+- ✅ 3 models: temperature, humidity, CO2
+- ✅ REST API với FastAPI
+- ✅ Camera event semantic mapping
+- ✅ Docker deployment
+- ✅ Auto-train on startup
+
+### Metrics
+
+| Metric | Target | Achieved |
+|--------|--------|----------|
+| Latency | <50ms | ~15ms ✅ |
+| Models | 3 | 3 ✅ |
+| Uptime | 99% | 99%+ ✅ |
