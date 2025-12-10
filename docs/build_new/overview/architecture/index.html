@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="vi" dir="ltr" class="docs-wrapper plugin-docs plugin-id-overview docs-version-current docs-doc-page docs-doc-id-architecture" data-has-hydrated="false">
+<head>
+<meta charset="UTF-8">
+<meta name="generator" content="Docusaurus v3.9.2">
+<title data-rh="true">3. Kiến Trúc Hệ Thống (System Architecture) | SmartCity-Platform</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:image" content="https://haui-hit-h2k.github.io/SmartCity-Platform/img/social-card.jpg"><meta data-rh="true" name="twitter:image" content="https://haui-hit-h2k.github.io/SmartCity-Platform/img/social-card.jpg"><meta data-rh="true" property="og:url" content="https://haui-hit-h2k.github.io/SmartCity-Platform/overview/architecture"><meta data-rh="true" property="og:locale" content="vi"><meta data-rh="true" name="docusaurus_locale" content="vi"><meta data-rh="true" name="docsearch:language" content="vi"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-overview-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-overview-current"><meta data-rh="true" property="og:title" content="3. Kiến Trúc Hệ Thống (System Architecture) | SmartCity-Platform"><meta data-rh="true" name="description" content="3.1 Tổng quan Kiến trúc (Architecture Overview)"><meta data-rh="true" property="og:description" content="3.1 Tổng quan Kiến trúc (Architecture Overview)"><link data-rh="true" rel="icon" href="/SmartCity-Platform/img/favicon.ico"><link data-rh="true" rel="canonical" href="https://haui-hit-h2k.github.io/SmartCity-Platform/overview/architecture"><link data-rh="true" rel="alternate" href="https://haui-hit-h2k.github.io/SmartCity-Platform/overview/architecture" hreflang="vi"><link data-rh="true" rel="alternate" href="https://haui-hit-h2k.github.io/SmartCity-Platform/overview/architecture" hreflang="x-default"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"3. Kiến Trúc Hệ Thống (System Architecture)","item":"https://haui-hit-h2k.github.io/SmartCity-Platform/overview/architecture"}]}</script><link rel="stylesheet" href="/SmartCity-Platform/assets/css/styles.0d7d499b.css">
+<script src="/SmartCity-Platform/assets/js/runtime~main.91fdba25.js" defer="defer"></script>
+<script src="/SmartCity-Platform/assets/js/main.03a3eb74.js" defer="defer"></script>
+</head>
+<body class="navigation-with-keyboard">
+<svg style="display: none;"><defs>
+<symbol id="theme-svg-external-link" viewBox="0 0 24 24"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"/></symbol>
+</defs></svg>
+<script>!function(){var t=function(){try{return new URLSearchParams(window.location.search).get("docusaurus-theme")}catch(t){}}()||function(){try{return window.localStorage.getItem("theme")}catch(t){}}();document.documentElement.setAttribute("data-theme",t||(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light")),document.documentElement.setAttribute("data-theme-choice",t||"system")}(),function(){try{const c=new URLSearchParams(window.location.search).entries();for(var[t,e]of c)if(t.startsWith("docusaurus-data-")){var a=t.replace("docusaurus-data-","data-");document.documentElement.setAttribute(a,e)}}catch(t){}}()</script><div id="__docusaurus"><link rel="preload" as="image" href="/SmartCity-Platform/img/logo.svg"><div role="region" aria-label="Chuyển tới nội dung chính"><a class="skipToContent_fXgn" href="#__docusaurus_skipToContent_fallback">Chuyển tới nội dung chính</a></div><nav aria-label="Thanh điều hướng" class="theme-layout-navbar navbar navbar--fixed-top"><div class="navbar__inner"><div class="theme-layout-navbar-left navbar__items"><button aria-label="Đóng - mở thanh điều hướng" aria-expanded="false" class="navbar__toggle clean-btn" type="button"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></button><a class="navbar__brand" href="/SmartCity-Platform/"><div class="navbar__logo"><img src="/SmartCity-Platform/img/logo.svg" alt="SmartCity-Platform Logo" class="themedComponent_mlkZ themedComponent--light_NVdE"><img src="/SmartCity-Platform/img/logo.svg" alt="SmartCity-Platform Logo" class="themedComponent_mlkZ themedComponent--dark_xIcU"></div><b class="navbar__title text--truncate">SmartCity-Platform</b></a><a aria-current="page" class="navbar__item navbar__link navbar__link--active" href="/SmartCity-Platform/overview/intro">System Overview</a><a class="navbar__item navbar__link" href="/SmartCity-Platform/backend/intro">Backend</a><a class="navbar__item navbar__link" href="/SmartCity-Platform/frontend/intro">Frontend</a><a class="navbar__item navbar__link" href="/SmartCity-Platform/ml-ai/intro">ML/AI</a><a class="navbar__item navbar__link" href="/SmartCity-Platform/infrastructure/intro">Infrastructure</a></div><div class="theme-layout-navbar-right navbar__items navbar__items--right"><a href="https://github.com/Haui-HIT-NhoNguoiYeuCu/SmartCity-Platform.git" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">GitHub<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a><div class="toggle_vylO colorModeToggle_DEke"><button class="clean-btn toggleButton_gllP toggleButtonDisabled_aARS" type="button" disabled="" title="system mode" aria-label="Chuyển đổi chế độ sáng và tối (hiện tại là system mode)"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_g3eP lightToggleIcon_pyhR"><path fill="currentColor" d="M12,9c1.65,0,3,1.35,3,3s-1.35,3-3,3s-3-1.35-3-3S10.35,9,12,9 M12,7c-2.76,0-5,2.24-5,5s2.24,5,5,5s5-2.24,5-5 S14.76,7,12,7L12,7z M2,13l2,0c0.55,0,1-0.45,1-1s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S1.45,13,2,13z M20,13l2,0c0.55,0,1-0.45,1-1 s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S19.45,13,20,13z M11,2v2c0,0.55,0.45,1,1,1s1-0.45,1-1V2c0-0.55-0.45-1-1-1S11,1.45,11,2z M11,20v2c0,0.55,0.45,1,1,1s1-0.45,1-1v-2c0-0.55-0.45-1-1-1C11.45,19,11,19.45,11,20z M5.99,4.58c-0.39-0.39-1.03-0.39-1.41,0 c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0s0.39-1.03,0-1.41L5.99,4.58z M18.36,16.95 c-0.39-0.39-1.03-0.39-1.41,0c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0c0.39-0.39,0.39-1.03,0-1.41 L18.36,16.95z M19.42,5.99c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06c-0.39,0.39-0.39,1.03,0,1.41 s1.03,0.39,1.41,0L19.42,5.99z M7.05,18.36c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06 c-0.39,0.39-0.39,1.03,0,1.41s1.03,0.39,1.41,0L7.05,18.36z"></path></svg><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_g3eP darkToggleIcon_wfgR"><path fill="currentColor" d="M9.37,5.51C9.19,6.15,9.1,6.82,9.1,7.5c0,4.08,3.32,7.4,7.4,7.4c0.68,0,1.35-0.09,1.99-0.27C17.45,17.19,14.93,19,12,19 c-3.86,0-7-3.14-7-7C5,9.07,6.81,6.55,9.37,5.51z M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.1-1.36 c-0.98,1.37-2.58,2.26-4.4,2.26c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.4C12.92,3.04,12.46,3,12,3L12,3z"></path></svg><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_g3eP systemToggleIcon_QzmC"><path fill="currentColor" d="m12 21c4.971 0 9-4.029 9-9s-4.029-9-9-9-9 4.029-9 9 4.029 9 9 9zm4.95-13.95c1.313 1.313 2.05 3.093 2.05 4.95s-0.738 3.637-2.05 4.95c-1.313 1.313-3.093 2.05-4.95 2.05v-14c1.857 0 3.637 0.737 4.95 2.05z"></path></svg></button></div><div class="navbarSearchContainer_Bca1"></div></div></div><div role="presentation" class="navbar-sidebar__backdrop"></div></nav><div id="__docusaurus_skipToContent_fallback" class="theme-layout-main main-wrapper mainWrapper_z2l0"><div class="docsWrapper_hBAB"><button aria-label="Trở lại đầu trang" class="clean-btn theme-back-to-top-button backToTopButton_sjWU" type="button"></button><div class="docRoot_UBD9"><aside class="theme-doc-sidebar-container docSidebarContainer_YfHR"><div class="sidebarViewport_aRkj"><div class="sidebar_njMd"><nav aria-label="Thanh điều hướng tài liệu" class="menu thin-scrollbar menu_SIkG"><ul class="theme-doc-sidebar-menu menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/SmartCity-Platform/overview/intro"><span title="1. Giới Thiệu (Introduction)" class="linkLabel_WmDU">1. Giới Thiệu (Introduction)</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/SmartCity-Platform/overview/system-description"><span title="2. Mô Tả Hệ Thống (Overall Description)" class="linkLabel_WmDU">2. Mô Tả Hệ Thống (Overall Description)</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link menu__link--active" aria-current="page" href="/SmartCity-Platform/overview/architecture"><span title="3. Kiến Trúc Hệ Thống (System Architecture)" class="linkLabel_WmDU">3. Kiến Trúc Hệ Thống (System Architecture)</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/SmartCity-Platform/overview/functional-requirements"><span title="4. Yêu Cầu Chức Năng (Functional Requirements)" class="linkLabel_WmDU">4. Yêu Cầu Chức Năng (Functional Requirements)</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/SmartCity-Platform/overview/non-functional-requirements"><span title="5. Yêu Cầu Phi Chức Năng (Non-Functional Requirements)" class="linkLabel_WmDU">5. Yêu Cầu Phi Chức Năng (Non-Functional Requirements)</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/SmartCity-Platform/overview/functions"><span title="6. Chức Năng Chính (Key Features)" class="linkLabel_WmDU">6. Chức Năng Chính (Key Features)</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/SmartCity-Platform/overview/edge-storage-management"><span title="Edge Storage Management" class="linkLabel_WmDU">Edge Storage Management</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/SmartCity-Platform/overview/roadmap"><span title="7. Lộ Trình Phát Triển (Development Roadmap)" class="linkLabel_WmDU">7. Lộ Trình Phát Triển (Development Roadmap)</span></a></li></ul></nav></div></div></aside><main class="docMainContainer_TBSr"><div class="container padding-top--md padding-bottom--lg"><div class="row"><div class="col docItemCol_VOVn"><div class="docItemContainer_Djhp"><article><nav class="theme-doc-breadcrumbs breadcrumbsContainer_Z_bl" aria-label="Liên kết điều hướng"><ul class="breadcrumbs"><li class="breadcrumbs__item"><a aria-label="Trang chủ" class="breadcrumbs__link" href="/SmartCity-Platform/"><svg viewBox="0 0 24 24" class="breadcrumbHomeIcon_YNFT"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a></li><li class="breadcrumbs__item breadcrumbs__item--active"><span class="breadcrumbs__link">3. Kiến Trúc Hệ Thống (System Architecture)</span></li></ul></nav><div class="tocCollapsible_ETCw theme-doc-toc-mobile tocMobile_ITEo"><button type="button" class="clean-btn tocCollapsibleButton_TO0P">Trên trang này</button></div><div class="theme-doc-markdown markdown"><header><h1>3. Kiến trúc Hệ thống (System Architecture)</h1></header>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="31-tổng-quan-kiến-trúc-architecture-overview">3.1 Tổng quan Kiến trúc (Architecture Overview)<a href="#31-tổng-quan-kiến-trúc-architecture-overview" class="hash-link" aria-label="Đường dẫn trực tiếp đến 3.1 Tổng quan Kiến trúc (Architecture Overview)" title="Đường dẫn trực tiếp đến 3.1 Tổng quan Kiến trúc (Architecture Overview)" translate="no">​</a></h2>
+<p>SmartCity-Platform áp dụng <strong>kiến trúc microservices</strong> với <strong>pull-based data ingestion</strong> và <strong>tiered storage strategy</strong>.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="sơ-đồ-kiến-trúc-tổng-thể">Sơ đồ Kiến trúc Tổng thể<a href="#sơ-đồ-kiến-trúc-tổng-thể" class="hash-link" aria-label="Đường dẫn trực tiếp đến Sơ đồ Kiến trúc Tổng thể" title="Đường dẫn trực tiếp đến Sơ đồ Kiến trúc Tổng thể" translate="no">​</a></h3>
+<!-- -->
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="32-component-architecture-kiến-trúc-component">3.2 Component Architecture (Kiến trúc Component)<a href="#32-component-architecture-kiến-trúc-component" class="hash-link" aria-label="Đường dẫn trực tiếp đến 3.2 Component Architecture (Kiến trúc Component)" title="Đường dẫn trực tiếp đến 3.2 Component Architecture (Kiến trúc Component)" translate="no">​</a></h2>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="321-data-simulator">3.2.1 Data Simulator<a href="#321-data-simulator" class="hash-link" aria-label="Đường dẫn trực tiếp đến 3.2.1 Data Simulator" title="Đường dẫn trực tiếp đến 3.2.1 Data Simulator" translate="no">​</a></h3>
+<p><strong>Công nghệ:</strong> Python 3.10, Faker, pika (RabbitMQ client)</p>
+<p><strong>Trách nhiệm:</strong></p>
+<ul>
+<li class="">Generate 40 triệu fake IoT messages</li>
+<li class="">Publish messages vào RabbitMQ queue <code>smartcity.data</code></li>
+<li class="">Simulate 1000 sensors với metric: temperature, humidity, CO2</li>
+</ul>
+<p><strong>Đặc điểm:</strong></p>
+<ul>
+<li class="">Multi-threaded: 20 concurrent threads</li>
+<li class="">Rate: ~500 messages/second</li>
+<li class="">Format: JSON với timestamp, sensorId, metricType, value</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="322-edge-storage-rabbitmq">3.2.2 Edge Storage (RabbitMQ)<a href="#322-edge-storage-rabbitmq" class="hash-link" aria-label="Đường dẫn trực tiếp đến 3.2.2 Edge Storage (RabbitMQ)" title="Đường dẫn trực tiếp đến 3.2.2 Edge Storage (RabbitMQ)" translate="no">​</a></h3>
+<p><strong>Công nghệ:</strong> RabbitMQ 3.x</p>
+<p><strong>Trách nhiệm:</strong></p>
+<ul>
+<li class="">Buffer dữ liệu từ sensors</li>
+<li class="">Cung cấp queue cho backend pull</li>
+<li class="">Đảm bảo high availability với 2 nodes</li>
+</ul>
+<p><strong>Topology:</strong></p>
+<ul>
+<li class=""><strong>Exchange</strong>: <code>smartcity.exchange</code> (type: direct)</li>
+<li class=""><strong>Queue</strong>: <code>smartcity.data</code></li>
+<li class=""><strong>Routing Key</strong>: <code>sensor.data</code></li>
+</ul>
+<p><strong>Configuration:</strong></p>
+<ul>
+<li class="">Durable queue: true (persist to disk)</li>
+<li class="">Message TTL: None (giữ cho đến khi consumed)</li>
+<li class="">Prefetch count: 5000 (batch size)</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="323-backend-service-spring-boot">3.2.3 Backend Service (Spring Boot)<a href="#323-backend-service-spring-boot" class="hash-link" aria-label="Đường dẫn trực tiếp đến 3.2.3 Backend Service (Spring Boot)" title="Đường dẫn trực tiếp đến 3.2.3 Backend Service (Spring Boot)" translate="no">​</a></h3>
+<p><strong>Công nghệ:</strong> Spring Boot 3.2, Java 17, Maven</p>
+<p><strong>Modules:</strong></p>
+<p><strong>a) Data Ingestion Module</strong></p>
+<ul>
+<li class=""><code>RabbitMQIngestionService</code>: Pull messages từ RabbitMQ</li>
+<li class="">Scheduled task: Fixed rate 10 seconds</li>
+<li class="">Batch processing: 1000-5000 messages per batch</li>
+</ul>
+<p><strong>b) ML Integration Module</strong></p>
+<ul>
+<li class=""><code>MLServiceClient</code>: REST client cho ML Service</li>
+<li class="">Endpoint: <code>POST http://ml-service:8000/predict</code></li>
+<li class="">Retry logic: 3 attempts với exponential backoff</li>
+</ul>
+<p><strong>c) Data Routing Module</strong></p>
+<ul>
+<li class=""><code>DataRoutingService</code>: Route data theo classification</li>
+<li class="">Logic: HOT → Redis, WARM/COLD → MongoDB</li>
+<li class="">Bulk operations cho MongoDB insert</li>
+</ul>
+<p><strong>d) API Module</strong></p>
+<ul>
+<li class=""><code>DataController</code>: Endpoints cho data query</li>
+<li class=""><code>SystemController</code>: Endpoints cho system management</li>
+<li class="">CORS enabled cho frontend</li>
+</ul>
+<p><strong>Ports:</strong></p>
+<ul>
+<li class="">8080: REST API</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="324-ml-service-fastapi">3.2.4 ML Service (FastAPI)<a href="#324-ml-service-fastapi" class="hash-link" aria-label="Đường dẫn trực tiếp đến 3.2.4 ML Service (FastAPI)" title="Đường dẫn trực tiếp đến 3.2.4 ML Service (FastAPI)" translate="no">​</a></h3>
+<p><strong>Công nghệ:</strong> FastAPI, scikit-learn, uvicorn</p>
+<p><strong>Models:</strong></p>
+<ul>
+<li class=""><code>temperature_model.pkl</code>: IsolationForest cho temperature anomaly</li>
+<li class=""><code>humidity_model.pkl</code>: IsolationForest cho humidity anomaly</li>
+<li class=""><code>co2_model.pkl</code>: IsolationForest cho CO2 anomaly</li>
+</ul>
+<p><strong>API Endpoints:</strong></p>
+<ul>
+<li class=""><code>POST /predict</code>: Classify single message</li>
+<li class=""><code>GET /health</code>: Health check</li>
+<li class=""><code>GET /models</code>: List loaded models</li>
+</ul>
+<p><strong>Classification Logic:</strong></p>
+<div class="language-python codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-python codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#393A34"><span class="token comment" style="color:#999988;font-style:italic"># IsolationForest returns:</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain"></span><span class="token comment" style="color:#999988;font-style:italic"># -1: Anomaly (outlier) → Label as HOT</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain"></span><span class="token comment" style="color:#999988;font-style:italic"># 1: Normal (inlier) → Label as COLD</span><br></span></code></pre></div></div>
+<p><strong>Performance:</strong></p>
+<ul>
+<li class="">Latency: &lt; 50ms per prediction</li>
+<li class="">Throughput: ~20 requests/second per model</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="325-storage-layer">3.2.5 Storage Layer<a href="#325-storage-layer" class="hash-link" aria-label="Đường dẫn trực tiếp đến 3.2.5 Storage Layer" title="Đường dẫn trực tiếp đến 3.2.5 Storage Layer" translate="no">​</a></h3>
+<p><strong>a) Redis (HOT Tier)</strong></p>
+<ul>
+<li class=""><strong>Công nghệ:</strong> Redis Alpine</li>
+<li class=""><strong>Data Structure:</strong> Hash với key pattern <code>hot:sensor:{sensorId}:{timestamp}</code></li>
+<li class=""><strong>TTL:</strong> 3600 seconds (1 giờ)</li>
+<li class=""><strong>Use Case:</strong> Real-time dashboard queries</li>
+</ul>
+<p><strong>b) MongoDB WARM</strong></p>
+<ul>
+<li class=""><strong>Database:</strong> <code>warm_db</code></li>
+<li class=""><strong>Collection:</strong> <code>city_data</code></li>
+<li class=""><strong>Indexes:</strong>
+<ul>
+<li class=""><code>timestamp</code> (TTL index, 30 days)</li>
+<li class=""><code>sensorId</code> (for query optimization)</li>
+<li class=""><code>metricType</code> (for filtering)</li>
+</ul>
+</li>
+<li class=""><strong>Use Case:</strong> Recent data analysis, trending</li>
+</ul>
+<p><strong>c) MongoDB COLD</strong></p>
+<ul>
+<li class=""><strong>Database:</strong> <code>cold_db</code></li>
+<li class=""><strong>Collection:</strong> <code>city_data</code></li>
+<li class=""><strong>Indexes:</strong> Same as WARM</li>
+<li class=""><strong>Retention:</strong> Vĩnh viễn (no TTL)</li>
+<li class=""><strong>Use Case:</strong> Historical analysis, long-term storage</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="326-frontend-nuxtjs">3.2.6 Frontend (NuxtJS)<a href="#326-frontend-nuxtjs" class="hash-link" aria-label="Đường dẫn trực tiếp đến 3.2.6 Frontend (NuxtJS)" title="Đường dẫn trực tiếp đến 3.2.6 Frontend (NuxtJS)" translate="no">​</a></h3>
+<p><strong>Công nghệ:</strong> Nuxt 3, TypeScript, TailwindCSS, Pinia, ECharts</p>
+<p><strong>Pages:</strong></p>
+<ul>
+<li class=""><code>/</code>: Dashboard với real-time charts</li>
+<li class=""><code>/data-explorer</code>: Data table với pagination</li>
+<li class=""><code>/system-control</code>: Manual sync và reset</li>
+</ul>
+<p><strong>Components:</strong></p>
+<ul>
+<li class=""><code>RealtimeLineChart</code>: ECharts line chart</li>
+<li class=""><code>StatCard</code>: Storage statistics display</li>
+<li class=""><code>NodeCard</code>: Edge node status display</li>
+</ul>
+<p><strong>State Management:</strong></p>
+<ul>
+<li class=""><code>systemStore</code>: System stats, edge nodes</li>
+<li class=""><code>dataStore</code>: City data, filters, pagination</li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="33-data-flow-architecture-kiến-trúc-luồng-dữ-liệu">3.3 Data Flow Architecture (Kiến trúc Luồng Dữ liệu)<a href="#33-data-flow-architecture-kiến-trúc-luồng-dữ-liệu" class="hash-link" aria-label="Đường dẫn trực tiếp đến 3.3 Data Flow Architecture (Kiến trúc Luồng Dữ liệu)" title="Đường dẫn trực tiếp đến 3.3 Data Flow Architecture (Kiến trúc Luồng Dữ liệu)" translate="no">​</a></h2>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="331-end-to-end-data-flow">3.3.1 End-to-End Data Flow<a href="#331-end-to-end-data-flow" class="hash-link" aria-label="Đường dẫn trực tiếp đến 3.3.1 End-to-End Data Flow" title="Đường dẫn trực tiếp đến 3.3.1 End-to-End Data Flow" translate="no">​</a></h3>
+<!-- -->
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="332-message-format">3.3.2 Message Format<a href="#332-message-format" class="hash-link" aria-label="Đường dẫn trực tiếp đến 3.3.2 Message Format" title="Đường dẫn trực tiếp đến 3.3.2 Message Format" translate="no">​</a></h3>
+<p><strong>Input Message (from Simulator):</strong></p>
+<div class="language-json codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-json codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#393A34"><span class="token punctuation" style="color:#393A34">{</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  </span><span class="token property" style="color:#36acaa">&quot;timestamp&quot;</span><span class="token operator" style="color:#393A34">:</span><span class="token plain"> </span><span class="token string" style="color:#e3116c">&quot;2025-12-04T22:57:00Z&quot;</span><span class="token punctuation" style="color:#393A34">,</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  </span><span class="token property" style="color:#36acaa">&quot;sensorId&quot;</span><span class="token operator" style="color:#393A34">:</span><span class="token plain"> </span><span class="token string" style="color:#e3116c">&quot;SENSOR_0042&quot;</span><span class="token punctuation" style="color:#393A34">,</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  </span><span class="token property" style="color:#36acaa">&quot;metricType&quot;</span><span class="token operator" style="color:#393A34">:</span><span class="token plain"> </span><span class="token string" style="color:#e3116c">&quot;temperature&quot;</span><span class="token punctuation" style="color:#393A34">,</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  </span><span class="token property" style="color:#36acaa">&quot;value&quot;</span><span class="token operator" style="color:#393A34">:</span><span class="token plain"> </span><span class="token number" style="color:#36acaa">45.5</span><span class="token punctuation" style="color:#393A34">,</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  </span><span class="token property" style="color:#36acaa">&quot;location&quot;</span><span class="token operator" style="color:#393A34">:</span><span class="token plain"> </span><span class="token punctuation" style="color:#393A34">{</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">    </span><span class="token property" style="color:#36acaa">&quot;lat&quot;</span><span class="token operator" style="color:#393A34">:</span><span class="token plain"> </span><span class="token number" style="color:#36acaa">21.0285</span><span class="token punctuation" style="color:#393A34">,</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">    </span><span class="token property" style="color:#36acaa">&quot;lng&quot;</span><span class="token operator" style="color:#393A34">:</span><span class="token plain"> </span><span class="token number" style="color:#36acaa">105.8542</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  </span><span class="token punctuation" style="color:#393A34">}</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain"></span><span class="token punctuation" style="color:#393A34">}</span><br></span></code></pre></div></div>
+<p><strong>ML Prediction Request:</strong></p>
+<div class="language-json codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-json codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#393A34"><span class="token punctuation" style="color:#393A34">{</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  </span><span class="token property" style="color:#36acaa">&quot;source&quot;</span><span class="token operator" style="color:#393A34">:</span><span class="token plain"> </span><span class="token string" style="color:#e3116c">&quot;SENSOR_0042&quot;</span><span class="token punctuation" style="color:#393A34">,</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  </span><span class="token property" style="color:#36acaa">&quot;metric_type&quot;</span><span class="token operator" style="color:#393A34">:</span><span class="token plain"> </span><span class="token string" style="color:#e3116c">&quot;temperature&quot;</span><span class="token punctuation" style="color:#393A34">,</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  </span><span class="token property" style="color:#36acaa">&quot;value&quot;</span><span class="token operator" style="color:#393A34">:</span><span class="token plain"> </span><span class="token number" style="color:#36acaa">45.5</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain"></span><span class="token punctuation" style="color:#393A34">}</span><br></span></code></pre></div></div>
+<p><strong>ML Prediction Response:</strong></p>
+<div class="language-json codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-json codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#393A34"><span class="token punctuation" style="color:#393A34">{</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  </span><span class="token property" style="color:#36acaa">&quot;label&quot;</span><span class="token operator" style="color:#393A34">:</span><span class="token plain"> </span><span class="token string" style="color:#e3116c">&quot;HOT&quot;</span><span class="token punctuation" style="color:#393A34">,</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  </span><span class="token property" style="color:#36acaa">&quot;uri&quot;</span><span class="token operator" style="color:#393A34">:</span><span class="token plain"> </span><span class="token string" style="color:#e3116c">&quot;https://schema.org/Warning&quot;</span><span class="token punctuation" style="color:#393A34">,</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  </span><span class="token property" style="color:#36acaa">&quot;desc&quot;</span><span class="token operator" style="color:#393A34">:</span><span class="token plain"> </span><span class="token string" style="color:#e3116c">&quot;Temperature Anomaly Detected&quot;</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain"></span><span class="token punctuation" style="color:#393A34">}</span><br></span></code></pre></div></div>
+<p><strong>Stored Entity (CityData):</strong></p>
+<div class="language-json codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-json codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#393A34"><span class="token punctuation" style="color:#393A34">{</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  </span><span class="token property" style="color:#36acaa">&quot;_id&quot;</span><span class="token operator" style="color:#393A34">:</span><span class="token plain"> </span><span class="token string" style="color:#e3116c">&quot;ObjectId(...)&quot;</span><span class="token punctuation" style="color:#393A34">,</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  </span><span class="token property" style="color:#36acaa">&quot;timestamp&quot;</span><span class="token operator" style="color:#393A34">:</span><span class="token plain"> </span><span class="token string" style="color:#e3116c">&quot;2025-12-04T22:57:00Z&quot;</span><span class="token punctuation" style="color:#393A34">,</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  </span><span class="token property" style="color:#36acaa">&quot;sensorId&quot;</span><span class="token operator" style="color:#393A34">:</span><span class="token plain"> </span><span class="token string" style="color:#e3116c">&quot;SENSOR_0042&quot;</span><span class="token punctuation" style="color:#393A34">,</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  </span><span class="token property" style="color:#36acaa">&quot;metricType&quot;</span><span class="token operator" style="color:#393A34">:</span><span class="token plain"> </span><span class="token string" style="color:#e3116c">&quot;temperature&quot;</span><span class="token punctuation" style="color:#393A34">,</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  </span><span class="token property" style="color:#36acaa">&quot;value&quot;</span><span class="token operator" style="color:#393A34">:</span><span class="token plain"> </span><span class="token number" style="color:#36acaa">45.5</span><span class="token punctuation" style="color:#393A34">,</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  </span><span class="token property" style="color:#36acaa">&quot;dataType&quot;</span><span class="token operator" style="color:#393A34">:</span><span class="token plain"> </span><span class="token string" style="color:#e3116c">&quot;HOT&quot;</span><span class="token punctuation" style="color:#393A34">,</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  </span><span class="token property" style="color:#36acaa">&quot;location&quot;</span><span class="token operator" style="color:#393A34">:</span><span class="token plain"> </span><span class="token punctuation" style="color:#393A34">{</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">    </span><span class="token property" style="color:#36acaa">&quot;lat&quot;</span><span class="token operator" style="color:#393A34">:</span><span class="token plain"> </span><span class="token number" style="color:#36acaa">21.0285</span><span class="token punctuation" style="color:#393A34">,</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">    </span><span class="token property" style="color:#36acaa">&quot;lng&quot;</span><span class="token operator" style="color:#393A34">:</span><span class="token plain"> </span><span class="token number" style="color:#36acaa">105.8542</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  </span><span class="token punctuation" style="color:#393A34">}</span><span class="token punctuation" style="color:#393A34">,</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  </span><span class="token property" style="color:#36acaa">&quot;createdAt&quot;</span><span class="token operator" style="color:#393A34">:</span><span class="token plain"> </span><span class="token string" style="color:#e3116c">&quot;2025-12-04T22:57:01Z&quot;</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain"></span><span class="token punctuation" style="color:#393A34">}</span><br></span></code></pre></div></div>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="34-deployment-architecture-kiến-trúc-triển-khai">3.4 Deployment Architecture (Kiến trúc Triển khai)<a href="#34-deployment-architecture-kiến-trúc-triển-khai" class="hash-link" aria-label="Đường dẫn trực tiếp đến 3.4 Deployment Architecture (Kiến trúc Triển khai)" title="Đường dẫn trực tiếp đến 3.4 Deployment Architecture (Kiến trúc Triển khai)" translate="no">​</a></h2>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="341-docker-compose-topology">3.4.1 Docker Compose Topology<a href="#341-docker-compose-topology" class="hash-link" aria-label="Đường dẫn trực tiếp đến 3.4.1 Docker Compose Topology" title="Đường dẫn trực tiếp đến 3.4.1 Docker Compose Topology" translate="no">​</a></h3>
+<!-- -->
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="342-container-dependencies">3.4.2 Container Dependencies<a href="#342-container-dependencies" class="hash-link" aria-label="Đường dẫn trực tiếp đến 3.4.2 Container Dependencies" title="Đường dẫn trực tiếp đến 3.4.2 Container Dependencies" translate="no">​</a></h3>
+<p><strong>Dependency Graph:</strong></p>
+<div class="language-text codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-text codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#393A34"><span class="token plain">smart-city-frontend</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  └─ depends_on: smart-city-backend</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">smart-city-backend</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  ├─ depends_on: rabbitmq-edge-1</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  ├─ depends_on: rabbitmq-edge-2</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  ├─ depends_on: core-redis-hot</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  ├─ depends_on: core-mongo-warm</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  ├─ depends_on: core-mongo-cold</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  └─ depends_on: smart-city-ml</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">smart-city-ml</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  └─ (no dependencies)</span><br></span></code></pre></div></div>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="343-volume-mounts">3.4.3 Volume Mounts<a href="#343-volume-mounts" class="hash-link" aria-label="Đường dẫn trực tiếp đến 3.4.3 Volume Mounts" title="Đường dẫn trực tiếp đến 3.4.3 Volume Mounts" translate="no">​</a></h3>
+<div class="language-yaml codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-yaml codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#393A34"><span class="token key atrule" style="color:#00a4db">Volumes</span><span class="token punctuation" style="color:#393A34">:</span><span class="token plain"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  </span><span class="token punctuation" style="color:#393A34">-</span><span class="token plain"> rabbitmq_edge1_data → /var/lib/rabbitmq</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  </span><span class="token punctuation" style="color:#393A34">-</span><span class="token plain"> rabbitmq_edge2_data → /var/lib/rabbitmq</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  </span><span class="token punctuation" style="color:#393A34">-</span><span class="token plain"> redis_hot_data → /data</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  </span><span class="token punctuation" style="color:#393A34">-</span><span class="token plain"> mongo_warm_data → /data/db</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  </span><span class="token punctuation" style="color:#393A34">-</span><span class="token plain"> mongo_cold_data → /data/db</span><br></span></code></pre></div></div>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="35-security-architecture-kiến-trúc-bảo-mật">3.5 Security Architecture (Kiến trúc Bảo mật)<a href="#35-security-architecture-kiến-trúc-bảo-mật" class="hash-link" aria-label="Đường dẫn trực tiếp đến 3.5 Security Architecture (Kiến trúc Bảo mật)" title="Đường dẫn trực tiếp đến 3.5 Security Architecture (Kiến trúc Bảo mật)" translate="no">​</a></h2>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="351-network-security">3.5.1 Network Security<a href="#351-network-security" class="hash-link" aria-label="Đường dẫn trực tiếp đến 3.5.1 Network Security" title="Đường dẫn trực tiếp đến 3.5.1 Network Security" translate="no">​</a></h3>
+<ul>
+<li class=""><strong>Container Isolation</strong>: Tất cả services trong Docker network riêng</li>
+<li class=""><strong>Port Exposure</strong>: Chỉ expose ports cần thiết (3000, 8080, 8000, etc.)</li>
+<li class=""><strong>No External Auth</strong>: Demo system, không có authentication (future enhancement)</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="352-data-security">3.5.2 Data Security<a href="#352-data-security" class="hash-link" aria-label="Đường dẫn trực tiếp đến 3.5.2 Data Security" title="Đường dẫn trực tiếp đến 3.5.2 Data Security" translate="no">​</a></h3>
+<ul>
+<li class=""><strong>No Encryption</strong>: Dữ liệu không mã hóa (demo purpose)</li>
+<li class=""><strong>Input Validation</strong>: Backend validate input data format</li>
+<li class=""><strong>SQL Injection Protection</strong>: Sử dụng MongoDB (NoSQL)</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="353-future-security-enhancements">3.5.3 Future Security Enhancements<a href="#353-future-security-enhancements" class="hash-link" aria-label="Đường dẫn trực tiếp đến 3.5.3 Future Security Enhancements" title="Đường dẫn trực tiếp đến 3.5.3 Future Security Enhancements" translate="no">​</a></h3>
+<ul class="contains-task-list containsTaskList_mC6p">
+<li class="task-list-item"><input type="checkbox" disabled=""> <!-- -->JWT-based authentication cho API</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> <!-- -->HTTPS/TLS cho all communication</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> <!-- -->RabbitMQ user authentication</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> <!-- -->MongoDB role-based access control</li>
+<li class="task-list-item"><input type="checkbox" disabled=""> <!-- -->Rate limiting cho API endpoints</li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="36-scalability-architecture-kiến-trúc-khả-năng-mở-rộng">3.6 Scalability Architecture (Kiến trúc Khả năng Mở rộng)<a href="#36-scalability-architecture-kiến-trúc-khả-năng-mở-rộng" class="hash-link" aria-label="Đường dẫn trực tiếp đến 3.6 Scalability Architecture (Kiến trúc Khả năng Mở rộng)" title="Đường dẫn trực tiếp đến 3.6 Scalability Architecture (Kiến trúc Khả năng Mở rộng)" translate="no">​</a></h2>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="361-horizontal-scaling-points">3.6.1 Horizontal Scaling Points<a href="#361-horizontal-scaling-points" class="hash-link" aria-label="Đường dẫn trực tiếp đến 3.6.1 Horizontal Scaling Points" title="Đường dẫn trực tiếp đến 3.6.1 Horizontal Scaling Points" translate="no">​</a></h3>
+<p><strong>RabbitMQ:</strong></p>
+<ul>
+<li class="">Thêm edge nodes: <code>rabbitmq-edge-3</code>, <code>rabbitmq-edge-4</code></li>
+<li class="">Backend tự động discover qua DNS</li>
+</ul>
+<p><strong>Backend:</strong></p>
+<ul>
+<li class="">Run multiple instances với load balancer</li>
+<li class="">Mỗi instance pull từ RabbitMQ độc lập</li>
+</ul>
+<p><strong>MongoDB:</strong></p>
+<ul>
+<li class="">Sharding cho WARM và COLD collections</li>
+<li class="">Replica sets cho high availability</li>
+</ul>
+<p><strong>Frontend:</strong></p>
+<ul>
+<li class="">Nginx load balancer cho multiple frontend instances</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="362-vertical-scaling-points">3.6.2 Vertical Scaling Points<a href="#362-vertical-scaling-points" class="hash-link" aria-label="Đường dẫn trực tiếp đến 3.6.2 Vertical Scaling Points" title="Đường dẫn trực tiếp đến 3.6.2 Vertical Scaling Points" translate="no">​</a></h3>
+<p><strong>Backend:</strong></p>
+<ul>
+<li class="">Increase batch size: <code>1000 → 10000</code></li>
+<li class="">Increase thread pool: <code>10 → 50</code></li>
+<li class="">Increase JVM heap: <code>-Xmx2g → -Xmx8g</code></li>
+</ul>
+<p><strong>ML Service:</strong></p>
+<ul>
+<li class="">Multiple worker processes với Gunicorn</li>
+<li class="">GPU acceleration cho predictions (future)</li>
+</ul>
+<p><strong>Redis:</strong></p>
+<ul>
+<li class="">Increase max memory: <code>256mb → 2gb</code></li>
+<li class="">Enable Redis Cluster mode</li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="37-performance-architecture-tối-ưu-hiệu-năng">3.7 Performance Architecture (Tối ưu Hiệu năng)<a href="#37-performance-architecture-tối-ưu-hiệu-năng" class="hash-link" aria-label="Đường dẫn trực tiếp đến 3.7 Performance Architecture (Tối ưu Hiệu năng)" title="Đường dẫn trực tiếp đến 3.7 Performance Architecture (Tối ưu Hiệu năng)" translate="no">​</a></h2>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="optimization-strategies">Optimization Strategies<a href="#optimization-strategies" class="hash-link" aria-label="Đường dẫn trực tiếp đến Optimization Strategies" title="Đường dẫn trực tiếp đến Optimization Strategies" translate="no">​</a></h3>
+<p><strong>1. Batch Processing</strong></p>
+<ul>
+<li class="">Pull 5000 messages từ RabbitMQ mỗi lần</li>
+<li class="">Bulk insert vào MongoDB (1000 docs per batch)</li>
+</ul>
+<p><strong>2. Parallel Processing</strong></p>
+<ul>
+<li class="">Multi-threaded message processing</li>
+<li class="">Concurrent ML predictions</li>
+</ul>
+<p><strong>3. Caching</strong></p>
+<ul>
+<li class="">Redis cho HOT data (in-memory access)</li>
+<li class="">Application-level cache cho system stats</li>
+</ul>
+<p><strong>4. Database Indexing</strong></p>
+<ul>
+<li class="">MongoDB indexes trên timestamp, sensorId</li>
+<li class="">Compound indexes cho complex queries</li>
+</ul>
+<p><strong>5. Connection Pooling</strong></p>
+<ul>
+<li class="">RabbitMQ connection pool</li>
+<li class="">MongoDB connection pool</li>
+<li class="">Redis connection pool</li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="38-monitoring-architecture-kiến-trúc-giám-sát">3.8 Monitoring Architecture (Kiến trúc Giám sát)<a href="#38-monitoring-architecture-kiến-trúc-giám-sát" class="hash-link" aria-label="Đường dẫn trực tiếp đến 3.8 Monitoring Architecture (Kiến trúc Giám sát)" title="Đường dẫn trực tiếp đến 3.8 Monitoring Architecture (Kiến trúc Giám sát)" translate="no">​</a></h2>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="current-monitoring">Current Monitoring<a href="#current-monitoring" class="hash-link" aria-label="Đường dẫn trực tiếp đến Current Monitoring" title="Đường dẫn trực tiếp đến Current Monitoring" translate="no">​</a></h3>
+<p><strong>Backend Metrics:</strong></p>
+<ul>
+<li class="">Data ingestion rate (incoming vs processed)</li>
+<li class="">Classification distribution (HOT/WARM/COLD counts)</li>
+<li class="">Edge node health status</li>
+</ul>
+<p><strong>Frontend Dashboard:</strong></p>
+<ul>
+<li class="">Real-time charts (ECharts)</li>
+<li class="">Auto-refresh every 2 seconds</li>
+<li class="">Node status indicators</li>
+</ul>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="future-monitoring-potential">Future Monitoring (Potential)<a href="#future-monitoring-potential" class="hash-link" aria-label="Đường dẫn trực tiếp đến Future Monitoring (Potential)" title="Đường dẫn trực tiếp đến Future Monitoring (Potential)" translate="no">​</a></h3>
+<p><strong>Prometheus + Grafana:</strong></p>
+<ul>
+<li class="">JVM metrics (heap, CPU, threads)</li>
+<li class="">MongoDB performance metrics</li>
+<li class="">RabbitMQ queue depth</li>
+<li class="">Custom business metrics</li>
+</ul>
+<p><strong>Logging Stack:</strong></p>
+<ul>
+<li class="">ELK (Elasticsearch, Logstash, Kibana)</li>
+<li class="">Centralized log aggregation</li>
+<li class="">Log retention policies</li>
+</ul></div></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Trang tài liệu"><a class="pagination-nav__link pagination-nav__link--prev" href="/SmartCity-Platform/overview/system-description"><div class="pagination-nav__sublabel">Trước</div><div class="pagination-nav__label">2. Mô Tả Hệ Thống (Overall Description)</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/SmartCity-Platform/overview/functional-requirements"><div class="pagination-nav__sublabel">Kế tiếp</div><div class="pagination-nav__label">4. Yêu Cầu Chức Năng (Functional Requirements)</div></a></nav></div></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#31-tổng-quan-kiến-trúc-architecture-overview" class="table-of-contents__link toc-highlight">3.1 Tổng quan Kiến trúc (Architecture Overview)</a><ul><li><a href="#sơ-đồ-kiến-trúc-tổng-thể" class="table-of-contents__link toc-highlight">Sơ đồ Kiến trúc Tổng thể</a></li></ul></li><li><a href="#32-component-architecture-kiến-trúc-component" class="table-of-contents__link toc-highlight">3.2 Component Architecture (Kiến trúc Component)</a><ul><li><a href="#321-data-simulator" class="table-of-contents__link toc-highlight">3.2.1 Data Simulator</a></li><li><a href="#322-edge-storage-rabbitmq" class="table-of-contents__link toc-highlight">3.2.2 Edge Storage (RabbitMQ)</a></li><li><a href="#323-backend-service-spring-boot" class="table-of-contents__link toc-highlight">3.2.3 Backend Service (Spring Boot)</a></li><li><a href="#324-ml-service-fastapi" class="table-of-contents__link toc-highlight">3.2.4 ML Service (FastAPI)</a></li><li><a href="#325-storage-layer" class="table-of-contents__link toc-highlight">3.2.5 Storage Layer</a></li><li><a href="#326-frontend-nuxtjs" class="table-of-contents__link toc-highlight">3.2.6 Frontend (NuxtJS)</a></li></ul></li><li><a href="#33-data-flow-architecture-kiến-trúc-luồng-dữ-liệu" class="table-of-contents__link toc-highlight">3.3 Data Flow Architecture (Kiến trúc Luồng Dữ liệu)</a><ul><li><a href="#331-end-to-end-data-flow" class="table-of-contents__link toc-highlight">3.3.1 End-to-End Data Flow</a></li><li><a href="#332-message-format" class="table-of-contents__link toc-highlight">3.3.2 Message Format</a></li></ul></li><li><a href="#34-deployment-architecture-kiến-trúc-triển-khai" class="table-of-contents__link toc-highlight">3.4 Deployment Architecture (Kiến trúc Triển khai)</a><ul><li><a href="#341-docker-compose-topology" class="table-of-contents__link toc-highlight">3.4.1 Docker Compose Topology</a></li><li><a href="#342-container-dependencies" class="table-of-contents__link toc-highlight">3.4.2 Container Dependencies</a></li><li><a href="#343-volume-mounts" class="table-of-contents__link toc-highlight">3.4.3 Volume Mounts</a></li></ul></li><li><a href="#35-security-architecture-kiến-trúc-bảo-mật" class="table-of-contents__link toc-highlight">3.5 Security Architecture (Kiến trúc Bảo mật)</a><ul><li><a href="#351-network-security" class="table-of-contents__link toc-highlight">3.5.1 Network Security</a></li><li><a href="#352-data-security" class="table-of-contents__link toc-highlight">3.5.2 Data Security</a></li><li><a href="#353-future-security-enhancements" class="table-of-contents__link toc-highlight">3.5.3 Future Security Enhancements</a></li></ul></li><li><a href="#36-scalability-architecture-kiến-trúc-khả-năng-mở-rộng" class="table-of-contents__link toc-highlight">3.6 Scalability Architecture (Kiến trúc Khả năng Mở rộng)</a><ul><li><a href="#361-horizontal-scaling-points" class="table-of-contents__link toc-highlight">3.6.1 Horizontal Scaling Points</a></li><li><a href="#362-vertical-scaling-points" class="table-of-contents__link toc-highlight">3.6.2 Vertical Scaling Points</a></li></ul></li><li><a href="#37-performance-architecture-tối-ưu-hiệu-năng" class="table-of-contents__link toc-highlight">3.7 Performance Architecture (Tối ưu Hiệu năng)</a><ul><li><a href="#optimization-strategies" class="table-of-contents__link toc-highlight">Optimization Strategies</a></li></ul></li><li><a href="#38-monitoring-architecture-kiến-trúc-giám-sát" class="table-of-contents__link toc-highlight">3.8 Monitoring Architecture (Kiến trúc Giám sát)</a><ul><li><a href="#current-monitoring" class="table-of-contents__link toc-highlight">Current Monitoring</a></li><li><a href="#future-monitoring-potential" class="table-of-contents__link toc-highlight">Future Monitoring (Potential)</a></li></ul></li></ul></div></div></div></div></main></div></div></div></div>
+</body>
+</html>

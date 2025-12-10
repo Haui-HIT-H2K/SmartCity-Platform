@@ -9,56 +9,65 @@ title: "Luồng Dữ Liệu (Data Flow)"
 
 ## 1. Sơ đồ Kiến trúc Tổng thể
 ```mermaid
-graph TD;
-    %% ---- 1. Nguồn ----
-    A["A. Nguồn Dữ liệu (Sensor, Camera...)"];
-    
-    %% ---- 2. Phân loại (Ý tưởng của bạn) ----
-    B("B. DNS Routing (Phân loại)");
-    
-    %% ---- 3. Lớp Đệm (Ý tưởng của bạn) ----
-    subgraph "Lớp Đệm (Edge Storage)"
-        C["C1. Edge Nóng"];
-        D["C2. Edge Ấm"];
-        E["C3. Edge Lạnh"];
+graph LR
+    subgraph DataGen["📡 Data Generation"]
+        A["🐍 Python IoT<br/>Simulator"]
     end
 
-    %% ---- 4. Logic Backend (Ý tưởng của bạn) ----
-    F["F. Smart Agent (Backend Logic)"];
-
-    %% ---- 5. Lớp Lõi (Yêu cầu Đề bài) ----
-    subgraph "Lớp Lõi (Hệ thống Server)"
-        G["G. Lớp Nóng (Orion-LD Broker)"];
-        H["H. Lớp Ấm (TimescaleDB)"];
-        I["I. Lớp Lạnh (MinIO)"];
+    subgraph EdgeStorage["💾 Edge Storage"]
+        B["🐰 RabbitMQ<br/>Node 1"]
+        L["🐰 RabbitMQ<br/>Node 2"]
     end
 
-    %% ---- 6. Ứng dụng Demo ----
-    J["J. Ứng dụng Demo (GreenX)"];
+    subgraph CoreProcessing["⚙️ Core Processing"]
+        C["☕ Spring Boot<br/>Backend"]
+    end
 
-    %% ---- ĐỊNH NGHĨA LUỒNG DỮ LIỆU ----
-    
-    %% Luồng 1+2: PUSH & Route
-    A -- "PUSH Raw Data" --> B;
-    B -- "Route 'Nóng'" --> C;
-    B -- "Route 'Ấm'" --> D;
-    B -- "Route 'Lạnh'" --> E;
+    subgraph MLLayer["🤖 ML Classification"]
+        D["🧠 FastAPI<br/>ML Service"]
+    end
 
-    %% Luồng 3: PULL (Ý tưởng của bạn)
-    F -- "PULL (Ưu tiên 1)" --> C;
-    F -- "PULL (Ưu tiên 2)" --> D;
-    F -- "PULL (Ưu tiên 3)" --> E;
-    
-    %% Luồng 4: Xử lý NGSI-LD (Yêu cầu Đề bài)
-    F -- "PUSH Chuẩn hóa (Nóng/Ấm)" --> G;
-    G -- "Auto-subscribe (QuantumLeap)" --> H;
-    
-    %% Luồng 5: Xử lý Lạnh (Ý tưởng của bạn)
-    F -- "PUSH Dữ liệu Lạnh" --> I;
+    subgraph TieredStorage["🗄️ Tiered Storage"]
+        E["🔥 Redis<br/>HOT"]
+        K["📦 MongoDB<br/>WARM"]
+        F["❄️ MongoDB<br/>COLD"]
+    end
 
-    %% Luồng 6: Ứng dụng
-    J -- "Query Real-time (NGSI-LD)" --> G;
-    J -- "Query Lịch sử" --> H;
+    subgraph Presentation["🖥️ Presentation"]
+        G["🌐 NuxtJS<br/>Frontend"]
+    end
+
+    %% Data Flow: Generation → Edge
+    A -->|"Publish"| B
+    A -->|"Publish"| L
+
+    %% Data Flow: Edge → Backend
+    B -->|"Pull Batch"| C
+    L -->|"Pull Batch"| C
+
+    %% ML Classification Flow (2 separate arrows)
+    C -->|"📤 Send CLassically Data"| D
+    D -->|"📥 HOT/WARM/COLD"| C
+
+    %% Tiered Storage Routing
+    C -->|"🔥 HOT"| E
+    C -->|"📦 WARM"| K
+    C -->|"❄️ COLD"| F
+
+    %% API Layer
+    C -->|"REST API"| G
+
+
+    %% Styling
+    style A fill:#3776AB,stroke:#FFD43B,stroke-width:2px,color:#fff
+    style B fill:#FF6600,stroke:#333,stroke-width:2px,color:#fff
+    style L fill:#FF6600,stroke:#333,stroke-width:2px,color:#fff
+    style C fill:#6DB33F,stroke:#333,stroke-width:2px,color:#fff
+    style D fill:#009688,stroke:#333,stroke-width:2px,color:#fff
+    style E fill:#DC382D,stroke:#333,stroke-width:2px,color:#fff
+    style K fill:#4DB33D,stroke:#333,stroke-width:2px,color:#fff
+    style F fill:#4169E1,stroke:#333,stroke-width:2px,color:#fff
+    style G fill:#00DC82,stroke:#333,stroke-width:2px,color:#000
 ```
 
 

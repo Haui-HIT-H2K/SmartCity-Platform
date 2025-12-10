@@ -302,7 +302,7 @@ Camera events được map trực tiếp theo bảng:
 | Resource | Usage |
 |----------|-------|
 | Memory | ~150-200MB |
-| CPU | <10% at 20 req/s |
+| CPU | `<10%` at 20 req/s |
 | Startup | ~2-3 seconds |
 
 ---
@@ -548,6 +548,6 @@ class RetrainingWorker(Thread):
 
 | Metric | Target | Achieved |
 |--------|--------|----------|
-| Latency | <50ms | ~15ms ✅ |
+| Latency | `<50ms` | ~15ms ✅ |
 | Models | 3 | 3 ✅ |
 | Uptime | 99% | 99%+ ✅ |
