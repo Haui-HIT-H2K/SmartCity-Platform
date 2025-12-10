@@ -122,36 +122,27 @@ async def predict(input_data: PredictionInput):
         # IsolationForest: 1 = Normal, -1 = Anomaly
         is_normal = prediction[0] == 1
         
-        # NEW: Get anomaly score for confidence calculation
+        # Get anomaly score for logging/metrics
         # IsolationForest score_samples: more negative = more anomalous
         anomaly_score = model.score_samples([[input_data.value]])[0]
         
-        # NEW: Calculate confidence score (0-1 range)
+        # Calculate confidence score (0-1 range) for logging purposes
         # Using sigmoid transformation of anomaly score
-        # Higher score = more normal = higher confidence
-        confidence = 1 / (1 + np.exp(-anomaly_score * 2))  # Scale factor 2 for better range
+        confidence = 1 / (1 + np.exp(-anomaly_score * 2))
         
-        # NEW: Determine label based on confidence threshold
-        if confidence > 0.8:
-            # High confidence - use original prediction
-            if is_normal:
-                label = "COLD"
-                uri = "https://schema.org/SafeCondition"
-                desc = f"Normal {metric_type.capitalize()} Reading"
-            else:
-                label = "HOT"
-                uri = "https://schema.org/Warning"
-                desc = f"{metric_type.capitalize()} Anomaly Detected"
-        elif confidence > 0.5:
-            # Medium confidence - uncertain (treat as COLD for backward compat)
+        # FIXED LOGIC: Primary classification based on anomaly detection
+        # Anomaly (is_normal=False) → HOT (critical data)
+        # Normal (is_normal=True) → COLD (routine data)
+        if is_normal:
+            # Normal reading - classify as COLD
             label = "COLD"
-            uri = "https://schema.org/EventStatusType"
-            desc = f"{metric_type.capitalize()} - Uncertain Classification"
+            uri = "https://schema.org/SafeCondition"
+            desc = f"Normal {metric_type.capitalize()} Reading"
         else:
-            # Low confidence - unknown/out-of-distribution (treat as COLD for backward compat)
-            label = "COLD"
-            uri = "https://schema.org/Thing"
-            desc = f"{metric_type.capitalize()} - Unknown Pattern Detected"
+            # Anomaly detected - classify as HOT
+            label = "HOT"
+            uri = "https://schema.org/Warning"
+            desc = f"{metric_type.capitalize()} Anomaly Detected (score: {anomaly_score:.3f})"
         
         # NEW: Async log unknown/uncertain events (non-blocking)
         if confidence <= 0.8 and unknown_db is not None:
@@ -237,17 +228,12 @@ async def predict_batch(input_data: BatchPredictionInput):
             prediction = model.predict([[value]])
             is_normal = prediction[0] == 1
             
-            # Get anomaly score for confidence
+            # Get anomaly score for logging
             anomaly_score = model.score_samples([[value]])[0]
-            confidence = 1 / (1 + np.exp(-anomaly_score * 2))
             
-            # Determine label based on confidence and prediction
-            if confidence > 0.8:
-                label = "COLD" if is_normal else "HOT"
-            elif confidence > 0.5:
-                label = "COLD"  # Uncertain -> default to COLD
-            else:
-                label = "COLD"  # Unknown -> default to COLD
+            # FIXED: Primary classification based on anomaly detection
+            # Anomaly (is_normal=False) → HOT, Normal → COLD
+            label = "COLD" if is_normal else "HOT"
                 
         except Exception as e:
             logger.error(f"Batch predict error for {metric_type}={value}: {e}")
