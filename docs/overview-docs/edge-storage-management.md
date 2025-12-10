@@ -387,6 +387,6 @@ app:
 
 ## References
 
-- [Backend API Reference](../backend-docs/api-reference#edge-storage-management-endpoints)
-- [Frontend Documentation](../frontend-docs/intro)
+- [Backend API Reference](/backend/api-reference#edge-storage-management-endpoints)
+- [Frontend Documentation](/frontend/intro)
 - [System Architecture](./architecture)
