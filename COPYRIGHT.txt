@@ -68,7 +68,7 @@ INFRASTRUCTURE SERVICES (Docker Images)
 ================================================================================================================================================================================
 RabbitMQ                        3              MPL-2.0            Open source message broker software                             https://www.rabbitmq.com
 Redis                           alpine         BSD-3-Clause       In-memory data structure store                                  https://redis.io
-MongoDB                         7.0            SSPL               Document-oriented NoSQL database                                https://www.mongodb.com
+MongoDB Community Server        4.0.0          AGPLv3             Document-oriented NoSQL database                                https://www.mongodb.com
 Mongo Express                   (latest)       MIT                Web-based MongoDB admin interface                               https://github.com/mongo-express/mongo-express
 
 ================================================================================================================================================================================
