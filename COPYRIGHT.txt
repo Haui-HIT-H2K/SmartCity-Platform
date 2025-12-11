@@ -88,8 +88,9 @@ Faker                           20.1.0         MIT                Python package
 ================================================================================================================================================================================
 INFRASTRUCTURE SERVICES (Docker Images)
 ================================================================================================================================================================================
-RabbitMQ (Alpine)               3              MPL-2.0            Open source message broker software                             https://www.rabbitmq.com
-Redis (Alpine)                  alpine         BSD-3-Clause       In-memory data structure store                                  https://redis.io
+RabbitMQ                        3              MPL-2.0            Open source message broker software                             https://www.rabbitmq.com
+Redis                           alpine         BSD-3-Clause       In-memory data structure store                                  https://redis.io
+MongoDB Community Server        4.0.0          AGPLv3             Document-oriented NoSQL database                                https://www.mongodb.com
 Mongo Express                   (latest)       MIT                Web-based MongoDB admin interface                               https://github.com/mongo-express/mongo-express
 Docker                          (latest)       Apache-2.0         Platform for developing, shipping, and running applications     https://www.docker.com
 Docker Compose                  (latest)       Apache-2.0         Tool for defining multi-container Docker applications           https://docs.docker.com/compose
