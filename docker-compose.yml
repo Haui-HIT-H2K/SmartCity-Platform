@@ -58,10 +58,10 @@ services:
 
   # 2. WARM STORAGE (MongoDB)
   core-mongo-warm:
-    image: mongo:7.0
+    image: mongo:4.0
     container_name: core-mongo-warm
     restart: always
-    command: ["mongod", "--wiredTigerCacheSizeGB", "0.5", "--bind_ip_all"]
+    command: ["mongod", "--bind_ip_all"]
     environment:
       MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INITDB_ROOT_PASSWORD: password123
@@ -73,7 +73,7 @@ services:
     networks:
       - h2k-network
     healthcheck:
-      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      test: ["CMD", "mongo", "--quiet", "--eval", "db.adminCommand('ping').ok"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -81,10 +81,10 @@ services:
 
   # 3. COLD STORAGE (MongoDB)
   core-mongo-cold:
-    image: mongo:7.0
+    image: mongo:4.0
     container_name: core-mongo-cold
     restart: always
-    command: ["mongod", "--wiredTigerCacheSizeGB", "0.5", "--bind_ip_all"]
+    command: ["mongod", "--bind_ip_all"]
     environment:
       MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INITDB_ROOT_PASSWORD: password123
@@ -96,7 +96,7 @@ services:
     networks:
       - h2k-network
     healthcheck:
-      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      test: ["CMD", "mongo", "--quiet", "--eval", "db.adminCommand('ping').ok"]
       interval: 10s
       timeout: 5s
       retries: 5
